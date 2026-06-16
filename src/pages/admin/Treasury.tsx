@@ -30,7 +30,17 @@ export default function Treasury() {
     );
   }
 
-  const byType = (type: string) => treasuryOverview.wallets.filter((w) => w.walletType === type);
+  const to = treasuryOverview ?? {};
+  const tWallets = to.wallets ?? [];
+  const tNetworks = to.networks ?? [];
+  const tMovements = to.recentMovements ?? [];
+  const tSnapshots = to.snapshots ?? [];
+  const tLiquidity = to.totalLiquidity ?? 0;
+  const tHot = to.hotTotal ?? 0;
+  const tWarm = to.warmTotal ?? 0;
+  const tCold = to.coldTotal ?? 0;
+
+  const byType = (type: string) => tWallets.filter((w) => w.walletType === type);
 
   return (
     <div className="space-y-6">
@@ -56,7 +66,7 @@ export default function Treasury() {
               <Database size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(treasuryOverview.totalLiquidity / 1_000_000).toFixed(1)}M</p>
+              <p className="text-2xl font-bold text-text-primary">${(tLiquidity / 1_000_000).toFixed(1)}M</p>
               <p className="text-xs text-text-secondary">Total Liquidity</p>
             </div>
           </div>
@@ -67,7 +77,7 @@ export default function Treasury() {
               <Thermometer size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(treasuryOverview.hotTotal / 1_000_000).toFixed(2)}M</p>
+              <p className="text-2xl font-bold text-text-primary">${(tHot / 1_000_000).toFixed(2)}M</p>
               <p className="text-xs text-danger font-medium">Hot Wallet</p>
             </div>
           </div>
@@ -78,7 +88,7 @@ export default function Treasury() {
               <Wallet size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(treasuryOverview.warmTotal / 1_000_000).toFixed(2)}M</p>
+              <p className="text-2xl font-bold text-text-primary">${(tWarm / 1_000_000).toFixed(2)}M</p>
               <p className="text-xs text-warning font-medium">Warm Wallet</p>
             </div>
           </div>
@@ -89,7 +99,7 @@ export default function Treasury() {
               <Shield size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(treasuryOverview.coldTotal / 1_000_000).toFixed(2)}M</p>
+              <p className="text-2xl font-bold text-text-primary">${(tCold / 1_000_000).toFixed(2)}M</p>
               <p className="text-xs text-secondary font-medium">Cold Storage</p>
             </div>
           </div>
@@ -103,9 +113,9 @@ export default function Treasury() {
           <h2 className="text-lg font-bold text-text-primary">Network Allocation</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {treasuryOverview.networks.map((network) => {
-            const netWallets = treasuryOverview.wallets.filter((w) => w.network === network);
-            const netTotal = netWallets.reduce((s, w) => s + w.balance, 0);
+          {tNetworks.map((network) => {
+            const netWallets = tWallets.filter((w) => w.network === network);
+            const netTotal = netWallets.reduce((s, w) => s + (w.balance ?? 0), 0) || 1;
             return (
               <div key={network} className="bg-card border border-border rounded-lg p-4">
                 <p className="text-sm font-bold text-text-primary mb-3">{network}</p>
@@ -164,8 +174,8 @@ export default function Treasury() {
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="text-text-primary font-mono">${w.balance.toLocaleString()}</p>
-                      {w.thresholdMin && (
+                      <p className="text-text-primary font-mono">${(w.balance ?? 0).toLocaleString()}</p>
+                      {w.thresholdMin != null && (
                         <p className="text-[9px] text-text-subtle">min: ${w.thresholdMin.toLocaleString()}</p>
                       )}
                     </div>
@@ -192,7 +202,7 @@ export default function Treasury() {
               </div>
             )}
             <div className="grid grid-cols-3 gap-2">
-              {treasuryOverview.networks.map((network) => (
+              {tNetworks.map((network) => (
                 <button
                   key={network}
                   onClick={() => triggerRebalance(network)}
@@ -212,10 +222,10 @@ export default function Treasury() {
             <h2 className="text-lg font-bold text-text-primary">Recent Movements</h2>
           </div>
           <div className="space-y-2">
-            {treasuryOverview.recentMovements.length === 0 ? (
+            {tMovements.length === 0 ? (
               <p className="text-text-subtle text-sm py-8 text-center">No recent movements</p>
             ) : (
-              treasuryOverview.recentMovements.map((m) => (
+              tMovements.map((m) => (
                 <div key={m.id} className="flex items-start gap-3 pb-2 border-b border-border last:border-0">
                   <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${m.status === "COMPLETED" ? "bg-primary" : "bg-warning"}`} />
                   <div className="flex-1 min-w-0">
@@ -227,7 +237,7 @@ export default function Treasury() {
                         {m.status}
                       </span>
                     </div>
-                    <p className="text-sm text-text-primary font-medium">${m.amount.toLocaleString()}</p>
+                    <p className="text-sm text-text-primary font-medium">${(m.amount ?? 0).toLocaleString()}</p>
                     <p className="text-[10px] text-text-subtle">{m.reason || m.network}</p>
                   </div>
                   <span className="text-[10px] text-text-subtle shrink-0">
@@ -247,13 +257,13 @@ export default function Treasury() {
           <h2 className="text-lg font-bold text-text-primary">Liquidity Trend (7 days)</h2>
         </div>
         <div className="space-y-2">
-          {treasuryOverview.snapshots.map((s) => (
+          {tSnapshots.map((s) => (
             <div key={s.id} className="flex items-center gap-4 py-1.5 border-b border-border last:border-0">
               <span className="text-xs text-text-subtle w-24">{new Date(s.createdAt).toLocaleDateString()}</span>
               <div className="flex-1 h-4 rounded-full bg-card-alt overflow-hidden flex">
-                <div className="bg-danger h-full transition-all" style={{ width: `${(s.hotBalance / s.totalBalance) * 100}%` }} title={`Hot: ${s.hotBalance}`} />
-                <div className="bg-warning h-full transition-all" style={{ width: `${(s.warmBalance / s.totalBalance) * 100}%` }} title={`Warm: ${s.warmBalance}`} />
-                <div className="bg-secondary h-full transition-all" style={{ width: `${(s.coldBalance / s.totalBalance) * 100}%` }} title={`Cold: ${s.coldBalance}`} />
+                <div className="bg-danger h-full transition-all" style={{ width: `${((s.hotBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Hot: ${s.hotBalance}`} />
+                <div className="bg-warning h-full transition-all" style={{ width: `${((s.warmBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Warm: ${s.warmBalance}`} />
+                <div className="bg-secondary h-full transition-all" style={{ width: `${((s.coldBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Cold: ${s.coldBalance}`} />
               </div>
               <span className="text-xs text-text-primary font-mono w-24 text-right">${(s.totalBalance / 1_000_000).toFixed(2)}M</span>
             </div>

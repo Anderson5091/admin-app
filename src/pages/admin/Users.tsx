@@ -6,15 +6,24 @@ import Button from "../../components/ui/Button";
 import { Search } from "lucide-react";
 
 export default function Users() {
-  const { users, fetchUsers, toggleUserStatus } = useAdminStore();
+  const { users, fetchUsers, toggleUserStatus, loading } = useAdminStore();
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const filtered = users.filter(
-    (u) => u.email.toLowerCase().includes(search.toLowerCase()) || u.name.toLowerCase().includes(search.toLowerCase())
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  const safeUsers = users ?? [];
+  const filtered = safeUsers.filter(
+    (u) => (u.email ?? "").toLowerCase().includes(search.toLowerCase()) || (u.name ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
   const statusBadge = (status: string) => {
@@ -67,7 +76,7 @@ export default function Users() {
                   <td className="px-4 py-3">{statusBadge(user.status)}</td>
                   <td className="px-4 py-3"><Badge variant="info">Tier {user.kycTier}</Badge></td>
                   <td className="px-4 py-3 text-text-primary">{user.totalTransfers}</td>
-                  <td className="px-4 py-3 text-text-primary">${user.totalVolume.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-text-primary">${(user.totalVolume ?? 0).toLocaleString()}</td>
                   <td className="px-4 py-3 text-right">
                     {user.status === "ACTIVE" ? (
                       <Button size="sm" variant="danger" onClick={() => toggleUserStatus(user.id)}>Freeze</Button>

@@ -27,15 +27,16 @@ export default function Dashboard() {
     );
   }
 
+  const d = dashboard ?? {};
   const kpis = [
-    { label: "Total Users", value: dashboard.totalUsers.toLocaleString(), icon: Users, color: "text-secondary bg-secondary-dim" },
-    { label: "Active Users", value: dashboard.activeUsers.toLocaleString(), icon: Users, color: "text-primary bg-primary-dim" },
-    { label: "Total Transfers", value: (dashboard.totalVolume / 1_000_000).toFixed(1) + "M", icon: ArrowUpDown, color: "text-violet-400 bg-violet-900/30" },
-    { label: "Volume (USDT)", value: "$" + (dashboard.totalVolume / 1_000_000).toFixed(1) + "M", icon: ArrowUpDown, color: "text-primary bg-primary-dim" },
-    { label: "Pending KYC", value: dashboard.pendingKyc, icon: Shield, color: "text-warning bg-warning-dim" },
-    { label: "Failed Payouts", value: dashboard.failedPayouts, icon: AlertTriangle, color: "text-danger bg-danger-dim" },
-    { label: "Open Cases", value: dashboard.openCases, icon: Scale, color: "text-warning bg-warning-dim" },
-    { label: "Fraud Alerts", value: dashboard.fraudAlerts, icon: Ban, color: "text-danger bg-danger-dim" },
+    { label: "Total Users", value: (d.totalUsers ?? 0).toLocaleString(), icon: Users, color: "text-secondary bg-secondary-dim" },
+    { label: "Active Users", value: (d.activeUsers ?? 0).toLocaleString(), icon: Users, color: "text-primary bg-primary-dim" },
+    { label: "Total Transfers", value: ((d.totalVolume ?? 0) / 1_000_000).toFixed(1) + "M", icon: ArrowUpDown, color: "text-violet-400 bg-violet-900/30" },
+    { label: "Volume (USDT)", value: "$" + ((d.totalVolume ?? 0) / 1_000_000).toFixed(1) + "M", icon: ArrowUpDown, color: "text-primary bg-primary-dim" },
+    { label: "Pending KYC", value: d.pendingKyc ?? 0, icon: Shield, color: "text-warning bg-warning-dim" },
+    { label: "Failed Payouts", value: d.failedPayouts ?? 0, icon: AlertTriangle, color: "text-danger bg-danger-dim" },
+    { label: "Open Cases", value: d.openCases ?? 0, icon: Scale, color: "text-warning bg-warning-dim" },
+    { label: "Fraud Alerts", value: d.fraudAlerts ?? 0, icon: Ban, color: "text-danger bg-danger-dim" },
   ];
 
   const severityColor = (s: string) => {
@@ -96,7 +97,7 @@ export default function Dashboard() {
             <h2 className="text-lg font-bold text-text-primary">Active Alerts</h2>
           </div>
           <div className="space-y-2">
-            {dashboard.alerts.map((alert) => (
+            {(d.alerts ?? []).map((alert) => (
               <div key={alert.id} className={`border-l-4 pl-3 py-2 rounded-r-lg ${severityColor(alert.severity)}`}>
                 <div className="flex items-center gap-2">
                   <AlertCircle size={12} className={severityIcon(alert.severity)} />
@@ -152,7 +153,7 @@ export default function Dashboard() {
             <h2 className="text-lg font-bold text-text-primary">Recent Activity</h2>
           </div>
           <div className="space-y-3">
-            {dashboard.recentActivity.map((item) => (
+            {(d.recentActivity ?? []).map((item) => (
               <div key={item.id} className="flex items-start gap-3 pb-3 border-b border-border last:border-0">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0" />
                 <div className="flex-1 min-w-0">
