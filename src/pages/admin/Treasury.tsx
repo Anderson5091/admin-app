@@ -40,6 +40,8 @@ export default function Treasury() {
     );
   }
 
+  const fmt = (n: number) => n < 1_000_000 ? `$${n.toLocaleString()}` : `$${(n / 1_000_000).toFixed(2)}M`;
+
   const to = treasuryOverview ?? {};
   const tWallets = to.wallets ?? [];
   const tNetworks = to.networks ?? [];
@@ -76,7 +78,7 @@ export default function Treasury() {
               <Database size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(tLiquidity / 1_000_000).toFixed(1)}M</p>
+              <p className="text-2xl font-bold text-text-primary">{fmt(tLiquidity)}</p>
               <p className="text-xs text-text-secondary">Total Liquidity</p>
             </div>
           </div>
@@ -87,7 +89,7 @@ export default function Treasury() {
               <Thermometer size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(tHot / 1_000_000).toFixed(2)}M</p>
+              <p className="text-2xl font-bold text-text-primary">{fmt(tHot)}</p>
               <p className="text-xs text-danger font-medium">Hot Wallet</p>
             </div>
           </div>
@@ -98,7 +100,7 @@ export default function Treasury() {
               <Wallet size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(tWarm / 1_000_000).toFixed(2)}M</p>
+              <p className="text-2xl font-bold text-text-primary">{fmt(tWarm)}</p>
               <p className="text-xs text-warning font-medium">Warm Wallet</p>
             </div>
           </div>
@@ -109,7 +111,7 @@ export default function Treasury() {
               <Shield size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-primary">${(tCold / 1_000_000).toFixed(2)}M</p>
+              <p className="text-2xl font-bold text-text-primary">{fmt(tCold)}</p>
               <p className="text-xs text-secondary font-medium">Cold Storage</p>
             </div>
           </div>
@@ -129,7 +131,7 @@ export default function Treasury() {
             return (
               <div key={network} className="bg-card border border-border rounded-lg p-4">
                 <p className="text-sm font-bold text-text-primary mb-3">{network}</p>
-                <p className="text-2xl font-bold text-primary mb-3">${(netTotal / 1_000_000).toFixed(2)}M</p>
+                <p className="text-2xl font-bold text-primary mb-3">{fmt(netTotal)}</p>
                 <div className="space-y-2">
                   {(["HOT", "WARM", "COLD"] as const).map((type) => {
                     const wallet = netWallets.find((w) => w.walletType === type);
@@ -145,7 +147,7 @@ export default function Treasury() {
                             <div className={`h-full rounded-full ${type === "HOT" ? "bg-danger" : type === "WARM" ? "bg-warning" : "bg-secondary"}`}
                               style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-text-secondary w-10 text-right">${(wallet.balance / 1_000_000).toFixed(2)}M</span>
+                          <span className="text-text-secondary w-auto text-right">{fmt(wallet.balance)}</span>
                         </div>
                       </div>
                     );
@@ -287,7 +289,7 @@ export default function Treasury() {
                 <div className="bg-warning h-full transition-all" style={{ width: `${((s.warmBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Warm: ${s.warmBalance}`} />
                 <div className="bg-secondary h-full transition-all" style={{ width: `${((s.coldBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Cold: ${s.coldBalance}`} />
               </div>
-              <span className="text-xs text-text-primary font-mono w-24 text-right">${(s.totalBalance / 1_000_000).toFixed(2)}M</span>
+              <span className="text-xs text-text-primary font-mono w-24 text-right">{fmt(s.totalBalance)}</span>
             </div>
           ))}
           <div className="flex items-center gap-4 pt-2 text-[10px] text-text-subtle">
