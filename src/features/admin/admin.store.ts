@@ -76,8 +76,12 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   fetchUsers: async () => {
-    const users = await AdminApi.getUsers();
-    set({ users });
+    try {
+      const users = await AdminApi.getUsers();
+      set({ users });
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    }
   },
 
   toggleUserStatus: async (userId: string) => {
@@ -210,8 +214,13 @@ export const useAdminStore = create<AdminState>((set) => ({
 
   fetchTreasuryOverview: async () => {
     set({ treasuryLoading: true });
-    const treasuryOverview = await AdminApi.getTreasuryOverview();
-    set({ treasuryOverview, treasuryLoading: false });
+    try {
+      const treasuryOverview = await AdminApi.getTreasuryOverview();
+      set({ treasuryOverview, treasuryLoading: false });
+    } catch (err) {
+      console.error("Failed to fetch treasury overview:", err);
+      set({ treasuryLoading: false });
+    }
   },
 
   triggerRebalance: async (network: string) => {

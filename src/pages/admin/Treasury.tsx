@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
-import { Wallet, ArrowUpDown, AlertTriangle, RefreshCw, Thermometer, Database, Shield } from "lucide-react";
+import { Wallet, ArrowUpDown, AlertTriangle, RefreshCw, Thermometer, Database, Shield, Copy } from "lucide-react";
 
 const walletTypeColors: Record<string, string> = {
   HOT: "text-danger bg-danger-dim border-danger/30",
@@ -22,10 +22,20 @@ export default function Treasury() {
     fetchTreasuryOverview();
   }, [fetchTreasuryOverview]);
 
-  if (treasuryLoading || !treasuryOverview) {
+  if (treasuryLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!treasuryOverview) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-text-secondary">
+        <AlertTriangle size={32} className="mb-2" />
+        <p className="text-sm">Failed to load treasury data</p>
+        <button onClick={() => fetchTreasuryOverview()} className="mt-3 text-xs text-primary hover:underline">Retry</button>
       </div>
     );
   }
@@ -167,13 +177,25 @@ export default function Treasury() {
               <div className="space-y-2">
                 {byType(type).map((w) => (
                   <div key={w.id} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="text-text-secondary font-mono">{w.network}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-text-secondary font-mono shrink-0">{w.network}</span>
+                      {w.address ? (
+                        <button
+                          onClick={() => navigator.clipboard.writeText(w.address)}
+                          className="text-[9px] font-mono text-text-subtle hover:text-text-primary truncate max-w-[120px] flex items-center gap-0.5"
+                          title={w.address}
+                        >
+                          {w.address.slice(0, 6)}...{w.address.slice(-4)}
+                          <Copy size={8} className="shrink-0" />
+                        </button>
+                      ) : (
+                        <span className="text-[9px] text-text-subtle">no address</span>
+                      )}
                       {w.thresholdMin && w.balance < w.thresholdMin && (
-                        <AlertTriangle size={10} className="text-danger" />
+                        <AlertTriangle size={10} className="text-danger shrink-0" />
                       )}
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <p className="text-text-primary font-mono">${(w.balance ?? 0).toLocaleString()}</p>
                       {w.thresholdMin != null && (
                         <p className="text-[9px] text-text-subtle">min: ${w.thresholdMin.toLocaleString()}</p>
