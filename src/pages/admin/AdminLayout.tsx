@@ -53,6 +53,8 @@ const roleColors: Record<string, string> = {
   COMPLIANCE: "text-blue-400 bg-blue-900/30",
   OPS: "text-warning bg-warning-dim",
   TREASURY: "text-primary bg-primary-dim",
+  AGENT_PARTNER: "text-violet-400 bg-violet-900/30",
+  AGENT_INTERNAL: "text-emerald-400 bg-emerald-900/30",
 };
 
 export default function AdminLayout() {
@@ -104,7 +106,9 @@ export default function AdminLayout() {
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xs">A</div>
               <div className="flex flex-col">
-                <span className="font-bold text-text-primary text-sm leading-tight">Admin Panel</span>
+                <span className="font-bold text-text-primary text-sm leading-tight">
+                  {profile?.role === "AGENT_PARTNER" || profile?.role === "AGENT_INTERNAL" ? "Agent Panel" : "Admin Panel"}
+                </span>
                 {profile && (
                   <span className={`text-[9px] font-semibold uppercase tracking-wider ${roleColors[profile.role]?.split(" ")[0] || "text-text-secondary"}`}>
                     {profile.role}

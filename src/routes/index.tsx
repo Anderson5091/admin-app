@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
 import AdminLayout from "../pages/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
+import AgentDashboard from "../pages/admin/AgentDashboard";
 import LiveFeed from "../pages/admin/LiveFeed";
 import Users from "../pages/admin/Users";
 import KycReview from "../pages/admin/KycReview";
@@ -32,6 +33,15 @@ function ProtectedRoute({ children, requiredPath }: { children: React.ReactNode;
   return <>{children}</>;
 }
 
+function IndexPage() {
+  const profile = useAuthStore.getState().profile;
+  const role = profile?.role;
+  if (role === "AGENT_PARTNER" || role === "AGENT_INTERNAL") {
+    return <ProtectedRoute requiredPath="/"><AgentDashboard /></ProtectedRoute>;
+  }
+  return <ProtectedRoute requiredPath="/"><Dashboard /></ProtectedRoute>;
+}
+
 export const router = createBrowserRouter([
   {
     path: "/login",
@@ -45,7 +55,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <ProtectedRoute requiredPath="/"><Dashboard /></ProtectedRoute> },
+      { index: true, element: <IndexPage /> },
       { path: "live", element: <ProtectedRoute requiredPath="/live"><LiveFeed /></ProtectedRoute> },
       { path: "users", element: <ProtectedRoute requiredPath="/users"><Users /></ProtectedRoute> },
       { path: "kyc", element: <ProtectedRoute requiredPath="/kyc"><KycReview /></ProtectedRoute> },

@@ -17,7 +17,7 @@ export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
   "/payouts": ["SUPER_ADMIN", "OPS"],
   "/cases": ["SUPER_ADMIN", "COMPLIANCE"],
   "/fraud": ["SUPER_ADMIN", "COMPLIANCE"],
-  "/": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY", "AGENT_PARTNER", "AGENT_INTERNAL"],
   "/live": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
   "/system": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
   "/notifications": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
