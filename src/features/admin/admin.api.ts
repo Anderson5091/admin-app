@@ -330,9 +330,9 @@ export const AdminApi = {
   async getAgents(): Promise<Agent[]> {
     if (USE_ADMIN_MOCK) {
       return [
-        { id: "agt_1", email: "partner1@quicksend.com", fullName: "John Partner", type: "PARTNER", status: "ACTIVE", kpiRating: 85, totalRewards: 12500, totalTransactions: 342, baseTreasuryBalance: 50000, commissionBalance: 3200, createdAt: new Date(Date.now() - 86400000 * 30).toISOString() },
-        { id: "agt_2", email: "internal1@quicksend.com", fullName: "Jane Internal", type: "INTERNAL", status: "ACTIVE", kpiRating: 92, totalRewards: 8500, totalTransactions: 218, baseTreasuryBalance: 0, commissionBalance: 1800, createdAt: new Date(Date.now() - 86400000 * 25).toISOString() },
-        { id: "agt_3", email: "partner2@quicksend.com", fullName: "Bob Partner", type: "PARTNER", status: "SUSPENDED", kpiRating: 45, totalRewards: 2300, totalTransactions: 89, baseTreasuryBalance: 12000, commissionBalance: 450, createdAt: new Date(Date.now() - 86400000 * 15).toISOString() },
+        { id: "agt_1", email: "partner1@quicksend.com", fullName: "John Partner", type: "PARTNER", status: "ACTIVE", kpiRating: 85, totalRewards: 12500, totalTransactions: 342, baseTreasuryBalance: 50000, commissionBalance: 3200, commissionLedgerBalance: 850, createdAt: new Date(Date.now() - 86400000 * 30).toISOString() },
+        { id: "agt_2", email: "internal1@quicksend.com", fullName: "Jane Internal", type: "INTERNAL", status: "ACTIVE", kpiRating: 92, totalRewards: 8500, totalTransactions: 218, baseTreasuryBalance: 0, commissionBalance: 1800, commissionLedgerBalance: 420, createdAt: new Date(Date.now() - 86400000 * 25).toISOString() },
+        { id: "agt_3", email: "partner2@quicksend.com", fullName: "Bob Partner", type: "PARTNER", status: "SUSPENDED", kpiRating: 45, totalRewards: 2300, totalTransactions: 89, baseTreasuryBalance: 12000, commissionBalance: 450, commissionLedgerBalance: 120, createdAt: new Date(Date.now() - 86400000 * 15).toISOString() },
       ];
     }
     const { data } = await api.get("/agent/list");
@@ -341,7 +341,7 @@ export const AdminApi = {
 
   async createAgent(data: { email: string; password: string; fullName?: string; phone?: string; type: string }): Promise<Agent> {
     if (USE_ADMIN_MOCK) {
-      return { id: `agt_${Date.now()}`, email: data.email, fullName: data.fullName || null, type: data.type as Agent["type"], status: "ACTIVE", kpiRating: null, totalRewards: 0, totalTransactions: 0, baseTreasuryBalance: 0, commissionBalance: 0, createdAt: new Date().toISOString() };
+      return { id: `agt_${Date.now()}`, email: data.email, fullName: data.fullName || null, type: data.type as Agent["type"], status: "ACTIVE", kpiRating: null, totalRewards: 0, totalTransactions: 0, baseTreasuryBalance: 0, commissionBalance: 0, commissionLedgerBalance: 0, createdAt: new Date().toISOString() };
     }
     const { data: res } = await api.post("/agent/create", data);
     return res;
@@ -357,6 +357,7 @@ export const AdminApi = {
         status: "ACTIVE",
         kpiRating: 78,
         totalRewards: 5600,
+        commissionLedgerBalance: 350,
         baseTreasuryBalance: 25000,
         commissionBalance: 1200,
         todayVolume: 3400,
