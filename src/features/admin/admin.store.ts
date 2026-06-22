@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem } from "./admin.types";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -47,6 +47,14 @@ interface AdminState {
   triggerBackup: () => Promise<void>;
   fetchTreasuryOverview: () => Promise<void>;
   triggerRebalance: (network: string) => Promise<void>;
+  agents: Agent[];
+  agentDetail: AgentDetail | null;
+  agentKpi: AgentKpiItem[];
+  fetchAgents: () => Promise<void>;
+  createAgent: (data: { email: string; password: string; fullName?: string; phone?: string; type: string }) => Promise<void>;
+  fetchAgentDetail: (agentId: string) => Promise<void>;
+  toggleAgentStatus: (agentId: string) => Promise<void>;
+  fetchAgentKpi: (agentId: string, period?: string) => Promise<void>;
 }
 
 export const useAdminStore = create<AdminState>((set) => ({
@@ -67,6 +75,9 @@ export const useAdminStore = create<AdminState>((set) => ({
   treasuryOverview: null,
   treasuryLoading: false,
   rebalanceMessage: "",
+  agents: [],
+  agentDetail: null,
+  agentKpi: [],
   loading: false,
 
   fetchDashboard: async () => {
@@ -227,5 +238,46 @@ export const useAdminStore = create<AdminState>((set) => ({
     set({ rebalanceMessage: "" });
     const result = await AdminApi.triggerRebalance(network);
     set({ rebalanceMessage: result.message });
+  },
+
+  fetchAgents: async () => {
+    try {
+      const agents = await AdminApi.getAgents();
+      set({ agents });
+    } catch (err) {
+      console.error("Failed to fetch agents:", err);
+    }
+  },
+
+  createAgent: async (data) => {
+    const agent = await AdminApi.createAgent(data);
+    set((state) => ({ agents: [...state.agents, agent] }));
+  },
+
+  fetchAgentDetail: async (agentId: string) => {
+    try {
+      const agentDetail = await AdminApi.getAgentDetail(agentId);
+      set({ agentDetail });
+    } catch (err) {
+      console.error("Failed to fetch agent detail:", err);
+    }
+  },
+
+  toggleAgentStatus: async (agentId: string) => {
+    await AdminApi.toggleAgentStatus(agentId);
+    set((state) => ({
+      agents: state.agents.map((a) =>
+        a.id === agentId ? { ...a, status: a.status === "ACTIVE" ? "SUSPENDED" as const : "ACTIVE" as const } : a
+      ),
+    }));
+  },
+
+  fetchAgentKpi: async (agentId: string, period?: string) => {
+    try {
+      const agentKpi = await AdminApi.getAgentKpi(agentId, period);
+      set({ agentKpi });
+    } catch (err) {
+      console.error("Failed to fetch agent KPI:", err);
+    }
   },
 }));

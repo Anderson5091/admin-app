@@ -1,4 +1,68 @@
-export type AdminRole = "SUPER_ADMIN" | "COMPLIANCE" | "OPS" | "TREASURY";
+export type AdminRole = "SUPER_ADMIN" | "COMPLIANCE" | "OPS" | "TREASURY" | "AGENT_PARTNER" | "AGENT_INTERNAL";
+
+export type AgentType = "PARTNER" | "INTERNAL";
+
+export interface Agent {
+  id: string;
+  email: string;
+  fullName: string | null;
+  type: AgentType;
+  status: "ACTIVE" | "SUSPENDED";
+  kpiRating: number | null;
+  totalRewards: number;
+  totalTransactions: number;
+  baseTreasuryBalance: number;
+  commissionBalance: number;
+  createdAt: string;
+}
+
+export interface AgentDetail {
+  id: string;
+  email: string;
+  fullName: string | null;
+  type: AgentType;
+  status: string;
+  kpiRating: number | null;
+  totalRewards: number;
+  baseTreasuryBalance: number | null;
+  commissionBalance: number | null;
+  todayVolume: number;
+  todayCommission: number;
+  todayTxCount: number;
+  transactions: AgentTransactionItem[];
+  wallets: AgentWalletInfo[];
+}
+
+export interface AgentTransactionItem {
+  id: string;
+  type: string;
+  amount: number;
+  commission: number;
+  netAmount: number;
+  userRef: string | null;
+  status: string;
+  createdAt: string;
+}
+
+export interface AgentWalletInfo {
+  id: string;
+  walletType: string;
+  network: string;
+  address: string;
+  balance: number;
+}
+
+export interface AgentKpiItem {
+  id: string;
+  period: string;
+  periodStart: string;
+  periodEnd: string;
+  totalVolume: number;
+  totalCommission: number;
+  totalTxCount: number;
+  rewardPoints: number;
+  rating: number | null;
+}
 
 export interface AdminProfile {
   id: string;

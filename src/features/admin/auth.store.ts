@@ -22,6 +22,14 @@ const mockAdmins: Record<string, { password: string; profile: AdminProfile }> = 
     password: "treasury123",
     profile: { id: "admin_4", email: "treasury@quicksend.com", role: "TREASURY", status: "ACTIVE", createdAt: new Date().toISOString() },
   },
+  "partner@quicksend.com": {
+    password: "partner123",
+    profile: { id: "agent_p1", email: "partner@quicksend.com", role: "AGENT_PARTNER", status: "ACTIVE", createdAt: new Date().toISOString() },
+  },
+  "internal@quicksend.com": {
+    password: "internal123",
+    profile: { id: "agent_i1", email: "internal@quicksend.com", role: "AGENT_INTERNAL", status: "ACTIVE", createdAt: new Date().toISOString() },
+  },
 };
 
 interface AuthState {

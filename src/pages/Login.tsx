@@ -7,6 +7,8 @@ const demoAccounts = [
   { email: "compliance@quicksend.com", password: "compliance123", role: "COMPLIANCE" },
   { email: "ops@quicksend.com", password: "ops123", role: "OPS" },
   { email: "treasury@quicksend.com", password: "treasury123", role: "TREASURY" },
+  { email: "partner@quicksend.com", password: "partner123", role: "AGENT_PARTNER" },
+  { email: "internal@quicksend.com", password: "internal123", role: "AGENT_INTERNAL" },
 ];
 
 const roleColors: Record<string, string> = {
@@ -14,6 +16,8 @@ const roleColors: Record<string, string> = {
   COMPLIANCE: "text-blue-400 bg-blue-900/30 border-blue-700/30",
   OPS: "text-warning bg-warning-dim border-warning/30",
   TREASURY: "text-primary bg-primary-dim border-primary-border",
+  AGENT_PARTNER: "text-violet-400 bg-violet-900/30 border-violet-700/30",
+  AGENT_INTERNAL: "text-emerald-400 bg-emerald-900/30 border-emerald-700/30",
 };
 
 export default function Login() {

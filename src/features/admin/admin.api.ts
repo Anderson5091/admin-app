@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem } from "./admin.types";
 
 const USE_ADMIN_MOCK = false;
 
@@ -324,6 +324,76 @@ export const AdminApi = {
       return { status: "SUCCESS", message: `Rebalance triggered for ${network}` };
     }
     const { data } = await api.post("/treasury/rebalance", { network });
+    return data;
+  },
+
+  async getAgents(): Promise<Agent[]> {
+    if (USE_ADMIN_MOCK) {
+      return [
+        { id: "agt_1", email: "partner1@quicksend.com", fullName: "John Partner", type: "PARTNER", status: "ACTIVE", kpiRating: 85, totalRewards: 12500, totalTransactions: 342, baseTreasuryBalance: 50000, commissionBalance: 3200, createdAt: new Date(Date.now() - 86400000 * 30).toISOString() },
+        { id: "agt_2", email: "internal1@quicksend.com", fullName: "Jane Internal", type: "INTERNAL", status: "ACTIVE", kpiRating: 92, totalRewards: 8500, totalTransactions: 218, baseTreasuryBalance: 0, commissionBalance: 1800, createdAt: new Date(Date.now() - 86400000 * 25).toISOString() },
+        { id: "agt_3", email: "partner2@quicksend.com", fullName: "Bob Partner", type: "PARTNER", status: "SUSPENDED", kpiRating: 45, totalRewards: 2300, totalTransactions: 89, baseTreasuryBalance: 12000, commissionBalance: 450, createdAt: new Date(Date.now() - 86400000 * 15).toISOString() },
+      ];
+    }
+    const { data } = await api.get("/agent/list");
+    return data;
+  },
+
+  async createAgent(data: { email: string; password: string; fullName?: string; phone?: string; type: string }): Promise<Agent> {
+    if (USE_ADMIN_MOCK) {
+      return { id: `agt_${Date.now()}`, email: data.email, fullName: data.fullName || null, type: data.type as Agent["type"], status: "ACTIVE", kpiRating: null, totalRewards: 0, totalTransactions: 0, baseTreasuryBalance: 0, commissionBalance: 0, createdAt: new Date().toISOString() };
+    }
+    const { data: res } = await api.post("/agent/create", data);
+    return res;
+  },
+
+  async getAgentDetail(agentId: string): Promise<AgentDetail> {
+    if (USE_ADMIN_MOCK) {
+      return {
+        id: agentId,
+        email: "agent@quicksend.com",
+        fullName: "Agent Name",
+        type: "PARTNER",
+        status: "ACTIVE",
+        kpiRating: 78,
+        totalRewards: 5600,
+        baseTreasuryBalance: 25000,
+        commissionBalance: 1200,
+        todayVolume: 3400,
+        todayCommission: 170,
+        todayTxCount: 12,
+        transactions: [],
+        wallets: [
+          { id: "w1", walletType: "BASE_TREASURY", network: "BASE", address: "0xBaseAgent...", balance: 25000 },
+          { id: "w2", walletType: "COMMISSION", network: "BASE", address: "0xCommAgent...", balance: 1200 },
+        ],
+      };
+    }
+    const { data } = await api.get(`/agent/${agentId}`);
+    return data;
+  },
+
+  async toggleAgentStatus(agentId: string): Promise<void> {
+    if (USE_ADMIN_MOCK) return;
+    await api.post(`/agent/${agentId}/toggle-status`);
+  },
+
+  async getAgentKpi(agentId: string, period?: string): Promise<AgentKpiItem[]> {
+    if (USE_ADMIN_MOCK) {
+      return Array.from({ length: 7 }, (_, i) => ({
+        id: `kpi_${i}`,
+        period: period || "DAILY",
+        periodStart: new Date(Date.now() - i * 86400000).toISOString(),
+        periodEnd: new Date(Date.now() - i * 86400000 + 86400000).toISOString(),
+        totalVolume: 1500 + i * 200,
+        totalCommission: 75 + i * 10,
+        totalTxCount: 8 + i,
+        rewardPoints: 150 + i * 20,
+        rating: 70 + i * 3,
+      }));
+    }
+    const params = period ? `?period=${period}` : "";
+    const { data } = await api.get(`/agent/${agentId}/kpi${params}`);
     return data;
   },
 
