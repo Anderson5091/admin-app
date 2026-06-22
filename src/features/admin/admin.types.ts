@@ -74,6 +74,14 @@ export interface AdminProfile {
   createdAt: string;
 }
 
+export interface AdminUserItem {
+  id: string;
+  email: string;
+  role: AdminRole;
+  status: string;
+  createdAt: string;
+}
+
 export type AlertSeverity = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 
 export interface AdminDashboardData {

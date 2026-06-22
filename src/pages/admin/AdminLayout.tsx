@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Ban, Bell, ChevronLeft, LogOut, GitBranch, Activity, Radio, Database, UserCog } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Ban, Bell, ChevronLeft, LogOut, GitBranch, Activity, Radio, Database, UserCog, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -19,6 +19,7 @@ const navIconMap: Record<string, any> = {
   "/treasury": Database,
   "/partners": GitBranch,
   "/agents": UserCog,
+  "/admins": ShieldCheck,
   "/notifications": Bell,
 };
 
@@ -34,6 +35,7 @@ const navLabelMap: Record<string, string> = {
   "/treasury": "Treasury",
   "/partners": "Partners",
   "/agents": "Agents",
+  "/admins": "Admins",
   "/notifications": "Notifications",
 };
 

@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem } from "./admin.types";
 
 const USE_ADMIN_MOCK = false;
 
@@ -413,5 +413,37 @@ export const AdminApi = {
     }
     const { data } = await api.get(`/admin/fraud/analyze/${userId}`);
     return data;
+  },
+
+  async getAdmins(): Promise<AdminUserItem[]> {
+    if (USE_ADMIN_MOCK) {
+      return [
+        { id: "adm_1", email: "admin@quicksend.com", role: "SUPER_ADMIN", status: "ACTIVE", createdAt: new Date(Date.now() - 86400000 * 60).toISOString() },
+        { id: "adm_2", email: "compliance@quicksend.com", role: "COMPLIANCE", status: "ACTIVE", createdAt: new Date(Date.now() - 86400000 * 45).toISOString() },
+        { id: "adm_3", email: "ops@quicksend.com", role: "OPS", status: "ACTIVE", createdAt: new Date(Date.now() - 86400000 * 30).toISOString() },
+        { id: "adm_4", email: "treasury@quicksend.com", role: "TREASURY", status: "ACTIVE", createdAt: new Date(Date.now() - 86400000 * 15).toISOString() },
+        { id: "adm_5", email: "suspended@quicksend.com", role: "OPS", status: "SUSPENDED", createdAt: new Date(Date.now() - 86400000 * 7).toISOString() },
+      ];
+    }
+    const { data } = await api.get("/admin/admins");
+    return data;
+  },
+
+  async createAdmin(data: { email: string; password: string; role: string }): Promise<AdminUserItem> {
+    if (USE_ADMIN_MOCK) {
+      return { id: `adm_${Date.now()}`, email: data.email, role: data.role as AdminUserItem["role"], status: "ACTIVE", createdAt: new Date().toISOString() };
+    }
+    const { data: res } = await api.post("/admin/admins", data);
+    return res;
+  },
+
+  async toggleAdminStatus(adminId: string): Promise<void> {
+    if (USE_ADMIN_MOCK) return;
+    await api.post(`/admin/admins/${adminId}/toggle-status`);
+  },
+
+  async deleteAdmin(adminId: string): Promise<void> {
+    if (USE_ADMIN_MOCK) return;
+    await api.delete(`/admin/admins/${adminId}`);
   },
 };

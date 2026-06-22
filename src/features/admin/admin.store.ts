@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem } from "./admin.types";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -55,6 +55,12 @@ interface AdminState {
   fetchAgentDetail: (agentId: string) => Promise<void>;
   toggleAgentStatus: (agentId: string) => Promise<void>;
   fetchAgentKpi: (agentId: string, period?: string) => Promise<void>;
+
+  adminUsers: AdminUserItem[];
+  fetchAdminUsers: () => Promise<void>;
+  createAdmin: (data: { email: string; password: string; role: string }) => Promise<void>;
+  toggleAdminStatus: (adminId: string) => Promise<void>;
+  deleteAdmin: (adminId: string) => Promise<void>;
 }
 
 export const useAdminStore = create<AdminState>((set) => ({
@@ -78,6 +84,7 @@ export const useAdminStore = create<AdminState>((set) => ({
   agents: [],
   agentDetail: null,
   agentKpi: [],
+  adminUsers: [],
   loading: false,
 
   fetchDashboard: async () => {
@@ -279,5 +286,33 @@ export const useAdminStore = create<AdminState>((set) => ({
     } catch (err) {
       console.error("Failed to fetch agent KPI:", err);
     }
+  },
+
+  fetchAdminUsers: async () => {
+    try {
+      const adminUsers = await AdminApi.getAdmins();
+      set({ adminUsers });
+    } catch (err) {
+      console.error("Failed to fetch admin users:", err);
+    }
+  },
+
+  createAdmin: async (data) => {
+    const admin = await AdminApi.createAdmin(data);
+    set((state) => ({ adminUsers: [...state.adminUsers, admin] }));
+  },
+
+  toggleAdminStatus: async (adminId: string) => {
+    await AdminApi.toggleAdminStatus(adminId);
+    set((state) => ({
+      adminUsers: state.adminUsers.map((a) =>
+        a.id === adminId ? { ...a, status: a.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE" } : a
+      ),
+    }));
+  },
+
+  deleteAdmin: async (adminId: string) => {
+    await AdminApi.deleteAdmin(adminId);
+    set((state) => ({ adminUsers: state.adminUsers.filter((a) => a.id !== adminId) }));
   },
 }));

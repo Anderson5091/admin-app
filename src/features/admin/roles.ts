@@ -19,6 +19,7 @@ export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
   "/treasury": ["SUPER_ADMIN", "TREASURY"],
   "/partners": ["SUPER_ADMIN", "OPS"],
   "/agents": ["SUPER_ADMIN", "OPS", "TREASURY"],
+  "/admins": ["SUPER_ADMIN"],
   "/notifications": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
 };
 

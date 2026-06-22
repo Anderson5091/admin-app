@@ -11,6 +11,7 @@ import FraudInvestigation from "../pages/admin/FraudInvestigation";
 import AdminNotifications from "../pages/admin/Notifications";
 import AdminPartners from "../pages/admin/Partners";
 import AdminAgents from "../pages/admin/Agents";
+import AdminAdmins from "../pages/admin/Admins";
 import AdminTreasury from "../pages/admin/Treasury";
 import SystemHealth from "../pages/admin/system/SystemHealth";
 import Forbidden from "../pages/admin/Forbidden";
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
       { path: "notifications", element: <ProtectedRoute requiredPath="/notifications"><AdminNotifications /></ProtectedRoute> },
       { path: "partners", element: <ProtectedRoute requiredPath="/partners"><AdminPartners /></ProtectedRoute> },
       { path: "agents", element: <ProtectedRoute requiredPath="/agents"><AdminAgents /></ProtectedRoute> },
+      { path: "admins", element: <ProtectedRoute requiredPath="/admins"><AdminAdmins /></ProtectedRoute> },
       { path: "system", element: <ProtectedRoute requiredPath="/system"><SystemHealth /></ProtectedRoute> },
     ],
   },
