@@ -8,18 +8,18 @@ export interface PagePermission {
 }
 
 export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
-  "/": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
-  "/live": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/admins": ["SUPER_ADMIN"],
+  "/agents": ["SUPER_ADMIN", "OPS", "TREASURY"],
   "/users": ["SUPER_ADMIN", "OPS"],
   "/kyc": ["SUPER_ADMIN", "COMPLIANCE"],
-  "/cases": ["SUPER_ADMIN", "COMPLIANCE"],
-  "/payouts": ["SUPER_ADMIN", "OPS"],
-  "/fraud": ["SUPER_ADMIN", "COMPLIANCE"],
-  "/system": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
-  "/treasury": ["SUPER_ADMIN", "TREASURY"],
   "/partners": ["SUPER_ADMIN", "OPS"],
-  "/agents": ["SUPER_ADMIN", "OPS", "TREASURY"],
-  "/admins": ["SUPER_ADMIN"],
+  "/treasury": ["SUPER_ADMIN", "TREASURY"],
+  "/payouts": ["SUPER_ADMIN", "OPS"],
+  "/cases": ["SUPER_ADMIN", "COMPLIANCE"],
+  "/fraud": ["SUPER_ADMIN", "COMPLIANCE"],
+  "/": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/live": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/system": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
   "/notifications": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
 };
 

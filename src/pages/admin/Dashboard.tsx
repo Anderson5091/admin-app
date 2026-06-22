@@ -12,20 +12,33 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Dashboard() {
-  const { dashboard, fetchDashboard, loading } = useAdminStore();
+  const { dashboard, fetchDashboard, loading, error } = useAdminStore();
   const { liveTransactions, connected } = useAdminStreamStore();
 
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  if (loading || !dashboard) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center space-y-2">
+          <p className="text-danger text-sm">{error}</p>
+          <button onClick={fetchDashboard} className="text-xs text-primary hover:underline">Retry</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboard) return null;
 
   const d = dashboard ?? {};
   const kpis = [

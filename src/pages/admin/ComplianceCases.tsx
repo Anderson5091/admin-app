@@ -35,23 +35,23 @@ export default function ComplianceCases() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Compliance Cases</h1>
-        <p className="text-text-secondary text-sm mt-1">{complianceCases.filter(c => c.status !== "CLOSED").length} active cases</p>
+        <p className="text-text-secondary text-sm mt-1">{(complianceCases || []).filter(c => c.status !== "CLOSED").length} active cases</p>
       </div>
 
       <div className="space-y-3">
-        {complianceCases.map((c) => (
+        {(complianceCases || []).map((c) => (
           <Card key={c.id} className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {severityBadge(c.severity)}
-                {statusBadge(c.status)}
+                {severityBadge(c.severity || "MEDIUM")}
+                {statusBadge(c.status || "OPEN")}
                 <div>
-                  <p className="text-text-primary font-semibold text-sm">{c.type}</p>
-                  <p className="text-xs text-text-secondary">{c.email}</p>
+                  <p className="text-text-primary font-semibold text-sm">{c.type || "N/A"}</p>
+                  <p className="text-xs text-text-secondary">{c.email || "N/A"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-text-subtle">{new Date(c.createdAt).toLocaleDateString()}</span>
+                <span className="text-xs text-text-subtle">{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "N/A"}</span>
                 {c.status !== "ESCALATED" && c.status !== "CLOSED" && (
                   <Button size="sm" variant="ghost" onClick={() => escalateCase(c.id)}>
                     <ExternalLink size={14} className="mr-1" /> Escalate

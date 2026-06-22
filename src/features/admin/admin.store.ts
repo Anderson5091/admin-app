@@ -21,6 +21,8 @@ interface AdminState {
   treasuryLoading: boolean;
   rebalanceMessage: string;
   loading: boolean;
+  usersLoading: boolean;
+  error: string;
 
   fetchDashboard: () => Promise<void>;
   fetchUsers: () => Promise<void>;
@@ -86,34 +88,51 @@ export const useAdminStore = create<AdminState>((set) => ({
   agentKpi: [],
   adminUsers: [],
   loading: false,
+  usersLoading: false,
+  error: "",
 
   fetchDashboard: async () => {
-    set({ loading: true });
-    const dashboard = await AdminApi.getDashboard();
-    set({ dashboard, loading: false });
+    set({ loading: true, error: "" });
+    try {
+      const dashboard = await AdminApi.getDashboard();
+      set({ dashboard, loading: false });
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to load dashboard";
+      set({ loading: false, error: message });
+    }
   },
 
   fetchUsers: async () => {
+    set({ usersLoading: true });
     try {
       const users = await AdminApi.getUsers();
-      set({ users });
+      set({ users, usersLoading: false });
     } catch (err) {
       console.error("Failed to fetch users:", err);
+      set({ usersLoading: false });
     }
   },
 
   toggleUserStatus: async (userId: string) => {
-    await AdminApi.toggleUserStatus(userId);
-    set((state) => ({
-      users: state.users.map((u) =>
-        u.id === userId ? { ...u, status: u.status === "ACTIVE" ? "FROZEN" as const : "ACTIVE" as const } : u
-      ),
-    }));
+    try {
+      await AdminApi.toggleUserStatus(userId);
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.id === userId ? { ...u, status: u.status === "ACTIVE" ? "FROZEN" as const : "ACTIVE" as const } : u
+        ),
+      }));
+    } catch (err) {
+      console.error("Failed to toggle user status:", err);
+    }
   },
 
   fetchPendingKyc: async () => {
-    const pendingKyc = await AdminApi.getPendingKyc();
-    set({ pendingKyc });
+    try {
+      const pendingKyc = await AdminApi.getPendingKyc();
+      set({ pendingKyc });
+    } catch (err) {
+      console.error("Failed to fetch pending KYC:", err);
+    }
   },
 
   approveKyc: async (kycId: string) => {
@@ -127,8 +146,12 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   fetchComplianceCases: async () => {
-    const complianceCases = await AdminApi.getComplianceCases();
-    set({ complianceCases });
+    try {
+      const complianceCases = await AdminApi.getComplianceCases();
+      set({ complianceCases });
+    } catch (err) {
+      console.error("Failed to fetch compliance cases:", err);
+    }
   },
 
   escalateCase: async (caseId: string) => {
@@ -141,8 +164,12 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   fetchFailedPayouts: async () => {
-    const failedPayouts = await AdminApi.getFailedPayouts();
-    set({ failedPayouts });
+    try {
+      const failedPayouts = await AdminApi.getFailedPayouts();
+      set({ failedPayouts });
+    } catch (err) {
+      console.error("Failed to fetch failed payouts:", err);
+    }
   },
 
   retryPayout: async (payoutId: string) => {
@@ -153,8 +180,12 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   fetchNotifications: async () => {
-    const notifications = await AdminApi.getNotifications();
-    set({ notifications, unreadNotifications: notifications.filter((n) => n.status === "UNREAD").length });
+    try {
+      const notifications = await AdminApi.getNotifications();
+      set({ notifications, unreadNotifications: notifications.filter((n) => n.status === "UNREAD").length });
+    } catch (err) {
+      console.error("Failed to fetch notifications:", err);
+    }
   },
 
   markNotificationRead: async (notificationId: string) => {
@@ -176,14 +207,22 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   fetchPartners: async () => {
-    const partners = await AdminApi.getPartners();
-    set({ partners });
+    try {
+      const partners = await AdminApi.getPartners();
+      set({ partners });
+    } catch (err) {
+      console.error("Failed to fetch partners:", err);
+    }
   },
 
   fetchPartnerMetrics: async (partnerId: string) => {
-    const metrics = await AdminApi.getPartnerMetrics(partnerId);
-    if (metrics) {
-      set((state) => ({ partnerMetrics: { ...state.partnerMetrics, [partnerId]: metrics } }));
+    try {
+      const metrics = await AdminApi.getPartnerMetrics(partnerId);
+      if (metrics) {
+        set((state) => ({ partnerMetrics: { ...state.partnerMetrics, [partnerId]: metrics } }));
+      }
+    } catch (err) {
+      console.error("Failed to fetch partner metrics:", err);
     }
   },
 
@@ -207,22 +246,38 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   fetchSystemHealth: async () => {
-    const systemHealth = await AdminApi.getSystemHealth();
-    set({ systemHealth });
+    try {
+      const systemHealth = await AdminApi.getSystemHealth();
+      set({ systemHealth });
+    } catch (err) {
+      console.error("Failed to fetch system health:", err);
+    }
   },
 
   fetchSystemMetrics: async () => {
-    const systemMetrics = await AdminApi.getSystemMetrics();
-    set({ systemMetrics });
+    try {
+      const systemMetrics = await AdminApi.getSystemMetrics();
+      set({ systemMetrics });
+    } catch (err) {
+      console.error("Failed to fetch system metrics:", err);
+    }
   },
 
   fetchSystemStatus: async () => {
-    const systemStatus = await AdminApi.getSystemStatus();
-    set({ systemStatus });
+    try {
+      const systemStatus = await AdminApi.getSystemStatus();
+      set({ systemStatus });
+    } catch (err) {
+      console.error("Failed to fetch system status:", err);
+    }
   },
 
   triggerBackup: async () => {
-    await AdminApi.triggerBackup();
+    try {
+      await AdminApi.triggerBackup();
+    } catch (err) {
+      console.error("Failed to trigger backup:", err);
+    }
   },
 
   analyzeFraud: async (userId: string) => {

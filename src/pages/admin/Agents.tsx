@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Plus, UserCog, DollarSign, TrendingUp, BarChart3, ToggleLeft, X } from "lucide-react";
+import { Plus, UserCog, DollarSign, TrendingUp, BarChart3, X } from "lucide-react";
 
 const typeColors: Record<string, string> = {
   PARTNER: "text-purple-400 bg-purple-900/30 border-purple-700/30",
@@ -148,9 +148,13 @@ export default function Agents() {
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); toggleAgentStatus(agent.id); }}
-                className="text-[10px] text-danger hover:opacity-80 hover:bg-danger-dim px-2 py-1 rounded-lg transition-colors shrink-0"
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shrink-0 ${
+                  agent.status === "ACTIVE"
+                    ? "bg-warning-dim text-warning hover:bg-warning/20"
+                    : "bg-primary-dim text-primary hover:bg-primary/20"
+                }`}
               >
-                <ToggleLeft size={14} />
+                {agent.status === "ACTIVE" ? "Suspend" : "Activate"}
               </button>
             </div>
 

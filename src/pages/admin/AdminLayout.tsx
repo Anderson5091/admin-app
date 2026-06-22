@@ -1,43 +1,52 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Ban, Bell, ChevronLeft, LogOut, GitBranch, Activity, Radio, Database, UserCog, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { connectAdminStream, disconnectAdminStream } from "../../features/admin/ws.service";
 import { useAdminStreamStore } from "../../features/admin/stream.store";
-import { getAccessiblePages } from "../../features/admin/roles";
+import { canAccess } from "../../features/admin/roles";
 
 const navIconMap: Record<string, any> = {
-  "/": LayoutDashboard,
-  "/live": Radio,
+  "/admins": ShieldCheck,
+  "/agents": UserCog,
   "/users": Users,
   "/kyc": Shield,
-  "/cases": Scale,
+  "/partners": Handshake,
+  "/treasury": Warehouse,
   "/payouts": AlertTriangle,
-  "/fraud": Ban,
+  "/cases": Scale,
+  "/fraud": Gavel,
+  "/": LayoutDashboard,
+  "/live": Radio,
   "/system": Activity,
-  "/treasury": Database,
-  "/partners": GitBranch,
-  "/agents": UserCog,
-  "/admins": ShieldCheck,
   "/notifications": Bell,
 };
 
 const navLabelMap: Record<string, string> = {
-  "/": "Dashboard",
-  "/live": "Live Feed",
+  "/admins": "Admins",
+  "/agents": "Agents",
   "/users": "Users",
   "/kyc": "KYC Review",
-  "/cases": "Compliance Cases",
-  "/payouts": "Payout Monitor",
-  "/fraud": "Fraud Investigation",
-  "/system": "System Health",
-  "/treasury": "Treasury",
   "/partners": "Partners",
-  "/agents": "Agents",
-  "/admins": "Admins",
+  "/treasury": "Treasury",
+  "/payouts": "Payout Monitor",
+  "/cases": "Compliance Cases",
+  "/fraud": "Fraud Investigation",
+  "/": "Dashboard",
+  "/live": "Live Feed",
+  "/system": "System Health",
   "/notifications": "Notifications",
 };
+
+const NAV_SECTIONS = [
+  { label: "Monitor", paths: ["/", "/notifications", "/live", "/system"] },
+  { label: "Administration", paths: ["/admins"] },
+  { label: "Finance", paths: ["/treasury", "/payouts"] },
+  { label: "Compliance", paths: ["/cases", "/fraud"] },
+  { label: "Users", paths: ["/users", "/kyc"] },
+  { label: "Agents & Partners", paths: ["/agents", "/partners"] },
+];
 
 const roleColors: Record<string, string> = {
   SUPER_ADMIN: "text-purple-400 bg-purple-900/30",
@@ -70,13 +79,21 @@ export default function AdminLayout() {
     navigate("/login");
   };
 
-  const accessiblePaths = getAccessiblePages(profile?.role);
-  const navItems = accessiblePaths.map((path) => ({
-    to: path,
-    icon: navIconMap[path],
-    label: navLabelMap[path],
-    end: path === "/",
-  }));
+  const role = profile?.role;
+
+  const visibleSections = NAV_SECTIONS
+    .map((section) => ({
+      ...section,
+      items: section.paths
+        .filter((path) => canAccess(path, role))
+        .map((path) => ({
+          to: path,
+          icon: navIconMap[path],
+          label: navLabelMap[path],
+          end: path === "/",
+        })),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <div className="min-h-screen bg-app-page flex">
@@ -101,40 +118,51 @@ export default function AdminLayout() {
           </button>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  isActive ? "bg-primary-dim text-primary border border-primary-border" : "text-text-secondary hover:text-text-primary hover:bg-card border border-transparent"
-                }`
-              }
-            >
-              <div className="relative">
-                <item.icon size={18} />
-                {item.label === "Notifications" && unreadNotifications > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-danger text-white text-[8px] font-bold rounded-full flex items-center justify-center">
-                    {unreadNotifications > 9 ? "9+" : unreadNotifications}
-                  </span>
-                )}
-                {item.label === "Live Feed" && (
-                  <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ${connected ? "bg-primary" : "bg-danger"} ${connected ? "animate-pulse" : ""}`} />
-                )}
-              </div>
-              {!collapsed && (
-                <div className="flex items-center justify-between flex-1">
-                  <span>{item.label}</span>
-                  {item.label === "Notifications" && unreadNotifications > 0 && (
-                    <span className="bg-danger-dim text-danger text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                      {unreadNotifications}
-                    </span>
-                  )}
-                </div>
+        <nav className="flex-1 p-3 space-y-3 overflow-y-auto">
+          {visibleSections.map((section) => (
+            <div key={section.label || "alerts"}>
+              {!collapsed && section.label && (
+                <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-text-subtle">
+                  {section.label}
+                </p>
               )}
-            </NavLink>
+              <div className="space-y-1">
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                        isActive ? "bg-primary-dim text-primary border border-primary-border" : "text-text-secondary hover:text-text-primary hover:bg-card border border-transparent"
+                      }`
+                    }
+                  >
+                    <div className="relative">
+                      <item.icon size={18} />
+                      {item.label === "Notifications" && unreadNotifications > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-danger text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                          {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                        </span>
+                      )}
+                      {item.label === "Live Feed" && (
+                        <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ${connected ? "bg-primary" : "bg-danger"} ${connected ? "animate-pulse" : ""}`} />
+                      )}
+                    </div>
+                    {!collapsed && (
+                      <div className="flex items-center justify-between flex-1">
+                        <span>{item.label}</span>
+                        {item.label === "Notifications" && unreadNotifications > 0 && (
+                          <span className="bg-danger-dim text-danger text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                            {unreadNotifications}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 

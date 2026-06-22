@@ -22,7 +22,7 @@ export default function PayoutMonitor() {
       </div>
 
       <div className="space-y-3">
-        {failedPayouts.map((payout) => (
+        {(failedPayouts || []).map((payout) => (
           <Card key={payout.id} className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -31,15 +31,15 @@ export default function PayoutMonitor() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-text-primary font-semibold">${payout.amount.toLocaleString()}</p>
-                    <Badge variant="info">{payout.currency}</Badge>
+                    <p className="text-text-primary font-semibold">${(payout.amount || 0).toLocaleString()}</p>
+                    <Badge variant="info">{payout.currency || "USDT"}</Badge>
                     <Badge variant={payout.status === "FAILED" ? "danger" : "warning"}>
                       {payout.status === "FAILED" ? "Failed" : "Pending Retry"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-text-secondary mt-0.5">{payout.reason}</p>
+                  <p className="text-sm text-text-secondary mt-0.5">{payout.reason || "Unknown"}</p>
                   <p className="text-xs text-text-subtle mt-0.5">
-                    {payout.attempts} attempt{payout.attempts > 1 ? "s" : ""} · Last: {new Date(payout.lastAttempt).toLocaleString()}
+                    {(payout.attempts || 0)} attempt{(payout.attempts || 0) > 1 ? "s" : ""} · Last: {payout.lastAttempt ? new Date(payout.lastAttempt).toLocaleString() : "N/A"}
                   </p>
                 </div>
               </div>

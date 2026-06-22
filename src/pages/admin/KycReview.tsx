@@ -25,7 +25,7 @@ export default function KycReview() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-text-primary font-bold">{item.name}</h3>
+                  <h3 className="text-text-primary font-bold">{item.name || item.email}</h3>
                   <Badge variant="info">Tier {item.tier}</Badge>
                 </div>
                 <p className="text-sm text-text-secondary mt-0.5">{item.email}</p>
@@ -42,11 +42,11 @@ export default function KycReview() {
             </div>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {item.documents.map((doc) => (
+              {(item.documents || []).map((doc) => (
                 <div key={doc.id} className="flex items-center gap-3 bg-card rounded-lg p-3 border border-border">
                   <FileText size={16} className="text-text-secondary" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-text-primary font-medium capitalize">{doc.type.replace(/_/g, " ")}</p>
+                    <p className="text-sm text-text-primary font-medium capitalize">{(doc.type || "").replace(/_/g, " ")}</p>
                     <Badge variant={doc.status === "PENDING" ? "warning" : doc.status === "APPROVED" ? "success" : "danger"}>
                       {doc.status}
                     </Badge>
