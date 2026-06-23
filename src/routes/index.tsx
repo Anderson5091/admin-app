@@ -22,7 +22,7 @@ import { canAccess } from "../features/admin/roles";
 
 function ProtectedRoute({ children, requiredPath }: { children: React.ReactNode; requiredPath?: string }) {
   const token = getToken();
-  const profile = useAuthStore.getState().profile;
+  const profile = useAuthStore((s) => s.profile);
 
   if (!token) return <Navigate to="/login" replace />;
 
@@ -34,7 +34,7 @@ function ProtectedRoute({ children, requiredPath }: { children: React.ReactNode;
 }
 
 function IndexPage() {
-  const profile = useAuthStore.getState().profile;
+  const profile = useAuthStore((s) => s.profile);
   const role = profile?.role;
   if (role === "AGENT_PARTNER" || role === "AGENT_INTERNAL") {
     return <ProtectedRoute requiredPath="/"><AgentDashboard /></ProtectedRoute>;
