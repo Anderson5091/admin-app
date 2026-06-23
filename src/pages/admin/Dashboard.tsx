@@ -44,7 +44,7 @@ export default function Dashboard() {
   const kpis = [
     { label: "Total Users", value: (d.totalUsers ?? 0).toLocaleString(), icon: Users, color: "text-secondary bg-secondary-dim" },
     { label: "Active Users", value: (d.activeUsers ?? 0).toLocaleString(), icon: Users, color: "text-primary bg-primary-dim" },
-    { label: "Total Transfers", value: ((d.totalVolume ?? 0) / 1_000_000).toFixed(1) + "M", icon: ArrowUpDown, color: "text-violet-400 bg-violet-900/30" },
+    { label: "Total Transfers", value: (d.totalTransfers ?? 0).toLocaleString(), icon: ArrowUpDown, color: "text-violet-400 bg-violet-900/30" },
     { label: "Volume (USDT)", value: "$" + ((d.totalVolume ?? 0) / 1_000_000).toFixed(1) + "M", icon: ArrowUpDown, color: "text-primary bg-primary-dim" },
     { label: "Pending KYC", value: d.pendingKyc ?? 0, icon: Shield, color: "text-warning bg-warning-dim" },
     { label: "Failed Payouts", value: d.failedPayouts ?? 0, icon: AlertTriangle, color: "text-danger bg-danger-dim" },
