@@ -1,4 +1,4 @@
-export type AdminRole = "SUPER_ADMIN" | "COMPLIANCE" | "OPS" | "TREASURY" | "AGENT_PARTNER" | "AGENT_INTERNAL";
+export type AdminRole = "SUPER_ADMIN" | "ADMIN" | "COMPLIANCE" | "OPS" | "TREASURY" | "AGENT_PARTNER" | "AGENT_INTERNAL";
 
 export type AgentType = "PARTNER" | "INTERNAL";
 

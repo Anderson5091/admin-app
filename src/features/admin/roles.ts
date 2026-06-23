@@ -9,18 +9,18 @@ export interface PagePermission {
 
 export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
   "/admins": ["SUPER_ADMIN"],
-  "/agents": ["SUPER_ADMIN", "OPS", "TREASURY"],
-  "/users": ["SUPER_ADMIN", "OPS"],
-  "/kyc": ["SUPER_ADMIN", "COMPLIANCE"],
-  "/partners": ["SUPER_ADMIN", "OPS"],
-  "/treasury": ["SUPER_ADMIN", "TREASURY"],
-  "/payouts": ["SUPER_ADMIN", "OPS"],
-  "/cases": ["SUPER_ADMIN", "COMPLIANCE"],
-  "/fraud": ["SUPER_ADMIN", "COMPLIANCE"],
-  "/": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY", "AGENT_PARTNER", "AGENT_INTERNAL"],
-  "/live": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
-  "/system": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
-  "/notifications": ["SUPER_ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/agents": ["SUPER_ADMIN", "ADMIN", "OPS", "TREASURY"],
+  "/users": ["SUPER_ADMIN", "ADMIN", "OPS"],
+  "/kyc": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE"],
+  "/partners": ["SUPER_ADMIN", "ADMIN", "OPS"],
+  "/treasury": ["SUPER_ADMIN", "ADMIN", "TREASURY"],
+  "/payouts": ["SUPER_ADMIN", "ADMIN", "OPS"],
+  "/cases": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE"],
+  "/fraud": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE"],
+  "/": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS", "TREASURY", "AGENT_PARTNER", "AGENT_INTERNAL"],
+  "/live": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/system": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/notifications": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
 };
 
 export function canAccess(path: string, role: AdminRole | undefined): boolean {

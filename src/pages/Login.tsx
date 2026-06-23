@@ -13,6 +13,7 @@ const demoAccounts = [
 
 const roleColors: Record<string, string> = {
   SUPER_ADMIN: "text-purple-400 bg-purple-900/30 border-purple-700/30",
+  ADMIN: "text-purple-400 bg-purple-900/30 border-purple-700/30",
   COMPLIANCE: "text-blue-400 bg-blue-900/30 border-blue-700/30",
   OPS: "text-warning bg-warning-dim border-warning/30",
   TREASURY: "text-primary bg-primary-dim border-primary-border",
