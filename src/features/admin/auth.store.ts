@@ -1,7 +1,11 @@
 import { create } from "zustand";
 import { api } from "../../api/client";
 import { getToken, setToken, clearToken } from "../../utils/token";
-import type { AdminProfile } from "./admin.types";
+import type { AdminProfile, AdminRole } from "./admin.types";
+
+function mapAgentTypeToRole(type: string): AdminRole {
+  return type === "PARTNER" ? "AGENT_PARTNER" : "AGENT_INTERNAL";
+}
 
 interface AuthState {
   profile: AdminProfile | null;
@@ -27,10 +31,27 @@ export const useAuthStore = create<AuthState>((set) => ({
       setToken(data.token);
       set({ profile: data.user, isAuthenticated: true, loading: false });
       return true;
-    } catch (err: any) {
-      const message = err?.response?.data?.error || err?.message || "Login failed";
-      set({ loading: false, error: message });
-      return false;
+    } catch {
+      try {
+        const { data } = await api.post("/agent/auth/login", { email, password });
+        setToken(data.token);
+        set({
+          profile: {
+            id: data.user.id,
+            email: data.user.email,
+            role: mapAgentTypeToRole(data.user.type),
+            status: "ACTIVE",
+            createdAt: "",
+          },
+          isAuthenticated: true,
+          loading: false,
+        });
+        return true;
+      } catch (err: any) {
+        const message = err?.response?.data?.error || err?.message || "Login failed";
+        set({ loading: false, error: message });
+        return false;
+      }
     }
   },
 
@@ -45,6 +66,22 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const { data } = await api.get("/admin/auth/me");
       set({ profile: data, isAuthenticated: true });
+      return;
+    } catch {
+      /* try agent */
+    }
+    try {
+      const { data } = await api.get("/agent/auth/me");
+      set({
+        profile: {
+          id: data.id,
+          email: data.email,
+          role: mapAgentTypeToRole(data.type),
+          status: data.status || "ACTIVE",
+          createdAt: data.createdAt || "",
+        },
+        isAuthenticated: true,
+      });
     } catch {
       clearToken();
       set({ profile: null, isAuthenticated: false });
