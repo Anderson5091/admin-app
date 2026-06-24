@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Plus, UserCog, DollarSign, TrendingUp, BarChart3, X, ExternalLink, HandCoins } from "lucide-react";
+import { Plus, UserCog, DollarSign, BarChart3, X, ExternalLink, HandCoins } from "lucide-react";
 
 const typeColors: Record<string, string> = {
   PARTNER: "text-purple-400 bg-purple-900/30 border-purple-700/30",
@@ -132,8 +132,8 @@ export default function Agents() {
                       Base: {agent.baseTreasuryBalance.toLocaleString()} USDT
                     </span>
                     <span className="flex items-center gap-1">
-                      <TrendingUp size={12} className="text-warning" />
-                      Commission: {agent.commissionBalance.toLocaleString()} USDT
+                      <BarChart3 size={12} className="text-secondary" />
+                      Ledger: {agent.commissionLedgerBalance.toLocaleString()} USDT
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 size={12} className="text-secondary" />

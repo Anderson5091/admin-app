@@ -89,18 +89,6 @@ export default function AgentDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-warning-dim">
-              <TrendingUp size={16} className="text-warning" />
-            </div>
-            <div>
-              <p className="text-lg font-bold text-text-primary">{a.commissionBalance?.toLocaleString() ?? "N/A"}</p>
-              <p className="text-xs text-text-secondary">Commission Wallet</p>
-              <p className="text-[9px] text-text-subtle">USDT</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-secondary-dim">
               <HandCoins size={16} className="text-secondary" />
             </div>
@@ -147,7 +135,7 @@ export default function AgentDetail() {
             {a.wallets.map((w) => (
               <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant={w.walletType === "BASE_TREASURY" ? "purple" : "warning"}>{w.walletType}</Badge>
+                  <Badge variant="purple">{w.walletType}</Badge>
                   <span className="text-[10px] text-text-subtle">{w.network}</span>
                 </div>
                 <p className="text-xs font-mono text-text-secondary truncate mb-1">{w.address}</p>

@@ -12,7 +12,6 @@ export interface Agent {
   totalRewards: number;
   totalTransactions: number;
   baseTreasuryBalance: number;
-  commissionBalance: number;
   commissionLedgerBalance: number;
   createdAt: string;
 }
@@ -27,7 +26,6 @@ export interface AgentDetail {
   totalRewards: number;
   commissionLedgerBalance: number;
   baseTreasuryBalance: number | null;
-  commissionBalance: number | null;
   todayVolume: number;
   todayCommission: number;
   todayTxCount: number;

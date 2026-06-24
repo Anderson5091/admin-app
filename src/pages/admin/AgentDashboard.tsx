@@ -3,7 +3,7 @@ import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, DollarSign, TrendingUp, RefreshCw, Clock, Activity } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock } from "lucide-react";
 
 export default function AgentDashboard() {
   const profile = useAuthStore((s) => s.profile);
@@ -24,9 +24,9 @@ export default function AgentDashboard() {
 
   const kpiCards = [
     { label: "Base Treasury", value: agentDetail?.baseTreasuryBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT" },
-    { label: "Commission Wallet", value: agentDetail?.commissionBalance ?? "—", icon: DollarSign, color: "text-warning bg-warning-dim", suffix: "USDT" },
+    { label: "Comm. Ledger", value: agentDetail?.commissionLedgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: "USDT" },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
-    { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: Activity, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
+    { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: Wallet, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
   ];
 
   return (
@@ -127,7 +127,7 @@ export default function AgentDashboard() {
               {agentDetail.wallets.map((w) => (
                 <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant={w.walletType === "BASE_TREASURY" ? "purple" : "warning"}>{w.walletType}</Badge>
+                    <Badge variant="purple">{w.walletType}</Badge>
                     <span className="text-[10px] text-text-subtle">{w.network}</span>
                   </div>
                   <p className="text-xs font-mono text-text-secondary truncate mb-1">{w.address}</p>
