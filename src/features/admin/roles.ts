@@ -10,6 +10,7 @@ export interface PagePermission {
 export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
   "/admins": ["SUPER_ADMIN"],
   "/agents": ["SUPER_ADMIN", "ADMIN", "OPS", "TREASURY"],
+  "/agents/topup": ["SUPER_ADMIN", "ADMIN", "OPS", "TREASURY"],
   "/users": ["SUPER_ADMIN", "ADMIN", "OPS"],
   "/kyc": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE"],
   "/partners": ["SUPER_ADMIN", "ADMIN", "OPS"],
@@ -21,6 +22,10 @@ export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
   "/live": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
   "/system": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
   "/notifications": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS", "TREASURY"],
+  "/agent/deposit": ["AGENT_PARTNER", "AGENT_INTERNAL"],
+  "/agent/withdraw": ["AGENT_PARTNER", "AGENT_INTERNAL"],
+  "/agent/payment": ["AGENT_PARTNER", "AGENT_INTERNAL"],
+  "/agent/topup": ["AGENT_INTERNAL"],
 };
 
 export function canAccess(path: string, role: AdminRole | undefined): boolean {

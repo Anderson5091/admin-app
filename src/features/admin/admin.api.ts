@@ -143,6 +143,11 @@ export const AdminApi = {
     return data;
   },
 
+  async addBalance(agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number }): Promise<{ message: string }> {
+    const { data } = await api.post(`/agent/topup-partner`, payload);
+    return data;
+  },
+
   async analyzeFraud(userId: string): Promise<FraudAnalysis> {
     const { data } = await api.get(`/admin/fraud/analyze/${userId}`);
     return data;

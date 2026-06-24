@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload } from "./admin.types";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -52,11 +52,15 @@ interface AdminState {
   agents: Agent[];
   agentDetail: AgentDetail | null;
   agentKpi: AgentKpiItem[];
+  agentActionLoading: boolean;
+  agentActionResult: string | null;
   fetchAgents: () => Promise<void>;
   createAgent: (data: { email: string; password: string; fullName?: string; phone?: string; type: string }) => Promise<void>;
   fetchAgentDetail: (agentId: string) => Promise<void>;
   toggleAgentStatus: (agentId: string) => Promise<void>;
   fetchAgentKpi: (agentId: string, period?: string) => Promise<void>;
+  agentAddBalance: (agentId: string, payload: AddBalancePayload) => Promise<void>;
+  clearAgentActionResult: () => void;
 
   adminUsers: AdminUserItem[];
   fetchAdminUsers: () => Promise<void>;
@@ -86,6 +90,8 @@ export const useAdminStore = create<AdminState>((set) => ({
   agents: [],
   agentDetail: null,
   agentKpi: [],
+  agentActionLoading: false,
+  agentActionResult: null,
   adminUsers: [],
   loading: false,
   usersLoading: false,
@@ -342,6 +348,19 @@ export const useAdminStore = create<AdminState>((set) => ({
       console.error("Failed to fetch agent KPI:", err);
     }
   },
+
+  agentAddBalance: async (agentId: string, payload: AddBalancePayload) => {
+    set({ agentActionLoading: true, agentActionResult: null });
+    try {
+      const result = await AdminApi.addBalance(agentId, payload);
+      set({ agentActionLoading: false, agentActionResult: result.message || "Top up successful" });
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Top up failed";
+      set({ agentActionLoading: false, agentActionResult: message });
+    }
+  },
+
+  clearAgentActionResult: () => set({ agentActionResult: null }),
 
   fetchAdminUsers: async () => {
     try {

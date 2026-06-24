@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, Globe, ArrowUpFromLine } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -21,6 +21,10 @@ const navIconMap: Record<string, any> = {
   "/live": Radio,
   "/system": Activity,
   "/notifications": Bell,
+  "/agent/deposit": Wallet,
+  "/agent/withdraw": Send,
+  "/agent/payment": Globe,
+  "/agent/topup": ArrowUpFromLine,
 };
 
 const navLabelMap: Record<string, string> = {
@@ -37,6 +41,10 @@ const navLabelMap: Record<string, string> = {
   "/live": "Live Feed",
   "/system": "System Health",
   "/notifications": "Notifications",
+  "/agent/deposit": "Deposit",
+  "/agent/withdraw": "Withdraw",
+  "/agent/payment": "Payment",
+  "/agent/topup": "Top Up Agent",
 };
 
 const NAV_SECTIONS = [
@@ -46,6 +54,7 @@ const NAV_SECTIONS = [
   { label: "Compliance", paths: ["/cases", "/fraud"] },
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },
+  { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payment", "/agent/topup"] },
 ];
 
 const roleColors: Record<string, string> = {
@@ -84,7 +93,10 @@ export default function AdminLayout() {
 
   const role = profile?.role;
 
+  const isAgent = role === "AGENT_PARTNER" || role === "AGENT_INTERNAL";
+
   const visibleSections = NAV_SECTIONS
+    .filter((section) => section.label !== "Agent Operations" || isAgent)
     .map((section) => ({
       ...section,
       items: section.paths

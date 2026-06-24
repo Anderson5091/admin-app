@@ -12,6 +12,13 @@ import FraudInvestigation from "../pages/admin/FraudInvestigation";
 import AdminNotifications from "../pages/admin/Notifications";
 import AdminPartners from "../pages/admin/Partners";
 import AdminAgents from "../pages/admin/Agents";
+import AdminAgentDetail from "../pages/admin/AgentDetail";
+import AdminAgentTransactions from "../pages/admin/AgentTransactions";
+import AdminAgentTopUp from "../pages/admin/AgentTopUp";
+import AgentDeposit from "../pages/admin/AgentDeposit";
+import AgentWithdraw from "../pages/admin/AgentWithdraw";
+import AgentPayment from "../pages/admin/AgentPayment";
+import AgentTopUpAgent from "../pages/admin/AgentTopUpAgent";
 import AdminAdmins from "../pages/admin/Admins";
 import AdminTreasury from "../pages/admin/Treasury";
 import SystemHealth from "../pages/admin/system/SystemHealth";
@@ -66,8 +73,15 @@ export const router = createBrowserRouter([
       { path: "notifications", element: <ProtectedRoute requiredPath="/notifications"><AdminNotifications /></ProtectedRoute> },
       { path: "partners", element: <ProtectedRoute requiredPath="/partners"><AdminPartners /></ProtectedRoute> },
       { path: "agents", element: <ProtectedRoute requiredPath="/agents"><AdminAgents /></ProtectedRoute> },
+      { path: "agents/topup", element: <ProtectedRoute requiredPath="/agents/topup"><AdminAgentTopUp /></ProtectedRoute> },
+      { path: "agents/:id", element: <ProtectedRoute requiredPath="/agents"><AdminAgentDetail /></ProtectedRoute> },
+      { path: "agents/:id/transactions", element: <ProtectedRoute requiredPath="/agents"><AdminAgentTransactions /></ProtectedRoute> },
       { path: "admins", element: <ProtectedRoute requiredPath="/admins"><AdminAdmins /></ProtectedRoute> },
       { path: "system", element: <ProtectedRoute requiredPath="/system"><SystemHealth /></ProtectedRoute> },
+      { path: "agent/deposit", element: <ProtectedRoute requiredPath="/agent/deposit"><AgentDeposit /></ProtectedRoute> },
+      { path: "agent/withdraw", element: <ProtectedRoute requiredPath="/agent/withdraw"><AgentWithdraw /></ProtectedRoute> },
+      { path: "agent/payment", element: <ProtectedRoute requiredPath="/agent/payment"><AgentPayment /></ProtectedRoute> },
+      { path: "agent/topup", element: <ProtectedRoute requiredPath="/agent/topup"><AgentTopUpAgent /></ProtectedRoute> },
     ],
   },
   {

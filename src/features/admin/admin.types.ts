@@ -66,6 +66,12 @@ export interface AgentKpiItem {
   rating: number | null;
 }
 
+export interface AddBalancePayload {
+  userId: string;
+  fiatAmount: string;
+  usdtAmount: number;
+}
+
 export interface AdminProfile {
   id: string;
   email: string;
