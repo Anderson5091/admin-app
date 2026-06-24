@@ -99,6 +99,9 @@ export interface AdminDashboardData {
   failedPayouts: number;
   openCases: number;
   fraudAlerts: number;
+  totalAgents: number;
+  partnerAgents: number;
+  internalAgents: number;
   alerts: Alert[];
   recentActivity: ActivityItem[];
 }

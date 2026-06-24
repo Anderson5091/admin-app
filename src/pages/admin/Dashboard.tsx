@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAdminStreamStore } from "../../features/admin/stream.store";
 import Card from "../../components/ui/Card";
-import { Users, ArrowUpDown, Shield, AlertTriangle, Scale, Ban, AlertCircle, Clock, Radio } from "lucide-react";
+import { Users, ArrowUpDown, Shield, AlertTriangle, Scale, Ban, AlertCircle, Clock, Radio, UserCog, Handshake } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   PENDING_PAYOUT: "text-warning",
@@ -50,6 +50,8 @@ export default function Dashboard() {
     { label: "Failed Payouts", value: d.failedPayouts ?? 0, icon: AlertTriangle, color: "text-danger bg-danger-dim" },
     { label: "Open Cases", value: d.openCases ?? 0, icon: Scale, color: "text-warning bg-warning-dim" },
     { label: "Fraud Alerts", value: d.fraudAlerts ?? 0, icon: Ban, color: "text-danger bg-danger-dim" },
+    { label: "Local Agents", value: (d.internalAgents ?? 0).toLocaleString(), icon: UserCog, color: "text-primary bg-primary-dim" },
+    { label: "External Agents", value: (d.partnerAgents ?? 0).toLocaleString(), icon: Handshake, color: "text-purple-400 bg-purple-900/30" },
   ];
 
   const severityColor = (s: string) => {
