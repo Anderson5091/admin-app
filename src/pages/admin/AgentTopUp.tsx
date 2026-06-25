@@ -47,7 +47,7 @@ export default function AgentTopUp() {
         </button>
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Top Up Partner</h1>
-          <p className="text-text-secondary text-sm mt-0.5">Add funds to a partner's BASE_TREASURY wallet</p>
+          <p className="text-text-secondary text-sm mt-0.5">Add funds to a partner's wallet</p>
         </div>
       </div>
 
@@ -68,7 +68,7 @@ export default function AgentTopUp() {
             <option value="">Select a partner...</option>
             {partners.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.fullName || p.email} — Treasury: {p.baseTreasuryBalance.toLocaleString()} USDT
+                {p.fullName || p.email} — Wallet: {p.walletBalance.toLocaleString()} USDT
               </option>
             ))}
           </select>

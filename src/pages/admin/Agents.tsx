@@ -129,7 +129,7 @@ export default function Agents() {
                   <div className="flex items-center gap-4 mt-2 text-xs text-text-secondary">
                     <span className="flex items-center gap-1">
                       <DollarSign size={12} className="text-primary" />
-                      Treasury: {agent.baseTreasuryBalance.toLocaleString()} USDT
+                      Wallet: {agent.walletBalance.toLocaleString()} USDT
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 size={12} className="text-secondary" />

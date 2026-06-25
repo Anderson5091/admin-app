@@ -60,7 +60,7 @@ export default function AgentTopUpAgent() {
         </button>
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Top Up Partner</h1>
-          <p className="text-text-secondary text-sm mt-0.5">Transfer USDT from system treasury to a partner's BASE_TREASURY wallet</p>
+          <p className="text-text-secondary text-sm mt-0.5">Transfer USDT from system treasury to a partner's wallet</p>
         </div>
       </div>
 

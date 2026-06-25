@@ -81,8 +81,8 @@ export default function AgentDetail() {
               <DollarSign size={16} className="text-primary" />
             </div>
             <div>
-              <p className="text-lg font-bold text-text-primary">{a.baseTreasuryBalance?.toLocaleString() ?? "N/A"}</p>
-              <p className="text-xs text-text-secondary">Base Treasury</p>
+              <p className="text-lg font-bold text-text-primary">{a.walletBalance?.toLocaleString() ?? "N/A"}</p>
+              <p className="text-xs text-text-secondary">Wallet Balance</p>
               <p className="text-[9px] text-text-subtle">USDT</p>
             </div>
           </div>
