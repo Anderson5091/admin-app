@@ -45,7 +45,7 @@ export default function AgentWithdraw() {
           <ArrowLeft size={18} className="text-text-secondary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Withdraw</h1>
+          <h1 className="text-2xl font-bold text-text-primary">Cash Withdraw</h1>
           <p className="text-text-secondary text-sm mt-0.5">Give cash to user, debit their wallet, credit agent commission</p>
         </div>
       </div>

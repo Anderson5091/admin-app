@@ -41,8 +41,8 @@ const navLabelMap: Record<string, string> = {
   "/live": "Live Feed",
   "/system": "System Health",
   "/notifications": "Notifications",
-  "/agent/deposit": "Deposit",
-  "/agent/withdraw": "Withdraw",
+  "/agent/deposit": "Cash Deposit",
+  "/agent/withdraw": "Cash Withdraw",
   "/agent/payment": "Payment",
   "/agent/topup": "Top Up Agent",
 };

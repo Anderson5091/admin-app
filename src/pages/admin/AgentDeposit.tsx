@@ -45,7 +45,7 @@ export default function AgentDeposit() {
           <ArrowLeft size={18} className="text-text-secondary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Deposit</h1>
+          <h1 className="text-2xl font-bold text-text-primary">Cash Deposit</h1>
           <p className="text-text-secondary text-sm mt-0.5">Take cash from user, credit their wallet from agent treasury</p>
         </div>
       </div>

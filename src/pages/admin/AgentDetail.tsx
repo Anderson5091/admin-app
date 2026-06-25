@@ -94,7 +94,7 @@ export default function AgentDetail() {
             </div>
             <div>
               <p className="text-lg font-bold text-text-primary">{a.commissionLedgerBalance.toLocaleString()}</p>
-              <p className="text-xs text-text-secondary">Comm. Ledger</p>
+              <p className="text-xs text-text-secondary">Commission</p>
               <p className="text-[9px] text-text-subtle">USDT</p>
             </div>
           </div>
