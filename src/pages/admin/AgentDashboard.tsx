@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, ArrowRight } from "lucide-react";
 import type { AgentDetail } from "../../features/admin/admin.types";
 
 export default function AgentDashboard() {
+  const navigate = useNavigate();
   const profile = useAuthStore((s) => s.profile);
   const { agentKpi, fetchAgentKpi } = useAdminStore();
   const [agentDetail, setAgentDetail] = useState<AgentDetail | null>(null);
@@ -50,10 +52,10 @@ export default function AgentDashboard() {
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
   const kpiCards = [
-    { label: "Wallet", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT" },
-    { label: "Commission", value: agentDetail?.commissionLedgerBalance ?? "—", icon: HandCoins, color: "text-warning bg-warning-dim", suffix: "USDT" },
-    { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
-    { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
+    { label: "Wallet", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", to: "/", subtitle: agentDetail?.wallets?.length ? `${agentDetail.wallets.length} wallet` : "" },
+    { label: "Commission", value: agentDetail?.commissionLedgerBalance ?? "—", icon: HandCoins, color: "text-warning bg-warning-dim", suffix: "USDT", to: "/agent/commission", subtitle: "Withdraw →" },
+    { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "", to: "/" },
+    { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT", to: "/agent/commission", subtitle: "Withdraw →" },
   ];
 
   return (
@@ -74,18 +76,26 @@ export default function AgentDashboard() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="p-4">
+          <button
+            key={kpi.label}
+            onClick={() => navigate(kpi.to)}
+            className="bg-app-bg border border-border rounded-xl p-4 hover:border-primary-border hover:bg-card-alt transition-all text-left w-full"
+          >
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${kpi.color}`}>
                 <kpi.icon size={18} />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-2xl font-bold text-text-primary truncate">{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
                 <p className="text-xs text-text-secondary">{kpi.label}</p>
-                {kpi.suffix && <p className="text-[9px] text-text-subtle">{kpi.suffix}</p>}
+                {kpi.subtitle ? (
+                  <p className="text-[9px] text-primary flex items-center gap-0.5">{kpi.subtitle}</p>
+                ) : kpi.suffix ? (
+                  <p className="text-[9px] text-text-subtle">{kpi.suffix}</p>
+                ) : null}
               </div>
             </div>
-          </Card>
+          </button>
         ))}
       </div>
 
