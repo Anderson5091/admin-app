@@ -139,7 +139,7 @@ export const AdminApi = {
 
   async getAgentKpi(agentId: string, period?: string): Promise<AgentKpiItem[]> {
     const params = period ? `?period=${period}` : "";
-    const { data } = await api.get(`/agent/${agentId}/kpi${params}`);
+    const { data } = await api.get(`/agent/kpi/${agentId}/${params}`);
     return data;
   },
 
