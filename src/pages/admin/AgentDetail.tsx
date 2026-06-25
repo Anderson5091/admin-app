@@ -131,17 +131,29 @@ export default function AgentDetail() {
             <Wallet size={16} className="text-primary" />
             <h2 className="text-lg font-bold text-text-primary">Wallets</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {a.wallets.map((w) => (
-              <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="purple">{w.walletType}</Badge>
-                  <span className="text-[10px] text-text-subtle">{w.network}</span>
-                </div>
-                <p className="text-xs font-mono text-text-secondary truncate mb-1">{w.address}</p>
-                <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-text-subtle uppercase border-b border-border">
+                  <th className="text-left py-2 pr-4">Type</th>
+                  <th className="text-left py-2 pr-4">Address</th>
+                  <th className="text-right py-2 pr-4">Network</th>
+                  <th className="text-right py-2">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {a.wallets.map((w) => (
+                  <tr key={w.id} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4">
+                      <Badge variant="purple">{w.walletType}</Badge>
+                    </td>
+                    <td className="py-2 pr-4 text-text-secondary font-mono truncate max-w-[200px]">{w.address}</td>
+                    <td className="py-2 pr-4 text-right text-text-subtle">{w.network}</td>
+                    <td className="py-2 text-right text-text-primary font-bold">{w.balance.toLocaleString()} USDT</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </Card>
       )}

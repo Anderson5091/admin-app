@@ -138,7 +138,6 @@ export default function AgentDashboard() {
             <p className="text-text-subtle text-sm py-8 text-center">No wallets assigned</p>
           )}
         </Card>
-        )}
       </div>
 
       {agentDetail?.transactions && agentDetail.transactions.length > 0 && (
