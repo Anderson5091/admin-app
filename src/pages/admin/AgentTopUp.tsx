@@ -68,7 +68,7 @@ export default function AgentTopUp() {
             <option value="">Select a partner...</option>
             {partners.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.fullName || p.email} — Wallet: {p.walletBalance.toLocaleString()} USDT
+                {p.fullName || p.email} — Wallet: {(p.walletBalance ?? 0).toLocaleString()} USDT
               </option>
             ))}
           </select>
