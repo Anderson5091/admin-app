@@ -31,6 +31,14 @@ export const AgentApi = {
     return data;
   },
 
+  async processPayout(
+    agentId: string,
+    payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string; commissionPercent?: number }
+  ): Promise<{ id: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
+    const { data } = await api.post(`/agent/${agentId}/process-payout`, payload);
+    return data;
+  },
+
   async getMyDashboard(): Promise<AgentDetail> {
     const { data } = await api.get("/agent/me/dashboard");
     return data;

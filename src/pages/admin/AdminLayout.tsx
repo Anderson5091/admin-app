@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, Globe, ArrowUpFromLine, ArrowLeftRight, ScrollText } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -23,7 +23,7 @@ const navIconMap: Record<string, any> = {
   "/notifications": Bell,
   "/agent/deposit": Wallet,
   "/agent/withdraw": Send,
-  "/agent/payment": Globe,
+  "/agent/payout": ExternalLink,
   "/agent/topup": ArrowUpFromLine,
   "/transfers": ArrowLeftRight,
   "/audit": ScrollText,
@@ -45,7 +45,7 @@ const navLabelMap: Record<string, string> = {
   "/notifications": "Notifications",
   "/agent/deposit": "Cash Deposit",
   "/agent/withdraw": "Cash Withdraw",
-  "/agent/payment": "Payment",
+  "/agent/payout": "Payout",
   "/agent/topup": "Top Up Agent",
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
@@ -58,7 +58,7 @@ const NAV_SECTIONS = [
   { label: "Compliance", paths: ["/cases", "/fraud", "/audit"] },
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },
-  { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payment", "/agent/topup"] },
+  { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payout", "/agent/topup"] },
 ];
 
 const roleColors: Record<string, string> = {
