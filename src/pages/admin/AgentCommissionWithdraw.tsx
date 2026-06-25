@@ -6,7 +6,7 @@ import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
-  ArrowLeft, Wallet, DollarSign, HandCoins,
+  ArrowLeft, HandCoins,
   Loader2, CheckCircle, AlertCircle, Clock,
   RefreshCw,
 } from "lucide-react";
@@ -66,7 +66,6 @@ export default function AgentCommissionWithdraw() {
   }
 
   const commLedger = dashboard?.commissionLedgerBalance ?? 0;
-  const commWallet = dashboard?.commissionWalletBalance ?? 0;
   const balanceTooLow = commLedger < 10;
   const commTxns = dashboard?.transactions?.filter((t) => t.type === "COMMISSION_WITHDRAW" || t.type === "COMMISSION") ?? [];
 
@@ -98,32 +97,18 @@ export default function AgentCommissionWithdraw() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-warning-dim">
-                  <DollarSign size={16} className="text-warning" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-text-primary">{commLedger.toLocaleString()}</p>
-                  <p className="text-xs text-text-secondary">Commission Ledger</p>
-                  <p className="text-[9px] text-text-subtle">USDT — withdrawable</p>
-                </div>
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-warning-dim">
+                <HandCoins size={16} className="text-warning" />
               </div>
-            </Card>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary-dim">
-                  <Wallet size={16} className="text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-text-primary">{commWallet.toLocaleString()}</p>
-                  <p className="text-xs text-text-secondary">Commission Wallet</p>
-                  <p className="text-[9px] text-text-subtle">USDT — on-chain balance</p>
-                </div>
+              <div>
+                <p className="text-2xl font-bold text-text-primary">{commLedger.toLocaleString()}</p>
+                <p className="text-xs text-text-secondary">Commission Wallet</p>
+                <p className="text-[9px] text-text-subtle">USDT — withdrawable to treasury</p>
               </div>
-            </Card>
-          </div>
+            </div>
+          </Card>
 
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-4 border-b border-border">

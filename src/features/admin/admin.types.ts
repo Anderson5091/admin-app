@@ -25,7 +25,6 @@ export interface AgentDetail {
   kpiRating: number | null;
   totalRewards: number;
   commissionLedgerBalance: number;
-  commissionWalletBalance: number | null;
   baseTreasuryBalance: number | null;
   todayVolume: number;
   todayCommission: number;
