@@ -48,7 +48,6 @@ export interface AgentWalletInfo {
   id: string;
   walletType: string;
   network: string;
-  address: string;
   balance: number;
 }
 

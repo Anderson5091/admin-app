@@ -156,7 +156,6 @@ export default function AgentDashboard() {
                     <Badge variant="purple">{w.walletType}</Badge>
                     <span className="text-[10px] text-text-subtle">{w.network}</span>
                   </div>
-                  <p className="text-xs font-mono text-text-secondary truncate mb-1">{w.address}</p>
                   <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
                 </div>
               ))}
