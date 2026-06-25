@@ -66,6 +66,8 @@ export default function AgentCommissionWithdraw() {
   }
 
   const commLedger = dashboard?.commissionLedgerBalance ?? 0;
+  const walletBal = dashboard?.walletBalance ?? 0;
+  const mainWallet = dashboard?.wallets?.find((w) => w.walletType === "MAIN");
   const balanceTooLow = commLedger < 10;
   const commTxns = dashboard?.transactions?.filter((t) => t.type === "COMMISSION_WITHDRAW" || t.type === "COMMISSION") ?? [];
 
@@ -97,18 +99,38 @@ export default function AgentCommissionWithdraw() {
         </div>
       ) : (
         <>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-warning-dim">
-                <HandCoins size={16} className="text-warning" />
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => navigate("/agent/commission")}
+              className="bg-app-bg border border-border rounded-xl p-4 hover:border-primary-border transition-all text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-warning-dim">
+                  <HandCoins size={16} className="text-warning" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-text-primary">{commLedger.toLocaleString()}</p>
+                  <p className="text-xs text-text-secondary">Commission Ledger</p>
+                  <p className="text-[9px] text-text-subtle">USDT — withdrawable</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-text-primary">{commLedger.toLocaleString()}</p>
-                <p className="text-xs text-text-secondary">Commission Wallet</p>
-                <p className="text-[9px] text-text-subtle">USDT — withdrawable to treasury</p>
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className="bg-app-bg border border-border rounded-xl p-4 hover:border-primary-border transition-all text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary-dim">
+                  <HandCoins size={16} className="text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-text-primary">{walletBal.toLocaleString()}</p>
+                  <p className="text-xs text-text-secondary">Main Wallet</p>
+                  <p className="text-[9px] text-text-subtle">{mainWallet?.network || "BASE"} — on-chain</p>
+                </div>
               </div>
-            </div>
-          </Card>
+            </button>
+          </div>
 
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-4 border-b border-border">
