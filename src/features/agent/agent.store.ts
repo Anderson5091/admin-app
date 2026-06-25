@@ -10,6 +10,22 @@ interface AgentActionState {
   processPayment: (agentId: string, payload: { userId: string; amount: number; paymentMethod: string; commissionPercent?: number }) => Promise<void>;
   topupPartner: (payload: { partnerAgentId: string; usdtAmount: number }) => Promise<void>;
   payout: (agentId: string, payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string; commissionPercent?: number }) => Promise<void>;
+  transfer: (agentId: string, payload: {
+    userId?: string;
+    amount: number;
+    payoutMethod: string;
+    beneficiaryId?: string;
+    beneficiary?: {
+      fullName: string;
+      country: string;
+      bankName?: string;
+      accountNumber?: string;
+      mobileWalletNumber?: string;
+      mobileProvider?: string;
+      cashPickupLocation?: string;
+    };
+    commissionPercent?: number;
+  }) => Promise<void>;
   clearResult: () => void;
 }
 
@@ -83,6 +99,20 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Payout failed";
+      set({ loading: false, result: { success: false, message: msg } });
+    }
+  },
+
+  transfer: async (agentId, payload) => {
+    set({ loading: true, result: null });
+    try {
+      const res = await AgentApi.processTransfer(agentId, payload);
+      set({
+        loading: false,
+        result: { success: true, message: `Transfer processed — ${res.netAmount} USDT via ${payload.payoutMethod}`, reference: res.reference },
+      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || "Transfer failed";
       set({ loading: false, result: { success: false, message: msg } });
     }
   },
