@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem } from "./admin.types";
 
 export const AdminApi = {
   async getDashboard(): Promise<AdminDashboardData> {
@@ -145,6 +145,16 @@ export const AdminApi = {
 
   async addBalance(agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number }): Promise<{ message: string }> {
     const { data } = await api.post(`/agent/topup-partner`, payload);
+    return data;
+  },
+
+  async getTransfers(): Promise<TransferItem[]> {
+    const { data } = await api.get("/admin/transfers");
+    return data;
+  },
+
+  async getAuditLogs(): Promise<AuditLogItem[]> {
+    const { data } = await api.get("/admin/audit-logs");
     return data;
   },
 

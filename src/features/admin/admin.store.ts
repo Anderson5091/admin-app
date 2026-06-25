@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem } from "./admin.types";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -67,6 +67,14 @@ interface AdminState {
   createAdmin: (data: { email: string; password: string; role: string }) => Promise<void>;
   toggleAdminStatus: (adminId: string) => Promise<void>;
   deleteAdmin: (adminId: string) => Promise<void>;
+
+  transfers: TransferItem[];
+  transfersLoading: boolean;
+  fetchTransfers: () => Promise<void>;
+
+  auditLogs: AuditLogItem[];
+  auditLogsLoading: boolean;
+  fetchAuditLogs: () => Promise<void>;
 }
 
 export const useAdminStore = create<AdminState>((set) => ({
@@ -93,6 +101,10 @@ export const useAdminStore = create<AdminState>((set) => ({
   agentActionLoading: false,
   agentActionResult: null,
   adminUsers: [],
+  transfers: [],
+  transfersLoading: false,
+  auditLogs: [],
+  auditLogsLoading: false,
   loading: false,
   usersLoading: false,
   error: "",
@@ -388,5 +400,27 @@ export const useAdminStore = create<AdminState>((set) => ({
   deleteAdmin: async (adminId: string) => {
     await AdminApi.deleteAdmin(adminId);
     set((state) => ({ adminUsers: state.adminUsers.filter((a) => a.id !== adminId) }));
+  },
+
+  fetchTransfers: async () => {
+    set({ transfersLoading: true });
+    try {
+      const transfers = await AdminApi.getTransfers();
+      set({ transfers, transfersLoading: false });
+    } catch (err) {
+      console.error("Failed to fetch transfers:", err);
+      set({ transfersLoading: false });
+    }
+  },
+
+  fetchAuditLogs: async () => {
+    set({ auditLogsLoading: true });
+    try {
+      const auditLogs = await AdminApi.getAuditLogs();
+      set({ auditLogs, auditLogsLoading: false });
+    } catch (err) {
+      console.error("Failed to fetch audit logs:", err);
+      set({ auditLogsLoading: false });
+    }
   },
 }));

@@ -276,6 +276,32 @@ export interface BackupEntry {
   backups: string[];
 }
 
+export interface TransferItem {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  amount: number;
+  fee: number;
+  destinationAmount: number;
+  payoutMethod: string | null;
+  status: string;
+  referenceId: string | null;
+  partner: string | null;
+  partnerStatus: string | null;
+  createdAt: string;
+}
+
+export interface AuditLogItem {
+  id: string;
+  adminId: string | null;
+  action: string;
+  entity: string | null;
+  entityId: string | null;
+  metadata: any;
+  createdAt: string;
+}
+
 export interface SystemStatus {
   healthy: boolean;
   lastBackup: string | null;

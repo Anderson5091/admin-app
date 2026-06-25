@@ -21,6 +21,8 @@ import AgentPayment from "../pages/admin/AgentPayment";
 import AgentTopUpAgent from "../pages/admin/AgentTopUpAgent";
 import AdminAdmins from "../pages/admin/Admins";
 import AdminTreasury from "../pages/admin/Treasury";
+import AdminTransfers from "../pages/admin/Transfers";
+import AdminAudit from "../pages/admin/Audit";
 import SystemHealth from "../pages/admin/system/SystemHealth";
 import Forbidden from "../pages/admin/Forbidden";
 import { getToken } from "../utils/token";
@@ -82,6 +84,8 @@ export const router = createBrowserRouter([
       { path: "agent/withdraw", element: <ProtectedRoute requiredPath="/agent/withdraw"><AgentWithdraw /></ProtectedRoute> },
       { path: "agent/payment", element: <ProtectedRoute requiredPath="/agent/payment"><AgentPayment /></ProtectedRoute> },
       { path: "agent/topup", element: <ProtectedRoute requiredPath="/agent/topup"><AgentTopUpAgent /></ProtectedRoute> },
+      { path: "transfers", element: <ProtectedRoute requiredPath="/transfers"><AdminTransfers /></ProtectedRoute> },
+      { path: "audit", element: <ProtectedRoute requiredPath="/audit"><AdminAudit /></ProtectedRoute> },
     ],
   },
   {
