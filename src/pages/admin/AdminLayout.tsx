@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, HandCoins } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -26,6 +26,7 @@ const navIconMap: Record<string, any> = {
   "/agent/payout": ExternalLink,
   "/agent/transfer": ArrowRight,
   "/agent/topup": ArrowUpFromLine,
+  "/agent/commission": HandCoins,
   "/transfers": ArrowLeftRight,
   "/audit": ScrollText,
 };
@@ -49,6 +50,7 @@ const navLabelMap: Record<string, string> = {
   "/agent/payout": "Payout",
   "/agent/transfer": "Transfer",
   "/agent/topup": "Top Up Agent",
+  "/agent/commission": "Commission",
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
 };

@@ -26,6 +26,7 @@ interface AgentActionState {
     };
     commissionPercent?: number;
   }) => Promise<void>;
+  withdrawCommission: (agentId: string) => Promise<void>;
   clearResult: () => void;
 }
 
@@ -113,6 +114,20 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Transfer failed";
+      set({ loading: false, result: { success: false, message: msg } });
+    }
+  },
+
+  withdrawCommission: async (agentId) => {
+    set({ loading: true, result: null });
+    try {
+      const res = await AgentApi.withdrawCommission(agentId);
+      set({
+        loading: false,
+        result: { success: true, message: `Commission — ${res.amount} USDT moved to treasury`, reference: res.reference },
+      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || "Withdraw commission failed";
       set({ loading: false, result: { success: false, message: msg } });
     }
   },

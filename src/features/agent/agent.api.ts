@@ -62,6 +62,11 @@ export const AgentApi = {
     return data;
   },
 
+  async withdrawCommission(agentId: string): Promise<{ id: string; type: string; amount: number; status: string; reference: string }> {
+    const { data } = await api.post(`/agent/${agentId}/withdraw-commission`);
+    return data;
+  },
+
   async getMyDashboard(): Promise<AgentDetail> {
     const { data } = await api.get("/agent/me/dashboard");
     return data;

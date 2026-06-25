@@ -27,6 +27,7 @@ export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
   "/agent/payout": ["AGENT_PARTNER", "AGENT_INTERNAL"],
   "/agent/transfer": ["AGENT_PARTNER", "AGENT_INTERNAL"],
   "/agent/topup": ["AGENT_INTERNAL"],
+  "/agent/commission": ["AGENT_PARTNER", "AGENT_INTERNAL"],
   "/transfers": ["SUPER_ADMIN", "ADMIN", "OPS", "TREASURY"],
   "/audit": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS"],
 };
