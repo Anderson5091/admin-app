@@ -1,24 +1,51 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
+import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import { Wallet, TrendingUp, RefreshCw, Clock } from "lucide-react";
+import type { AgentDetail } from "../../features/admin/admin.types";
 
 export default function AgentDashboard() {
   const profile = useAuthStore((s) => s.profile);
-  const { agentDetail, agentKpi, fetchAgentDetail, fetchAgentKpi } = useAdminStore();
+  const { agentKpi, fetchAgentKpi } = useAdminStore();
+  const [agentDetail, setAgentDetail] = useState<AgentDetail | null>(null);
+  const [loading, setLoading] = useState(true);
   const [kpiPeriod, setKpiPeriod] = useState("DAILY");
+
+  const loadDashboard = async () => {
+    if (!profile?.id) return;
+    setLoading(true);
+    try {
+      const [detail] = await Promise.all([
+        AgentApi.getMyDashboard(),
+      ]);
+      setAgentDetail(detail);
+    } catch (err) {
+      console.error("Failed to load agent dashboard:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (profile?.id) {
-      fetchAgentDetail(profile.id);
+      loadDashboard();
       fetchAgentKpi(profile.id, kpiPeriod);
     }
-  }, [profile?.id, kpiPeriod, fetchAgentDetail, fetchAgentKpi]);
+  }, [profile?.id, kpiPeriod, fetchAgentKpi]);
 
   const isAgent = profile?.role === "AGENT_PARTNER" || profile?.role === "AGENT_INTERNAL";
   if (!isAgent) return null;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
@@ -37,7 +64,7 @@ export default function AgentDashboard() {
           <p className="text-text-secondary text-sm mt-1">Welcome back, {agentName}</p>
         </div>
         <button
-          onClick={() => { if (profile?.id) { fetchAgentDetail(profile.id); fetchAgentKpi(profile.id, kpiPeriod); } }}
+          onClick={() => { if (profile?.id) { loadDashboard(); fetchAgentKpi(profile.id, kpiPeriod); } }}
           className="flex items-center gap-1.5 text-xs text-text-subtle hover:text-text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-card-alt"
         >
           <RefreshCw size={14} />

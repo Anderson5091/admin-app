@@ -1,4 +1,5 @@
 import { api } from "../../api/client";
+import type { AgentDetail } from "../admin/admin.types";
 
 export const AgentApi = {
   async addBalance(
@@ -27,6 +28,11 @@ export const AgentApi = {
     payload: { userId: string; amount: number; paymentMethod: string; commissionPercent?: number }
   ): Promise<{ id: string; status: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
     const { data } = await api.post(`/agent/${agentId}/process-payment`, payload);
+    return data;
+  },
+
+  async getMyDashboard(): Promise<AgentDetail> {
+    const { data } = await api.get("/agent/me/dashboard");
     return data;
   },
 };
