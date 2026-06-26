@@ -16,6 +16,16 @@ export interface Agent {
   createdAt: string;
 }
 
+export interface PendingTransferItem {
+  id: string;
+  beneficiaryId: string | null;
+  amount: number;
+  payoutMethod: string | null;
+  currency: string;
+  status: string;
+  createdAt: string;
+}
+
 export interface AgentDetail {
   id: string;
   email: string;
@@ -31,6 +41,7 @@ export interface AgentDetail {
   todayTxCount: number;
   transactions: AgentTransactionItem[];
   wallets: AgentWalletInfo[];
+  pendingTransfers: PendingTransferItem[];
 }
 
 export interface AgentTransactionItem {
