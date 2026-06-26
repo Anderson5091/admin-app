@@ -58,13 +58,13 @@ const navLabelMap: Record<string, string> = {
 };
 
 const NAV_SECTIONS = [
-  { label: "Monitor", paths: ["/", "/notifications", "/live", "/system"] },
+  { label: "Monitor", paths: ["/", "/notifications", "/live", "/system", "/pending-transfers"] },
   { label: "Administration", paths: ["/admins"] },
   { label: "Finance", paths: ["/treasury", "/payouts", "/transfers"] },
   { label: "Compliance", paths: ["/cases", "/fraud", "/audit"] },
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },
-  { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payout", "/agent/transfer", "/agent/topup", "/pending-transfers"] },
+  { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payout", "/agent/transfer", "/agent/topup"] },
 ];
 
 const roleColors: Record<string, string> = {
