@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock } from "lucide-react";
 import type { AgentDetail } from "../../features/admin/admin.types";
 
 export default function AgentDashboard() {
@@ -15,6 +15,10 @@ export default function AgentDashboard() {
   const [agentDetail, setAgentDetail] = useState<AgentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [kpiPeriod, setKpiPeriod] = useState("DAILY");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [photoData, setPhotoData] = useState<{ transferId: string; base64: string; mimeType: string; preview: string } | null>(null);
+  const pendingTransferIdRef = useRef<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const loadDashboard = async () => {
     if (!profile?.id) return;
     setLoading(true);
@@ -27,6 +31,61 @@ export default function AgentDashboard() {
       console.error("Failed to load agent dashboard:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const lockedPayouts = (agentDetail?.pendingTransfers || []).filter(
+    (t) => t.status === "PROCESSING" && t.processingAgentId === profile?.id
+  );
+
+  const cancelPayout = async (transferId: string) => {
+    if (!profile?.id) return;
+    setBusyId(transferId);
+    try {
+      await AgentApi.cancelPayout(profile.id, transferId);
+      setPhotoData(null);
+      loadDashboard();
+    } catch {
+      // handled by api
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleCameraClick = (transferId: string) => {
+    pendingTransferIdRef.current = transferId;
+    setPhotoData(null);
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(",")[1];
+      const tid = pendingTransferIdRef.current || (lockedPayouts.length > 0 ? lockedPayouts[0].id : null);
+      if (tid) {
+        setPhotoData({ transferId: tid, base64, mimeType: file.type || "image/jpeg", preview: dataUrl });
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const submitPhoto = async () => {
+    if (!photoData || !profile?.id) return;
+    setBusyId(photoData.transferId);
+    try {
+      await AgentApi.confirmPayout(profile.id, photoData.transferId, photoData.base64, photoData.mimeType);
+      setPhotoData(null);
+      loadDashboard();
+    } catch {
+      // handled by api
+    } finally {
+      setBusyId(null);
     }
   };
 
@@ -178,6 +237,104 @@ export default function AgentDashboard() {
           )}
         </Card>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
+      {photoData && (
+        <Card>
+          <div className="flex items-center gap-4">
+            <img src={photoData.preview} alt="Proof" className="w-20 h-20 object-cover rounded-lg border border-border" />
+            <div className="flex-1">
+              <p className="text-xs text-text-secondary">Proof photo captured</p>
+              <p className="text-[10px] text-text-subtle font-mono">{photoData.transferId}</p>
+            </div>
+            <button
+              onClick={submitPhoto}
+              disabled={busyId === photoData.transferId}
+              className="flex items-center gap-1.5 text-xs font-semibold text-white bg-success px-3 py-2 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+            >
+              {busyId === photoData.transferId ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Send size={14} />
+              )}
+              {busyId === photoData.transferId ? "Submitting..." : "Submit Proof"}
+            </button>
+            <button
+              onClick={() => setPhotoData(null)}
+              disabled={busyId === photoData.transferId}
+              className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary bg-card px-3 py-2 rounded-lg hover:opacity-80 transition-opacity"
+            >
+              <XCircle size={14} />
+              Discard
+            </button>
+          </div>
+        </Card>
+      )}
+
+      {lockedPayouts.length > 0 && (
+        <Card>
+          <div className="flex items-center gap-2 mb-4">
+            <Lock size={16} className="text-warning" />
+            <h2 className="text-lg font-bold text-text-primary">Pending Payouts</h2>
+            <Badge variant="warning">{lockedPayouts.length} locked</Badge>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-text-subtle uppercase border-b border-border">
+                  <th className="text-left py-2 pr-4">Reference</th>
+                  <th className="text-left py-2 pr-4">Amount</th>
+                  <th className="text-left py-2 pr-4">Method</th>
+                  <th className="text-left py-2 pr-4">Currency</th>
+                  <th className="text-left py-2 pr-4">Date</th>
+                  <th className="text-right py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lockedPayouts.map((t) => (
+                  <tr key={t.id} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4 text-text-subtle font-mono text-[10px]">{t.referenceId || "—"}</td>
+                    <td className="py-2 pr-4 text-text-primary font-bold">${t.amount.toLocaleString()}</td>
+                    <td className="py-2 pr-4">
+                      <Badge variant="info">{t.payoutMethod || "—"}</Badge>
+                    </td>
+                    <td className="py-2 pr-4 text-text-secondary">{t.currency}</td>
+                    <td className="py-2 pr-4 text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</td>
+                    <td className="py-2 text-right">
+                      <div className="flex items-center gap-1.5 ml-auto justify-end">
+                        <button
+                          onClick={() => handleCameraClick(t.id)}
+                          disabled={busyId === t.id}
+                          className="flex items-center gap-1 text-xs font-semibold text-success bg-success-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                        >
+                          {busyId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+                          Proof
+                        </button>
+                        <button
+                          onClick={() => cancelPayout(t.id)}
+                          disabled={busyId === t.id}
+                          className="flex items-center gap-1 text-xs font-semibold text-danger bg-danger-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                        >
+                          <XCircle size={12} />
+                          Cancel
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       {agentDetail?.transactions && agentDetail.transactions.length > 0 && (
         <Card>

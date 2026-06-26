@@ -24,6 +24,7 @@ export interface PendingTransferItem {
   currency: string;
   status: string;
   referenceId: string | null;
+  processingAgentId: string | null;
   createdAt: string;
 }
 
