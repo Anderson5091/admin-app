@@ -90,6 +90,7 @@ export const router = createBrowserRouter([
       { path: "agent/commission", element: <ProtectedRoute requiredPath="/agent/commission"><AgentCommissionWithdraw /></ProtectedRoute> },
       { path: "transfers", element: <ProtectedRoute requiredPath="/transfers"><AdminTransfers /></ProtectedRoute> },
       { path: "audit", element: <ProtectedRoute requiredPath="/audit"><AdminAudit /></ProtectedRoute> },
+      { path: "pending-transfers", element: <ProtectedRoute requiredPath="/"><AgentDashboard /></ProtectedRoute> },
     ],
   },
   {

@@ -53,10 +53,11 @@ const navLabelMap: Record<string, string> = {
   "/agent/commission": "Commission",
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
+  "/pending-transfers": "Pending Transfers",
 };
 
 const NAV_SECTIONS = [
-  { label: "Monitor", paths: ["/", "/notifications", "/live", "/system"] },
+  { label: "Monitor", paths: ["/", "/notifications", "/live", "/system", "/pending-transfers"] },
   { label: "Administration", paths: ["/admins"] },
   { label: "Finance", paths: ["/treasury", "/payouts", "/transfers"] },
   { label: "Compliance", paths: ["/cases", "/fraud", "/audit"] },

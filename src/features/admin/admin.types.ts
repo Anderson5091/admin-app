@@ -23,6 +23,7 @@ export interface PendingTransferItem {
   payoutMethod: string | null;
   currency: string;
   status: string;
+  referenceId: string | null;
   createdAt: string;
 }
 

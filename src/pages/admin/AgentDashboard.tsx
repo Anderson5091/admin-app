@@ -244,6 +244,7 @@ export default function AgentDashboard() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-text-subtle uppercase border-b border-border">
+                  <th className="text-left py-2 pr-4">Reference</th>
                   <th className="text-left py-2 pr-4">Amount</th>
                   <th className="text-left py-2 pr-4">Method</th>
                   <th className="text-left py-2 pr-4">Currency</th>
@@ -255,6 +256,7 @@ export default function AgentDashboard() {
               <tbody>
                 {agentDetail.pendingTransfers.map((pt: PendingTransferItem) => (
                   <tr key={pt.id} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4 text-text-subtle font-mono text-[10px]">{pt.referenceId || "—"}</td>
                     <td className="py-2 pr-4 text-text-primary font-bold">${pt.amount.toLocaleString()}</td>
                     <td className="py-2 pr-4">
                       <Badge variant="info">{pt.payoutMethod || "—"}</Badge>
