@@ -3,6 +3,7 @@ import Login from "../pages/Login";
 import AdminLayout from "../pages/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
 import AgentDashboard from "../pages/admin/AgentDashboard";
+import PendingTransfers from "../pages/admin/PendingTransfers";
 import LiveFeed from "../pages/admin/LiveFeed";
 import Users from "../pages/admin/Users";
 import KycReview from "../pages/admin/KycReview";
@@ -100,7 +101,7 @@ export const router = createBrowserRouter([
       { path: "pending-transfers", element: (
         <ProtectedRoute requiredPath="/">
           <RouteGuard adminFallback={<Navigate to="/" replace />}>
-            <AgentDashboard />
+            <PendingTransfers />
           </RouteGuard>
         </ProtectedRoute>
       )},

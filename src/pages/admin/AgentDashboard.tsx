@@ -5,8 +5,8 @@ import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, AlertCircle, Clock, HandCoins, Play, Loader2 } from "lucide-react";
-import type { AgentDetail, PendingTransferItem } from "../../features/admin/admin.types";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins } from "lucide-react";
+import type { AgentDetail } from "../../features/admin/admin.types";
 
 export default function AgentDashboard() {
   const navigate = useNavigate();
@@ -15,8 +15,6 @@ export default function AgentDashboard() {
   const [agentDetail, setAgentDetail] = useState<AgentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [kpiPeriod, setKpiPeriod] = useState("DAILY");
-  const [executing, setExecuting] = useState<string | null>(null);
-
   const loadDashboard = async () => {
     if (!profile?.id) return;
     setLoading(true);
@@ -60,19 +58,6 @@ export default function AgentDashboard() {
   ];
 
   const goToCommission = () => navigate("/agent/commission");
-
-  const executePayout = async (transferId: string) => {
-    if (!profile?.id) return;
-    setExecuting(transferId);
-    try {
-      await AgentApi.executePayout(profile.id, transferId);
-      loadDashboard();
-    } catch {
-      // handled by api
-    } finally {
-      setExecuting(null);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -233,62 +218,6 @@ export default function AgentDashboard() {
         </Card>
       )}
 
-      {agentDetail?.pendingTransfers && agentDetail.pendingTransfers.length > 0 && (
-        <Card>
-          <div className="flex items-center gap-2 mb-4">
-            <AlertCircle size={16} className="text-warning" />
-            <h2 className="text-lg font-bold text-text-primary">Pending Transfers</h2>
-            <Badge variant="warning">{agentDetail.pendingTransfers.length}</Badge>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-text-subtle uppercase border-b border-border">
-                  <th className="text-left py-2 pr-4">Reference</th>
-                  <th className="text-left py-2 pr-4">Amount</th>
-                  <th className="text-left py-2 pr-4">Method</th>
-                  <th className="text-left py-2 pr-4">Currency</th>
-                  <th className="text-left py-2 pr-4">Status</th>
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-right py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {agentDetail.pendingTransfers.map((pt: PendingTransferItem) => (
-                  <tr key={pt.id} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-4 text-text-subtle font-mono text-[10px]">{pt.referenceId || "—"}</td>
-                    <td className="py-2 pr-4 text-text-primary font-bold">${pt.amount.toLocaleString()}</td>
-                    <td className="py-2 pr-4">
-                      <Badge variant="info">{pt.payoutMethod || "—"}</Badge>
-                    </td>
-                    <td className="py-2 pr-4 text-text-secondary">{pt.currency}</td>
-                    <td className="py-2 pr-4">
-                      <Badge variant={pt.status === "PENDING_PAYOUT" ? "warning" : "info"}>
-                        {pt.status}
-                      </Badge>
-                    </td>
-                    <td className="py-2 pr-4 text-text-subtle">{new Date(pt.createdAt).toLocaleDateString()}</td>
-                    <td className="py-2 text-right">
-                      <button
-                        onClick={() => executePayout(pt.id)}
-                        disabled={executing === pt.id}
-                        className="flex items-center gap-1 ml-auto text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                      >
-                        {executing === pt.id ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <Play size={12} />
-                        )}
-                        {executing === pt.id ? "Executing..." : "Execute"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
     </div>
   );
 }

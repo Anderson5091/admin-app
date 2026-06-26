@@ -72,6 +72,11 @@ export const AgentApi = {
     return data;
   },
 
+  async getPendingTransfers(): Promise<any[]> {
+    const { data } = await api.get("/agent/pending-transfers");
+    return data;
+  },
+
   async executePayout(agentId: string, transferId: string): Promise<{ success: boolean; message: string; transferId: string }> {
     const { data } = await api.post(`/agent/${agentId}/execute-payout`, { transferId });
     return data;
