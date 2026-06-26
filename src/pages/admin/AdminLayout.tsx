@@ -110,6 +110,7 @@ export default function AdminLayout() {
     .map((section) => ({
       ...section,
       items: section.paths
+        .filter((path) => path === "/pending-transfers" ? isAgent : true)
         .filter((path) => canAccess(path, role))
         .map((path) => ({
           to: path,
