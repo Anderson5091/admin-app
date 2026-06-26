@@ -15,6 +15,7 @@ interface PendingTransfer {
   status: string;
   referenceId: string | null;
   processingAgentId: string | null;
+  isMine: boolean;
   createdAt: string;
 }
 
@@ -26,8 +27,7 @@ export default function PendingTransfers() {
   const [photoData, setPhotoData] = useState<{ transferId: string; base64: string; mimeType: string; preview: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isMine = (t: PendingTransfer) => t.processingAgentId === profile?.id;
-  const isLocked = (t: PendingTransfer) => t.status === "PROCESSING" && !isMine(t);
+  const isLocked = (t: PendingTransfer) => t.status === "PROCESSING" && !t.isMine;
 
   const load = async () => {
     setLoading(true);
@@ -84,7 +84,7 @@ export default function PendingTransfers() {
     reader.onload = () => {
       const dataUrl = reader.result as string;
       const base64 = dataUrl.split(",")[1];
-      const transferId = photoData?.transferId || transfers.find(t => t.status === "PROCESSING" && isMine(t))?.id;
+      const transferId = photoData?.transferId || transfers.find(t => t.status === "PROCESSING" && t.isMine)?.id;
       if (transferId) {
         setPhotoData({ transferId, base64, mimeType: file.type || "image/jpeg", preview: dataUrl });
       }
@@ -217,7 +217,7 @@ export default function PendingTransfers() {
                           <Lock size={12} />
                           Locked
                         </span>
-                      ) : t.status === "PROCESSING" && isMine(t) ? (
+                      ) : t.status === "PROCESSING" && t.isMine ? (
                         <div className="flex items-center gap-1.5 ml-auto">
                           <button
                             onClick={() => handleCameraClick(t.id)}
