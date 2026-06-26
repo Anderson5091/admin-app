@@ -3,7 +3,7 @@ import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Play, Loader2, AlertCircle, CheckCircle, Camera } from "lucide-react";
+import { Play, Loader2, AlertCircle, CheckCircle, Camera, XCircle, Send, Lock, Image as ImageIcon } from "lucide-react";
 
 interface PendingTransfer {
   id: string;
@@ -14,6 +14,7 @@ interface PendingTransfer {
   currency: string;
   status: string;
   referenceId: string | null;
+  processingAgentId: string | null;
   createdAt: string;
 }
 
@@ -22,11 +23,15 @@ export default function PendingTransfers() {
   const [transfers, setTransfers] = useState<PendingTransfer[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [photoData, setPhotoData] = useState<{ transferId: string; base64: string; mimeType: string; preview: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isMine = (t: PendingTransfer) => t.processingAgentId === profile?.id;
+  const isLocked = (t: PendingTransfer) => t.status === "PROCESSING" && !isMine(t);
 
   const load = async () => {
     setLoading(true);
+    setPhotoData(null);
     try {
       const data = await AgentApi.getPendingTransfers();
       setTransfers(data);
@@ -52,31 +57,54 @@ export default function PendingTransfers() {
     }
   };
 
-  const handleFilePick = (transferId: string) => {
-    setConfirmId(transferId);
-    setTimeout(() => fileInputRef.current?.click(), 0);
+  const cancelPayout = async (transferId: string) => {
+    if (!profile?.id) return;
+    setBusyId(transferId);
+    try {
+      await AgentApi.cancelPayout(profile.id, transferId);
+      setPhotoData(null);
+      load();
+    } catch {
+      // handled by api
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleCameraClick = (transferId: string) => {
+    setPhotoData(null);
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !confirmId || !profile?.id) return;
+    if (!file) return;
 
-    setBusyId(confirmId);
     const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = (reader.result as string).split(",")[1];
-      const mimeType = file.type || "image/jpeg";
-      try {
-        await AgentApi.confirmPayout(profile.id!, confirmId, base64, mimeType);
-        setConfirmId(null);
-        load();
-      } catch {
-        // handled by api
-      } finally {
-        setBusyId(null);
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(",")[1];
+      const transferId = photoData?.transferId || transfers.find(t => t.status === "PROCESSING" && isMine(t))?.id;
+      if (transferId) {
+        setPhotoData({ transferId, base64, mimeType: file.type || "image/jpeg", preview: dataUrl });
       }
     };
     reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const submitPhoto = async () => {
+    if (!photoData || !profile?.id) return;
+    setBusyId(photoData.transferId);
+    try {
+      await AgentApi.confirmPayout(profile.id, photoData.transferId, photoData.base64, photoData.mimeType);
+      setPhotoData(null);
+      load();
+    } catch {
+      // handled by api
+    } finally {
+      setBusyId(null);
+    }
   };
 
   if (loading) {
@@ -103,6 +131,38 @@ export default function PendingTransfers() {
         className="hidden"
         onChange={handleFileChange}
       />
+
+      {photoData && (
+        <Card>
+          <div className="flex items-center gap-4">
+            <img src={photoData.preview} alt="Proof" className="w-20 h-20 object-cover rounded-lg border border-border" />
+            <div className="flex-1">
+              <p className="text-xs text-text-secondary">Proof photo captured</p>
+              <p className="text-[10px] text-text-subtle font-mono">{photoData.transferId}</p>
+            </div>
+            <button
+              onClick={submitPhoto}
+              disabled={busyId === photoData.transferId}
+              className="flex items-center gap-1.5 text-xs font-semibold text-white bg-success px-3 py-2 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+            >
+              {busyId === photoData.transferId ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Send size={14} />
+              )}
+              {busyId === photoData.transferId ? "Submitting..." : "Submit Proof"}
+            </button>
+            <button
+              onClick={() => setPhotoData(null)}
+              disabled={busyId === photoData.transferId}
+              className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary bg-card px-3 py-2 rounded-lg hover:opacity-80 transition-opacity"
+            >
+              <XCircle size={14} />
+              Discard
+            </button>
+          </div>
+        </Card>
+      )}
 
       {transfers.length === 0 ? (
         <Card>
@@ -152,19 +212,30 @@ export default function PendingTransfers() {
                           )}
                           {busyId === t.id ? "Processing..." : "Execute"}
                         </button>
-                      ) : t.status === "PROCESSING" ? (
-                        <button
-                          onClick={() => handleFilePick(t.id)}
-                          disabled={busyId === t.id}
-                          className="flex items-center gap-1 ml-auto text-xs font-semibold text-success bg-success-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                        >
-                          {busyId === t.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Camera size={12} />
-                          )}
-                          {busyId === t.id ? "Uploading..." : "Confirm"}
-                        </button>
+                      ) : isLocked(t) ? (
+                        <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
+                          <Lock size={12} />
+                          Locked
+                        </span>
+                      ) : t.status === "PROCESSING" && isMine(t) ? (
+                        <div className="flex items-center gap-1.5 ml-auto">
+                          <button
+                            onClick={() => handleCameraClick(t.id)}
+                            disabled={busyId === t.id}
+                            className="flex items-center gap-1 text-xs font-semibold text-success bg-success-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                          >
+                            {busyId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+                            Camera
+                          </button>
+                          <button
+                            onClick={() => cancelPayout(t.id)}
+                            disabled={busyId === t.id}
+                            className="flex items-center gap-1 text-xs font-semibold text-danger bg-danger-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                          >
+                            <XCircle size={12} />
+                            Cancel
+                          </button>
+                        </div>
                       ) : (
                         <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
                           <CheckCircle size={12} className="text-success" />

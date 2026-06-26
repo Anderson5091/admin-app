@@ -77,6 +77,11 @@ export const AgentApi = {
     return data;
   },
 
+  async cancelPayout(agentId: string, transferId: string): Promise<{ success: boolean; message: string; transferId: string }> {
+    const { data } = await api.post(`/agent/${agentId}/cancel-payout`, { transferId });
+    return data;
+  },
+
   async confirmPayout(agentId: string, transferId: string, proofImage: string, proofMimeType: string): Promise<{ success: boolean; message: string; transferId: string }> {
     const { data } = await api.post(`/agent/${agentId}/confirm-payout`, { transferId, proofImage, proofMimeType });
     return data;
