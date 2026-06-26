@@ -6,7 +6,7 @@ import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
-  ArrowLeft, HandCoins,
+  ArrowLeft, HandCoins, Wallet, ArrowRight,
   Loader2, CheckCircle, AlertCircle, Clock,
   RefreshCw,
 } from "lucide-react";
@@ -99,14 +99,11 @@ export default function AgentCommissionWithdraw() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={() => navigate("/agent/commission")}
-              className="bg-app-bg border border-border rounded-xl p-4 hover:border-primary-border transition-all text-left"
-            >
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+            <div className="bg-warning-dim border border-warning/20 rounded-xl p-4 text-left">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-warning-dim">
-                  <HandCoins size={16} className="text-warning" />
+                  <Wallet size={16} className="text-warning" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-text-primary">{commLedger.toLocaleString()}</p>
@@ -114,14 +111,14 @@ export default function AgentCommissionWithdraw() {
                   <p className="text-[9px] text-text-subtle">USDT — withdrawable</p>
                 </div>
               </div>
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="bg-app-bg border border-border rounded-xl p-4 hover:border-primary-border transition-all text-left"
-            >
+            </div>
+            <div className="flex items-center justify-center">
+              <ArrowRight size={20} className="text-text-subtle" />
+            </div>
+            <div className="bg-primary-dim border border-primary/20 rounded-xl p-4 text-left">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-primary-dim">
-                  <HandCoins size={16} className="text-primary" />
+                  <Wallet size={16} className="text-primary" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-text-primary">{walletBal.toLocaleString()}</p>
@@ -129,7 +126,7 @@ export default function AgentCommissionWithdraw() {
                   <p className="text-[9px] text-text-subtle">{mainWallet?.network || "BASE"} — on-chain</p>
                 </div>
               </div>
-            </button>
+            </div>
           </div>
 
           <Card className="p-6 space-y-5">
