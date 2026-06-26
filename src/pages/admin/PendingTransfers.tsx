@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Play, Loader2, AlertCircle } from "lucide-react";
+import { Play, Loader2, AlertCircle, CheckCircle, Camera } from "lucide-react";
 
 interface PendingTransfer {
   id: string;
@@ -21,7 +21,9 @@ export default function PendingTransfers() {
   const profile = useAuthStore((s) => s.profile);
   const [transfers, setTransfers] = useState<PendingTransfer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [executing, setExecuting] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     setLoading(true);
@@ -39,15 +41,42 @@ export default function PendingTransfers() {
 
   const executePayout = async (transferId: string) => {
     if (!profile?.id) return;
-    setExecuting(transferId);
+    setBusyId(transferId);
     try {
       await AgentApi.executePayout(profile.id, transferId);
       load();
     } catch {
       // handled by api
     } finally {
-      setExecuting(null);
+      setBusyId(null);
     }
+  };
+
+  const handleFilePick = (transferId: string) => {
+    setConfirmId(transferId);
+    setTimeout(() => fileInputRef.current?.click(), 0);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !confirmId || !profile?.id) return;
+
+    setBusyId(confirmId);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = (reader.result as string).split(",")[1];
+      const mimeType = file.type || "image/jpeg";
+      try {
+        await AgentApi.confirmPayout(profile.id!, confirmId, base64, mimeType);
+        setConfirmId(null);
+        load();
+      } catch {
+        // handled by api
+      } finally {
+        setBusyId(null);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   if (loading) {
@@ -65,6 +94,15 @@ export default function PendingTransfers() {
         <h1 className="text-2xl font-bold text-text-primary">Pending Transfers</h1>
         <Badge variant="warning">{transfers.length}</Badge>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
       {transfers.length === 0 ? (
         <Card>
@@ -95,24 +133,44 @@ export default function PendingTransfers() {
                     </td>
                     <td className="py-2 pr-4 text-text-secondary">{t.currency}</td>
                     <td className="py-2 pr-4">
-                      <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : "info"}>
+                      <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : t.status === "PROCESSING" ? "info" : "success"}>
                         {t.status}
                       </Badge>
                     </td>
                     <td className="py-2 pr-4 text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</td>
                     <td className="py-2 text-right">
-                      <button
-                        onClick={() => executePayout(t.id)}
-                        disabled={executing === t.id}
-                        className="flex items-center gap-1 ml-auto text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                      >
-                        {executing === t.id ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <Play size={12} />
-                        )}
-                        {executing === t.id ? "Executing..." : "Execute"}
-                      </button>
+                      {t.status === "PENDING_PAYOUT" ? (
+                        <button
+                          onClick={() => executePayout(t.id)}
+                          disabled={busyId === t.id}
+                          className="flex items-center gap-1 ml-auto text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                        >
+                          {busyId === t.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Play size={12} />
+                          )}
+                          {busyId === t.id ? "Processing..." : "Execute"}
+                        </button>
+                      ) : t.status === "PROCESSING" ? (
+                        <button
+                          onClick={() => handleFilePick(t.id)}
+                          disabled={busyId === t.id}
+                          className="flex items-center gap-1 ml-auto text-xs font-semibold text-success bg-success-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                        >
+                          {busyId === t.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Camera size={12} />
+                          )}
+                          {busyId === t.id ? "Uploading..." : "Confirm"}
+                        </button>
+                      ) : (
+                        <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
+                          <CheckCircle size={12} className="text-success" />
+                          Done
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
