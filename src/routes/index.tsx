@@ -53,6 +53,13 @@ function IndexPage() {
   return <ProtectedRoute requiredPath="/"><Dashboard /></ProtectedRoute>;
 }
 
+function RouteGuard({ children, adminFallback }: { children: React.ReactNode; adminFallback: React.ReactNode }) {
+  const profile = useAuthStore((s) => s.profile);
+  const isAgent = profile?.role === "AGENT_PARTNER" || profile?.role === "AGENT_INTERNAL";
+  if (!isAgent) return <>{adminFallback}</>;
+  return <>{children}</>;
+}
+
 export const router = createBrowserRouter([
   {
     path: "/login",
@@ -90,7 +97,13 @@ export const router = createBrowserRouter([
       { path: "agent/commission", element: <ProtectedRoute requiredPath="/agent/commission"><AgentCommissionWithdraw /></ProtectedRoute> },
       { path: "transfers", element: <ProtectedRoute requiredPath="/transfers"><AdminTransfers /></ProtectedRoute> },
       { path: "audit", element: <ProtectedRoute requiredPath="/audit"><AdminAudit /></ProtectedRoute> },
-      { path: "pending-transfers", element: <ProtectedRoute requiredPath="/"><AgentDashboard /></ProtectedRoute> },
+      { path: "pending-transfers", element: (
+        <ProtectedRoute requiredPath="/">
+          <RouteGuard adminFallback={<Navigate to="/" replace />}>
+            <AgentDashboard />
+          </RouteGuard>
+        </ProtectedRoute>
+      )},
     ],
   },
   {
