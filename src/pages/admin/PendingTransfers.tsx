@@ -16,6 +16,7 @@ interface PendingTransfer {
   referenceId: string | null;
   processingAgentId: string | null;
   isMine: boolean;
+  isAvailable: boolean;
   createdAt: string;
 }
 
@@ -28,6 +29,10 @@ export default function PendingTransfers() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isLocked = (t: PendingTransfer) => t.status === "PROCESSING" && !t.isMine;
+  
+  // Separate transfers into two categories
+  const myProcessingTransfers = transfers.filter(t => t.isMine);
+  const availablePendingTransfers = transfers.filter(t => t.isAvailable && !t.isMine);
 
   const load = async () => {
     setLoading(true);
@@ -115,12 +120,73 @@ export default function PendingTransfers() {
     );
   }
 
+  const renderTransferRow = (t: PendingTransfer) => (
+    <tr key={t.id} className="border-b border-border last:border-0">
+      <td className="py-2 pr-4 text-text-subtle font-mono text-[10px]">{t.referenceId || "—"}</td>
+      <td className="py-2 pr-4 text-text-primary font-bold">${t.amount.toLocaleString()}</td>
+      <td className="py-2 pr-4">
+        <Badge variant="info">{t.payoutMethod || "—"}</Badge>
+      </td>
+      <td className="py-2 pr-4 text-text-secondary">{t.currency}</td>
+      <td className="py-2 pr-4">
+        <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : t.status === "PROCESSING" ? "info" : "success"}>
+          {t.status}
+        </Badge>
+      </td>
+      <td className="py-2 pr-4 text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</td>
+      <td className="py-2 text-right">
+        {t.status === "PENDING_PAYOUT" ? (
+          <button
+            onClick={() => executePayout(t.id)}
+            disabled={busyId === t.id}
+            className="flex items-center gap-1 ml-auto text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+          >
+            {busyId === t.id ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <Play size={12} />
+            )}
+            {busyId === t.id ? "Processing..." : "Execute"}
+          </button>
+        ) : isLocked(t) ? (
+          <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
+            <Lock size={12} />
+            Locked
+          </span>
+        ) : t.status === "PROCESSING" && t.isMine ? (
+          <div className="flex items-center gap-1.5 ml-auto">
+            <button
+              onClick={() => handleCameraClick(t.id)}
+              disabled={busyId === t.id}
+              className="flex items-center gap-1 text-xs font-semibold text-success bg-success-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+            >
+              {busyId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+              Camera
+            </button>
+            <button
+              onClick={() => cancelPayout(t.id)}
+              disabled={busyId === t.id}
+              className="flex items-center gap-1 text-xs font-semibold text-danger bg-danger-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+            >
+              <XCircle size={12} />
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
+            <CheckCircle size={12} className="text-success" />
+            Done
+          </span>
+        )}
+      </td>
+    </tr>
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <AlertCircle size={20} className="text-warning" />
-        <h1 className="text-2xl font-bold text-text-primary">Pending Transfers</h1>
-        <Badge variant="warning">{transfers.length}</Badge>
+        <h1 className="text-2xl font-bold text-text-primary">Transfers Dashboard</h1>
       </div>
 
       <input
@@ -164,92 +230,73 @@ export default function PendingTransfers() {
         </Card>
       )}
 
-      {transfers.length === 0 ? (
-        <Card>
-          <p className="text-text-secondary text-sm">No pending transfers.</p>
-        </Card>
-      ) : (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-text-subtle uppercase border-b border-border">
-                  <th className="text-left py-2 pr-4">Reference</th>
-                  <th className="text-left py-2 pr-4">Amount</th>
-                  <th className="text-left py-2 pr-4">Method</th>
-                  <th className="text-left py-2 pr-4">Currency</th>
-                  <th className="text-left py-2 pr-4">Status</th>
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-right py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transfers.map((t) => (
-                  <tr key={t.id} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-4 text-text-subtle font-mono text-[10px]">{t.referenceId || "—"}</td>
-                    <td className="py-2 pr-4 text-text-primary font-bold">${t.amount.toLocaleString()}</td>
-                    <td className="py-2 pr-4">
-                      <Badge variant="info">{t.payoutMethod || "—"}</Badge>
-                    </td>
-                    <td className="py-2 pr-4 text-text-secondary">{t.currency}</td>
-                    <td className="py-2 pr-4">
-                      <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : t.status === "PROCESSING" ? "info" : "success"}>
-                        {t.status}
-                      </Badge>
-                    </td>
-                    <td className="py-2 pr-4 text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</td>
-                    <td className="py-2 text-right">
-                      {t.status === "PENDING_PAYOUT" ? (
-                        <button
-                          onClick={() => executePayout(t.id)}
-                          disabled={busyId === t.id}
-                          className="flex items-center gap-1 ml-auto text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                        >
-                          {busyId === t.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Play size={12} />
-                          )}
-                          {busyId === t.id ? "Processing..." : "Execute"}
-                        </button>
-                      ) : isLocked(t) ? (
-                        <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
-                          <Lock size={12} />
-                          Locked
-                        </span>
-                      ) : t.status === "PROCESSING" && t.isMine ? (
-                        <div className="flex items-center gap-1.5 ml-auto">
-                          <button
-                            onClick={() => handleCameraClick(t.id)}
-                            disabled={busyId === t.id}
-                            className="flex items-center gap-1 text-xs font-semibold text-success bg-success-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                          >
-                            {busyId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
-                            Camera
-                          </button>
-                          <button
-                            onClick={() => cancelPayout(t.id)}
-                            disabled={busyId === t.id}
-                            className="flex items-center gap-1 text-xs font-semibold text-danger bg-danger-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                          >
-                            <XCircle size={12} />
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
-                          <CheckCircle size={12} className="text-success" />
-                          Done
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+       <div className="space-y-6">
+        <Card className="flex-1">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Loader2 size={18} className="text-primary" />
+              <h2 className="text-lg font-bold text-text-primary">My Processing Transfers</h2>
+            </div>
+            <Badge variant="info">{myProcessingTransfers.length}</Badge>
           </div>
+          
+          {myProcessingTransfers.length === 0 ? (
+            <p className="text-text-secondary text-sm text-center py-4">No transfers currently being processed by you.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-text-subtle uppercase border-b border-border">
+                    <th className="text-left py-2 pr-4">Reference</th>
+                    <th className="text-left py-2 pr-4">Amount</th>
+                    <th className="text-left py-2 pr-4">Method</th>
+                    <th className="text-left py-2 pr-4">Currency</th>
+                    <th className="text-left py-2 pr-4">Status</th>
+                    <th className="text-left py-2 pr-4">Date</th>
+                    <th className="text-right py-2">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myProcessingTransfers.map(renderTransferRow)}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Card>
-      )}
+
+        <Card className="flex-1">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={18} className="text-warning" />
+              <h2 className="text-lg font-bold text-text-primary">Available Pending Transfers</h2>
+            </div>
+            <Badge variant="warning">{availablePendingTransfers.length}</Badge>
+          </div>
+          
+          {availablePendingTransfers.length === 0 ? (
+            <p className="text-text-secondary text-sm text-center py-4">No pending transfers available.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-text-subtle uppercase border-b border-border">
+                    <th className="text-left py-2 pr-4">Reference</th>
+                    <th className="text-left py-2 pr-4">Amount</th>
+                    <th className="text-left py-2 pr-4">Method</th>
+                    <th className="text-left py-2 pr-4">Currency</th>
+                    <th className="text-left py-2 pr-4">Status</th>
+                    <th className="text-left py-2 pr-4">Date</th>
+                    <th className="text-right py-2">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {availablePendingTransfers.map(renderTransferRow)}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      </div>
     </div>
   );
 }
