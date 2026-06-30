@@ -151,7 +151,7 @@ export default function ReconciliationWorksheet() {
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -227,6 +227,32 @@ export default function ReconciliationWorksheet() {
               <span className="text-3xl font-bold text-primary">{state.data.closingBalance.toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Current cash position</p>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <DollarSign size={20} className="text-warning" />
+                <h2 className="text-lg font-bold text-text-primary">Request Cash</h2>
+              </div>
+            </div>
+            <p className="text-text-secondary text-sm mt-2">Request cash delivery from Quicksend</p>
+            <button className="mt-4 w-full bg-warning text-white py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+              Request Cash
+            </button>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Clock size={20} className="text-info" />
+                <h2 className="text-lg font-bold text-text-primary">Submit Settlement</h2>
+              </div>
+            </div>
+            <p className="text-text-secondary text-sm mt-2">Submit bank settlements for verification</p>
+            <button className="mt-4 w-full bg-info text-white py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+              Submit Bank Settlements
+            </button>
           </Card>
         </div>
 
