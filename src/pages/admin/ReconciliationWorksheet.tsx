@@ -19,6 +19,7 @@ interface Transaction {
 interface ReconciliationData {
   openingBalance: number;
   cashIn: number;
+  liquidCashReceived: number;
   cashOut: number;
   treasuryIn: number;
   bankSettlements: number;
@@ -49,12 +50,14 @@ export default function ReconciliationWorksheet() {
       const data: ReconciliationData = {
         openingBalance: 0,
         cashIn: 200,
+        liquidCashReceived: 500,
         cashOut: 70,
         treasuryIn: 1000,
         bankSettlements: 500,
-        closingBalance: 630,
+        closingBalance: 1130,
         transactions: [
           { type: "CASH_DEPOSIT", amount: 200, date: "2026-06-01", description: "User cash deposit" },
+          { type: "LIQUID_CASH", amount: 500, date: "2026-06-01", description: "Cash delivery from Quicksend" },
           { type: "CASH_WITHDRAWAL", amount: 70, date: "2026-06-02", description: "User cash withdrawal" },
           { type: "TREASURY_TOPUP", amount: 1000, date: "2026-06-03", description: "Float top-up from treasury" },
           { type: "BANK_SETTLEMENT", amount: 500, date: "2026-06-04", description: "Confirmed bank deposit" },
@@ -174,6 +177,17 @@ export default function ReconciliationWorksheet() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
+                <DollarSign size={20} className="text-info" />
+                <h2 className="text-lg font-bold text-text-primary">Liquid Cash Received</h2>
+              </div>
+              <span className="text-3xl font-bold text-info">+{state.data.liquidCashReceived || 0} USDT</span>
+            </div>
+            <p className="text-text-secondary text-sm mt-2">Cash delivery from Quicksend</p>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <DollarSign size={20} className="text-danger" />
                 <h2 className="text-lg font-bold text-text-primary">Cash Out</h2>
               </div>
@@ -236,16 +250,17 @@ export default function ReconciliationWorksheet() {
                   <tr key={tx.date + tx.type + index} className="border-b border-border last:border-0">
                     <td className="py-2 pr-4 text-text-secondary">{tx.date}</td>
                     <td className="py-2 pr-4">
-                      <Badge variant={
-                        tx.type === "CASH_DEPOSIT" ? "success" :
-                        tx.type === "CASH_WITHDRAWAL" ? "danger" :
-                        tx.type === "TREASURY_TOPUP" ? "warning" : "info"
-                      }>
-                        {tx.type.replace("_", " ")}
-                      </Badge>
+                        <Badge variant={
+                          tx.type === "CASH_DEPOSIT" ? "success" :
+                          tx.type === "CASH_WITHDRAWAL" ? "danger" :
+                          tx.type === "TREASURY_TOPUP" ? "warning" :
+                          tx.type === "LIQUID_CASH" ? "info" : "info"
+                        }>
+                          {tx.type.replace("_", " ")}
+                        </Badge>
                     </td>
                     <td className="py-2 pr-4 text-right text-primary font-bold">
-                      {tx.type === "CASH_DEPOSIT" || tx.type === "TREASURY_TOPUP" ? "+" : "-"}${tx.amount.toLocaleString()}
+                        {tx.type === "CASH_DEPOSIT" || tx.type === "TREASURY_TOPUP" || tx.type === "LIQUID_CASH" ? "+" : "-"}${tx.amount.toLocaleString()}
                     </td>
                     <td className="py-2 pr-4 text-text-secondary">{tx.description}</td>
                   </tr>
