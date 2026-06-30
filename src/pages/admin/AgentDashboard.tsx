@@ -117,6 +117,8 @@ export default function AgentDashboard() {
   ];
 
   const goToCommission = () => navigate("/agent/commission");
+  const goToSwapWallet = () => navigate("/agent/swap-wallet");
+  const isPartner = profile?.role === "AGENT_PARTNER";
 
   return (
     <div className="space-y-6">
@@ -145,12 +147,22 @@ export default function AgentDashboard() {
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-2xl font-bold text-text-primary truncate">{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
                   {kpi.isCommission && (
-                    <button
-                      onClick={goToCommission}
-                      className="shrink-0 text-xs font-semibold text-warning bg-warning-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
-                    >
-                      Withdraw
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {isPartner && (
+                        <button
+                          onClick={goToSwapWallet}
+                          className="shrink-0 text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
+                        >
+                          Swap
+                        </button>
+                      )}
+                      <button
+                        onClick={goToCommission}
+                        className="shrink-0 text-xs font-semibold text-warning bg-warning-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
+                      >
+                        Withdraw
+                      </button>
+                    </div>
                   )}
                 </div>
                 <p className="text-xs text-text-secondary">{kpi.label}</p>

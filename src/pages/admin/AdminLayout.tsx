@@ -69,7 +69,7 @@ const NAV_SECTIONS = [
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },
   { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payout", "/agent/transfer", "/agent/topup"] },
-  { label: "Wallet", paths: ["/agent/commission", "/agent/swap-wallet"] },
+
 ];
 
 const roleColors: Record<string, string> = {
