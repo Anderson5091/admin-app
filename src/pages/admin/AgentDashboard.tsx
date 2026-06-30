@@ -164,7 +164,7 @@ export default function AgentDashboard() {
                   )}
                 </div>
                 <p className="text-xs text-text-secondary">{kpi.label}</p>
-                {kpi.sub !== undefined && (
+                {kpi.sub !== undefined && isPartner && (
                   <div className="flex items-center gap-1.5 mt-1">
                     <span className="text-lg font-bold text-text-primary">{typeof kpi.sub === "number" ? kpi.sub.toLocaleString() : kpi.sub}</span>
                     <span className="text-[10px] text-text-subtle">{kpi.subLabel}</span>
