@@ -237,7 +237,7 @@ export default function ReconciliationWorksheet() {
               </div>
             </div>
             <p className="text-text-secondary text-sm mt-2">Request cash delivery from Quicksend</p>
-            <button className="mt-4 w-full bg-card-alt border border-border text-text-primary py-2 rounded-lg text-sm font-semibold hover:bg-card transition-colors">
+            <button className="mt-4 w-full bg-warning text-white py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
               Request Cash
             </button>
           </Card>
