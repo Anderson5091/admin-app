@@ -28,14 +28,6 @@ export const AgentApi = {
     return data;
   },
 
-  async processPayment(
-    agentId: string,
-    payload: { userId: string; amount: number; paymentMethod: string; commissionPercent?: number }
-  ): Promise<{ id: string; status: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
-    const { data } = await api.post(`/agent/${agentId}/process-payment`, payload);
-    return data;
-  },
-
   async processPayout(
     agentId: string,
     payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string; commissionPercent?: number }

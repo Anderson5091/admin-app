@@ -57,7 +57,6 @@ export default function AgentTransactions() {
               <option value="ALL">All Types</option>
               <option value="ADD_BALANCE">Add Balance</option>
               <option value="WITHDRAW">Withdraw</option>
-              <option value="PAYMENT">Payment</option>
               <option value="COMMISSION">Commission</option>
               <option value="TOPUP">Top Up</option>
             </select>

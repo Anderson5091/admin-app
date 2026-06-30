@@ -7,7 +7,6 @@ interface AgentActionState {
 
   deposit: (agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number; commissionPercent?: number }) => Promise<void>;
   withdraw: (agentId: string, payload: { userId: string; amount: number; destinationAddress: string; commissionPercent?: number }) => Promise<void>;
-  processPayment: (agentId: string, payload: { userId: string; amount: number; paymentMethod: string; commissionPercent?: number }) => Promise<void>;
   topupPartner: (payload: { partnerAgentId: string; usdtAmount: number }) => Promise<void>;
   payout: (agentId: string, payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string; commissionPercent?: number }) => Promise<void>;
   transfer: (agentId: string, payload: {
@@ -58,20 +57,6 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Withdrawal failed";
-      set({ loading: false, result: { success: false, message: msg } });
-    }
-  },
-
-  processPayment: async (agentId, payload) => {
-    set({ loading: true, result: null });
-    try {
-      const res = await AgentApi.processPayment(agentId, payload);
-      set({
-        loading: false,
-        result: { success: true, message: `Payment processed — ${res.netAmount} USDT via ${payload.paymentMethod}`, reference: res.reference },
-      });
-    } catch (err: any) {
-      const msg = err?.response?.data?.error || err?.message || "Payment failed";
       set({ loading: false, result: { success: false, message: msg } });
     }
   },

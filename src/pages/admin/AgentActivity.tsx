@@ -30,7 +30,7 @@ export default function AgentActivity() {
 
   const filtered = typeFilter === "ALL" ? transactions : transactions.filter((tx) => tx.type === typeFilter);
 
-  const typeOptions = ["ALL", "ADD_BALANCE", "WITHDRAW", "PAYMENT", "TRANSFER", "PAYOUT", "TOPUP", "COMMISSION_WITHDRAW"];
+  const typeOptions = ["ALL", "ADD_BALANCE", "WITHDRAW", "TRANSFER", "PAYOUT", "TOPUP", "COMMISSION_WITHDRAW"];
 
   return (
     <div className="space-y-6">
