@@ -37,7 +37,11 @@ export default function AgentSwapWallet() {
   }, [profile?.id]);
 
   useEffect(() => {
-    if (result && result.success) {
+    return () => clearResult();
+  }, [clearResult]);
+
+  useEffect(() => {
+    if (result?.success) {
       loadDashboard();
       const t = setTimeout(clearResult, 5000);
       return () => clearTimeout(t);

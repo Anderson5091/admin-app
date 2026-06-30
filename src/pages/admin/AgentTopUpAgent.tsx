@@ -24,7 +24,11 @@ export default function AgentTopUpAgent() {
   };
 
   useEffect(() => {
-    if (result && result.success) {
+    return () => clearResult();
+  }, [clearResult]);
+
+  useEffect(() => {
+    if (result?.success) {
       const t = setTimeout(() => { clearResult(); setPartnerAgentId(""); setUsdtAmount(""); }, 4000);
       return () => clearTimeout(t);
     }
