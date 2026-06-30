@@ -53,7 +53,11 @@ export default function AgentTransfer() {
   };
 
   useEffect(() => {
-    if (result && result.success) {
+    return () => clearResult();
+  }, [clearResult]);
+
+  useEffect(() => {
+    if (result?.success) {
       const t = setTimeout(() => {
         clearResult();
         setAmount(""); setBeneficiaryId(""); setCommissionPercent("0");

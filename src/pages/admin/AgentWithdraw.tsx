@@ -59,6 +59,10 @@ export default function AgentWithdraw() {
     loadRecentWithdrawals();
   }, [loadRecentWithdrawals]);
 
+  useEffect(() => {
+    return () => { useAgentStore.getState().clearResult(); };
+  }, []);
+
   const handleLookup = useCallback(async () => {
     if (!identifier.trim()) return;
     setLookupLoading(true);

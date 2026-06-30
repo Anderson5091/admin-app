@@ -58,6 +58,10 @@ export default function AgentDeposit() {
     loadRecentDeposits();
   }, [loadRecentDeposits]);
 
+  useEffect(() => {
+    return () => { useAgentStore.getState().clearResult(); };
+  }, []);
+
   const handleLookup = useCallback(async () => {
     if (!identifier.trim()) return;
     setLookupLoading(true);
