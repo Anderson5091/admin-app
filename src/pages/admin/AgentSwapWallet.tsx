@@ -6,7 +6,7 @@ import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
-  ArrowLeft, ArrowRight, ArrowLeftRight, Wallet,
+  ArrowLeft, ArrowLeftRight, Wallet,
   Loader2, CheckCircle, AlertCircle, Clock,
   RefreshCw,
 } from "lucide-react";
@@ -117,25 +117,6 @@ export default function AgentSwapWallet() {
         </div>
       ) : (
         <>
-          {/* Direction Toggle */}
-          <div className="flex items-center justify-center">
-            <button
-              onClick={() => {
-                setDirection(direction === "TO_MAIN" ? "TO_OFFCHAIN" : "TO_MAIN");
-                setAmount("");
-              }}
-              className="flex items-center gap-3 px-5 py-2.5 bg-card-alt border border-border rounded-xl hover:bg-card transition-colors"
-            >
-              <span className={`text-sm font-medium ${direction === "TO_MAIN" ? "text-primary" : "text-text-secondary"}`}>
-                Offchain
-              </span>
-              <ArrowLeftRight size={20} className="text-text-subtle" />
-              <span className={`text-sm font-medium ${direction === "TO_OFFCHAIN" ? "text-primary" : "text-text-secondary"}`}>
-                Main
-              </span>
-            </button>
-          </div>
-
           {/* Wallet Cards */}
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
             <div className={`rounded-xl p-4 text-left border ${direction === "TO_MAIN" ? "bg-warning-dim border-warning/20" : "bg-primary-dim border-primary/20"}`}>
@@ -150,9 +131,15 @@ export default function AgentSwapWallet() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-center">
-              <ArrowRight size={20} className="text-text-subtle" />
-            </div>
+            <button
+              onClick={() => {
+                setDirection(direction === "TO_MAIN" ? "TO_OFFCHAIN" : "TO_MAIN");
+                setAmount("");
+              }}
+              className="flex items-center justify-center p-2 rounded-lg hover:bg-card-alt transition-colors"
+            >
+              <ArrowLeftRight size={20} className="text-text-subtle" />
+            </button>
             <div className={`rounded-xl p-4 text-left border ${direction === "TO_OFFCHAIN" ? "bg-warning-dim border-warning/20" : "bg-primary-dim border-primary/20"}`}>
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-card-alt">
@@ -171,9 +158,7 @@ export default function AgentSwapWallet() {
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-4 border-b border-border">
               <ArrowLeftRight size={18} className="text-primary" />
-              <h2 className="text-lg font-bold text-text-primary">
-                {direction === "TO_MAIN" ? "Offchain → Main" : "Main → Offchain"}
-              </h2>
+              <h2 className="text-lg font-bold text-text-primary">Swap</h2>
             </div>
 
             <div>
