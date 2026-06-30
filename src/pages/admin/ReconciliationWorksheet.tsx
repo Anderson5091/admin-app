@@ -56,11 +56,7 @@ export default function ReconciliationWorksheet() {
         bankSettlements: 500,
         closingBalance: 1130,
         transactions: [
-          { type: "CASH_DEPOSIT", amount: 200, date: "2026-06-01", description: "User cash deposit" },
-          { type: "LIQUID_CASH", amount: 500, date: "2026-06-01", description: "Cash delivery from Quicksend" },
-          { type: "CASH_WITHDRAWAL", amount: 70, date: "2026-06-02", description: "User cash withdrawal" },
-          { type: "TREASURY_TOPUP", amount: 1000, date: "2026-06-03", description: "Float top-up from treasury" },
-          { type: "BANK_SETTLEMENT", amount: 500, date: "2026-06-04", description: "Confirmed bank deposit" },
+          { type: "CASH_DEPOSIT", amount: 200, date: "2026-06-30", description: "User cash deposit" },
         ]
       };
       setState(prev => ({ ...prev, data, loading: false }));
@@ -137,7 +133,7 @@ export default function ReconciliationWorksheet() {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-text-primary">Cash Reconciliation Worksheet</h1>
-            <p className="text-text-secondary text-sm mt-0.5">Internal Agent Cash Flow Tracking</p>
+            <p className="text-text-secondary text-sm mt-0.5">Internal Agent Yesterday reconciliation</p>
           </div>
         </div>
         <button
