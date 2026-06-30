@@ -6,7 +6,7 @@ import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
-  ArrowLeft, ArrowLeftRight, Wallet,
+  ArrowLeft, ArrowRight, Wallet,
   Loader2, CheckCircle, AlertCircle, Clock,
   RefreshCw,
 } from "lucide-react";
@@ -68,7 +68,6 @@ export default function AgentSwapWallet() {
   const offchainBal = dashboard?.offchainLedgerBalance ?? 0;
   const mainBal = dashboard?.walletBalance ?? 0;
   const mainWallet = dashboard?.wallets?.find((w) => w.walletType === "MAIN");
-  const balanceTooLow = offchainBal < 10;
   const swapTxs = dashboard?.transactions?.filter((t) => t.type === "OFFCHAIN_SWAP") ?? [];
 
   return (
@@ -113,7 +112,7 @@ export default function AgentSwapWallet() {
               </div>
             </div>
             <div className="flex items-center justify-center">
-              <ArrowLeftRight size={20} className="text-text-subtle" />
+              <ArrowRight size={20} className="text-text-subtle" />
             </div>
             <div className="bg-primary-dim border border-primary/20 rounded-xl p-4 text-left">
               <div className="flex items-center gap-3">
@@ -131,7 +130,7 @@ export default function AgentSwapWallet() {
 
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-4 border-b border-border">
-              <ArrowLeftRight size={18} className="text-primary" />
+              <ArrowRight size={18} className="text-primary" />
               <h2 className="text-lg font-bold text-text-primary">Swap Pending OffChain</h2>
             </div>
 
@@ -139,13 +138,6 @@ export default function AgentSwapWallet() {
               <span className="text-sm text-text-secondary">Available to swap</span>
               <span className="text-lg font-bold text-primary">{offchainBal.toLocaleString()} USDT</span>
             </div>
-
-            {balanceTooLow && (
-              <div className="flex items-start gap-3 px-4 py-3 rounded-lg text-sm bg-warning/10 text-warning">
-                <AlertCircle size={18} className="shrink-0 mt-0.5" />
-                <p>Minimum swap is 10 USDT. Add more pending funds before swapping.</p>
-              </div>
-            )}
 
             {result && (
               <div className={`flex items-start gap-3 px-4 py-3 rounded-lg text-sm ${
@@ -169,7 +161,7 @@ export default function AgentSwapWallet() {
               </button>
               <button
                 onClick={() => profile?.id && swapOffchain(profile.id, "TO_MAIN", offchainBal)}
-                disabled={loading || balanceTooLow}
+                disabled={loading}
                 className="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
               >
                 {loading && <Loader2 size={14} className="animate-spin" />}
