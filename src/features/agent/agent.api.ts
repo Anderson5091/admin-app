@@ -53,6 +53,7 @@ export const AgentApi = {
         cashPickupLocation?: string;
       };
       commissionPercent?: number;
+      debitUserWallet?: boolean;
     }
   ): Promise<{ id: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
     const { data } = await api.post(`/agent/${agentId}/transfer`, payload);

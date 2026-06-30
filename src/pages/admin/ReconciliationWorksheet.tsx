@@ -9,11 +9,14 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-interface Transaction {
-  type: string;
-  amount: number;
+interface DailyReconciliation {
   date: string;
-  description: string;
+  openingBalance: number;
+  cashIn: number;
+  cashOut: number;
+  closingBalance: number;
+  status: "MATCHED" | "PENDING" | "DISCREPANCY";
+  discrepancy: number;
 }
 
 interface ReconciliationData {
@@ -24,7 +27,7 @@ interface ReconciliationData {
   treasuryIn: number;
   bankSettlements: number;
   closingBalance: number;
-  transactions: Transaction[];
+  reconciliations: DailyReconciliation[];
 }
 
 interface ReconciliationState {
@@ -55,8 +58,12 @@ export default function ReconciliationWorksheet() {
         treasuryIn: 1000,
         bankSettlements: 500,
         closingBalance: 1130,
-        transactions: [
-          { type: "CASH_DEPOSIT", amount: 200, date: "2026-06-30", description: "User cash deposit" },
+        reconciliations: [
+          { date: "2026-06-30", openingBalance: 1130, cashIn: 0, cashOut: 0, closingBalance: 1130, status: "PENDING", discrepancy: 0 },
+          { date: "2026-06-29", openingBalance: 500, cashIn: 700, cashOut: 70, closingBalance: 1130, status: "MATCHED", discrepancy: 0 },
+          { date: "2026-06-28", openingBalance: 500, cashIn: 200, cashOut: 200, closingBalance: 500, status: "MATCHED", discrepancy: 0 },
+          { date: "2026-06-27", openingBalance: 600, cashIn: 100, cashOut: 200, closingBalance: 500, status: "DISCREPANCY", discrepancy: -10 },
+          { date: "2026-06-26", openingBalance: 0, cashIn: 1000, cashOut: 400, closingBalance: 600, status: "MATCHED", discrepancy: 0 },
         ]
       };
       setState(prev => ({ ...prev, data, loading: false }));
@@ -84,7 +91,7 @@ export default function ReconciliationWorksheet() {
     );
   }
 
-  if (!state.data) {
+  if (!state.data || !state.data.reconciliations) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
         <div className="p-3 rounded-lg bg-warning-dim border border-warning/30 mb-4">
@@ -124,6 +131,8 @@ export default function ReconciliationWorksheet() {
     );
   }
 
+  const data = state.data;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -154,7 +163,7 @@ export default function ReconciliationWorksheet() {
                 <DollarSign size={20} className="text-primary" />
                 <h2 className="text-lg font-bold text-text-primary">Opening Balance</h2>
               </div>
-              <span className="text-3xl font-bold text-primary">{state.data.openingBalance.toLocaleString()} USDT</span>
+              <span className="text-3xl font-bold text-primary">{(data.openingBalance ?? 0).toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Starting cash position</p>
           </Card>
@@ -165,7 +174,7 @@ export default function ReconciliationWorksheet() {
                 <DollarSign size={20} className="text-success" />
                 <h2 className="text-lg font-bold text-text-primary">Cash In</h2>
               </div>
-              <span className="text-3xl font-bold text-success">+{state.data.cashIn.toLocaleString()} USDT</span>
+              <span className="text-3xl font-bold text-success">+{(data.cashIn ?? 0).toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Cash received from users</p>
           </Card>
@@ -176,7 +185,7 @@ export default function ReconciliationWorksheet() {
                 <DollarSign size={20} className="text-info" />
                 <h2 className="text-lg font-bold text-text-primary">Liquid Cash Received</h2>
               </div>
-              <span className="text-3xl font-bold text-info">+{state.data.liquidCashReceived || 0} USDT</span>
+              <span className="text-3xl font-bold text-info">+{(data.liquidCashReceived ?? 0).toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Cash delivery from Quicksend</p>
           </Card>
@@ -187,7 +196,7 @@ export default function ReconciliationWorksheet() {
                 <DollarSign size={20} className="text-danger" />
                 <h2 className="text-lg font-bold text-text-primary">Cash Out</h2>
               </div>
-              <span className="text-3xl font-bold text-danger">-{state.data.cashOut.toLocaleString()} USDT</span>
+              <span className="text-3xl font-bold text-danger">-{(data.cashOut ?? 0).toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Cash paid to users</p>
           </Card>
@@ -198,7 +207,7 @@ export default function ReconciliationWorksheet() {
                 <DollarSign size={20} className="text-warning" />
                 <h2 className="text-lg font-bold text-text-primary">Treasury Top-up</h2>
               </div>
-              <span className="text-3xl font-bold text-warning">+{state.data.treasuryIn.toLocaleString()} USDT</span>
+              <span className="text-3xl font-bold text-warning">+{(data.treasuryIn ?? 0).toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Float replenishment from treasury</p>
           </Card>
@@ -209,7 +218,7 @@ export default function ReconciliationWorksheet() {
                 <DollarSign size={20} className="text-danger" />
                 <h2 className="text-lg font-bold text-text-primary">Bank Settlements</h2>
               </div>
-              <span className="text-3xl font-bold text-danger">-{state.data.bankSettlements.toLocaleString()} USDT</span>
+              <span className="text-3xl font-bold text-danger">-{(data.bankSettlements ?? 0).toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Confirmed bank deposits to Quicksend</p>
           </Card>
@@ -220,7 +229,7 @@ export default function ReconciliationWorksheet() {
                 <DollarSign size={20} className="text-primary font-bold" />
                 <h2 className="text-lg font-bold text-text-primary">Closing Balance</h2>
               </div>
-              <span className="text-3xl font-bold text-primary">{state.data.closingBalance.toLocaleString()} USDT</span>
+              <span className="text-3xl font-bold text-primary">{(data.closingBalance ?? 0).toLocaleString()} USDT</span>
             </div>
             <p className="text-text-secondary text-sm mt-2">Current cash position</p>
           </Card>
@@ -255,36 +264,42 @@ export default function ReconciliationWorksheet() {
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <Clock size={16} className="text-primary" />
-            <h2 className="text-lg font-bold text-text-primary">Transaction Details</h2>
+            <h2 className="text-lg font-bold text-text-primary">Reconciliation Details</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-text-subtle uppercase border-b border-border">
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-left py-2 pr-4">Type</th>
-                  <th className="text-right py-2 pr-4">Amount</th>
-                  <th className="text-left py-2 pr-4">Description</th>
+                  <th className="text-left py-3 pr-4 font-semibold">Date</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Open Balance (Beginning)</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Cash In</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Cash Out</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Close Balance (End)</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Discrepancy</th>
+                  <th className="text-right py-3 font-semibold">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {state.data.transactions.map((tx, index) => (
-                  <tr key={tx.date + tx.type + index} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-4 text-text-secondary">{tx.date}</td>
-                    <td className="py-2 pr-4">
-                        <Badge variant={
-                          tx.type === "CASH_DEPOSIT" ? "success" :
-                          tx.type === "CASH_WITHDRAWAL" ? "danger" :
-                          tx.type === "TREASURY_TOPUP" ? "warning" :
-                          tx.type === "LIQUID_CASH" ? "info" : "info"
-                        }>
-                          {tx.type.replace("_", " ")}
-                        </Badge>
+                {(data.reconciliations ?? []).map((rec) => (
+                  <tr key={rec.date} className="border-b border-border last:border-0 hover:bg-card-alt transition-colors">
+                    <td className="py-3 pr-4 font-medium text-text-primary">{rec.date}</td>
+                    <td className="py-3 pr-4 text-right">${(rec.openingBalance ?? 0).toLocaleString()}</td>
+                    <td className="py-3 pr-4 text-right text-success">+${(rec.cashIn ?? 0).toLocaleString()}</td>
+                    <td className="py-3 pr-4 text-right text-danger">-${(rec.cashOut ?? 0).toLocaleString()}</td>
+                    <td className="py-3 pr-4 text-right font-bold text-text-primary">${(rec.closingBalance ?? 0).toLocaleString()}</td>
+                    <td className={`py-3 pr-4 text-right font-medium ${rec.discrepancy !== 0 ? "text-danger" : "text-text-subtle"}`}>
+                      {rec.discrepancy !== 0 ? `-$${Math.abs(rec.discrepancy ?? 0).toLocaleString()}` : "—"}
                     </td>
-                    <td className="py-2 pr-4 text-right text-primary font-bold">
-                        {tx.type === "CASH_DEPOSIT" || tx.type === "TREASURY_TOPUP" || tx.type === "LIQUID_CASH" ? "+" : "-"}${tx.amount.toLocaleString()}
+                    <td className="py-3 text-right">
+                      <Badge
+                        variant={
+                          rec.status === "MATCHED" ? "success" :
+                          rec.status === "PENDING" ? "warning" : "danger"
+                        }
+                      >
+                        {rec.status}
+                      </Badge>
                     </td>
-                    <td className="py-2 pr-4 text-text-secondary">{tx.description}</td>
                   </tr>
                 ))}
               </tbody>

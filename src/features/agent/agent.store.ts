@@ -24,6 +24,7 @@ interface AgentActionState {
       cashPickupLocation?: string;
     };
     commissionPercent?: number;
+    debitUserWallet?: boolean;
   }) => Promise<void>;
   withdrawCommission: (agentId: string) => Promise<void>;
   swapOffchain: (agentId: string, direction: "TO_MAIN" | "TO_OFFCHAIN", amount?: number) => Promise<void>;

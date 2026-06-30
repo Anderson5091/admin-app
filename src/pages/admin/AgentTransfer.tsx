@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { useAgentStore } from "../../features/agent/agent.store";
+import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import {
   ArrowLeft, Send, DollarSign, Percent, CreditCard, User,
-  Loader2, CheckCircle, AlertCircle, Hash, Globe, Building2, Smartphone, MapPin,
+  Loader2, CheckCircle, AlertCircle, Hash, Globe, Building2, Smartphone, MapPin, Search
 } from "lucide-react";
 
 const PAYOUT_METHODS = [
@@ -18,8 +19,13 @@ export default function AgentTransfer() {
   const navigate = useNavigate();
   const profile = useAuthStore((s) => s.profile);
   const agentId = profile?.id || "";
-  const agentName = profile?.email || "Agent";
   const { loading, result, transfer, clearResult } = useAgentStore();
+
+  const [customerIdentifier, setCustomerIdentifier] = useState("");
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState("");
+  const [foundUser, setFoundUser] = useState<{ id: string; email: string; fullName: string | null; phone: string | null } | null>(null);
+  const [debitUserWallet, setDebitUserWallet] = useState(false);
 
   const [amount, setAmount] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("BANK_TRANSFER");
@@ -35,6 +41,30 @@ export default function AgentTransfer() {
   const [mobileProvider, setMobileProvider] = useState("");
   const [cashPickupLocation, setCashPickupLocation] = useState("");
 
+  const handleLookupCustomer = async () => {
+    if (!customerIdentifier.trim()) {
+      setFoundUser(null);
+      setLookupError("");
+      return;
+    }
+    setLookupLoading(true);
+    setLookupError("");
+    try {
+      const user = await AgentApi.lookupUser(customerIdentifier.trim());
+      if (!user) {
+        setLookupError("User not found");
+        setFoundUser(null);
+      } else {
+        setFoundUser(user);
+      }
+    } catch (err: any) {
+      setLookupError(err?.response?.data?.error || err?.message || "User not found");
+      setFoundUser(null);
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!amount || !payoutMethod) return;
     if (!useExistingBeneficiary && !fullName) return;
@@ -43,12 +73,17 @@ export default function AgentTransfer() {
       ? undefined
       : { fullName, country, bankName: bankName || undefined, accountNumber: accountNumber || undefined, mobileWalletNumber: mobileWalletNumber || undefined, mobileProvider: mobileProvider || undefined, cashPickupLocation: cashPickupLocation || undefined };
 
+    // On submission, if there is no walk-in/wallet user specified, pass the agent's own info
+    const targetUserId = foundUser ? foundUser.id : agentId;
+
     await transfer(agentId, {
+      userId: targetUserId,
       amount: Number(amount),
       payoutMethod,
       beneficiaryId: useExistingBeneficiary ? beneficiaryId || undefined : undefined,
       beneficiary,
       commissionPercent: Number(commissionPercent) || 0,
+      debitUserWallet: foundUser ? debitUserWallet : false,
     });
   };
 
@@ -63,6 +98,7 @@ export default function AgentTransfer() {
         setAmount(""); setBeneficiaryId(""); setCommissionPercent("0");
         setFullName(""); setCountry(""); setBankName(""); setAccountNumber("");
         setMobileWalletNumber(""); setMobileProvider(""); setCashPickupLocation("");
+        setCustomerIdentifier(""); setFoundUser(null); setDebitUserWallet(false);
       }, 4000);
       return () => clearTimeout(t);
     }
@@ -89,18 +125,82 @@ export default function AgentTransfer() {
           <h2 className="text-lg font-bold text-text-primary">Transfer Details</h2>
         </div>
 
-        {/* Sender Info (Agent) */}
-        <div className="bg-card-alt rounded-lg p-4 border border-border">
-          <p className="text-[10px] text-text-subtle uppercase tracking-wider font-semibold mb-2">Sender (Agent)</p>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-dim flex items-center justify-center">
-              <User size={18} className="text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-text-primary">{agentName}</p>
-              <p className="text-[11px] text-text-secondary font-mono">{agentId}</p>
-            </div>
+        {/* Customer / Sender Lookup */}
+        <div className="bg-card-alt rounded-lg p-4 border border-border space-y-3">
+          <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider">
+            Sender (Optional Wallet User)
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={customerIdentifier}
+              onChange={(e) => setCustomerIdentifier(e.target.value)}
+              placeholder="Enter User ID, Email, or Phone"
+              className="flex-1 bg-card border border-border rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
+              disabled={loading || lookupLoading}
+            />
+            <button
+              type="button"
+              onClick={handleLookupCustomer}
+              disabled={loading || lookupLoading || !customerIdentifier.trim()}
+              className="px-3 py-2 text-xs bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1 shrink-0 font-medium"
+            >
+              {lookupLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+              Verify
+            </button>
           </div>
+
+          {lookupError && (
+            <p className="text-[11px] text-danger mt-1 flex items-center gap-1">
+              <AlertCircle size={12} /> {lookupError}
+            </p>
+          )}
+
+          {foundUser ? (
+            <div className="space-y-3 mt-2">
+              <div className="flex items-center gap-3 p-2 bg-primary-dim rounded-lg border border-primary/20">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs">
+                  {foundUser.fullName ? foundUser.fullName[0].toUpperCase() : foundUser.email[0].toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-text-primary">
+                    {foundUser.fullName || "Registered User"}
+                  </p>
+                  <p className="text-[10px] text-text-secondary truncate">{foundUser.email}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFoundUser(null);
+                    setCustomerIdentifier("");
+                    setDebitUserWallet(false);
+                  }}
+                  className="text-[10px] text-text-subtle hover:text-danger px-2 py-1 rounded hover:bg-card transition-colors font-medium"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <label className="flex items-center gap-2 text-xs text-text-secondary cursor-pointer font-medium">
+                  <input
+                    type="checkbox"
+                    checked={debitUserWallet}
+                    onChange={(e) => setDebitUserWallet(e.target.checked)}
+                    className="accent-primary"
+                    disabled={loading}
+                  />
+                  Debit sender's wallet balance (instead of agent treasury/cash paid at counter)
+                </label>
+              </div>
+            </div>
+          ) : (
+            <div className="p-2 bg-card rounded-lg border border-dashed border-border mt-2">
+              <p className="text-xs text-text-secondary text-center">
+                Unregistered / Walk-in Customer (Agent Treasury Funded)
+              </p>
+            </div>
+          )}
         </div>
 
         <div>
