@@ -110,7 +110,7 @@ export default function AgentDashboard() {
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
   const kpiCards = [
-    { label: "Wallet", value: agentDetail?.walletBalance ?? "—", sub: agentDetail?.offchainLedgerBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", subLabel: "OffChain" },
+    { label: "Wallet", value: agentDetail?.walletBalance ?? "—", sub: agentDetail?.offchainLedgerBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", subLabel: "OffChain", isWallet: true },
     { label: "Commission", value: agentDetail?.commissionLedgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: "USDT", isCommission: true },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
     { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
@@ -146,23 +146,21 @@ export default function AgentDashboard() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-2xl font-bold text-text-primary truncate">{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
+                  {kpi.isWallet && isPartner && (
+                    <button
+                      onClick={goToSwapWallet}
+                      className="shrink-0 text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
+                    >
+                      Swap
+                    </button>
+                  )}
                   {kpi.isCommission && (
-                    <div className="flex items-center gap-1.5">
-                      {isPartner && (
-                        <button
-                          onClick={goToSwapWallet}
-                          className="shrink-0 text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
-                        >
-                          Swap
-                        </button>
-                      )}
-                      <button
-                        onClick={goToCommission}
-                        className="shrink-0 text-xs font-semibold text-warning bg-warning-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
-                      >
-                        Withdraw
-                      </button>
-                    </div>
+                    <button
+                      onClick={goToCommission}
+                      className="shrink-0 text-xs font-semibold text-warning bg-warning-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
+                    >
+                      Withdraw
+                    </button>
                   )}
                 </div>
                 <p className="text-xs text-text-secondary">{kpi.label}</p>
