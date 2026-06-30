@@ -116,4 +116,9 @@ export const AgentApi = {
     const { data } = await api.get(`/agent/${agentId}/recent-deposits`);
     return data;
   },
+
+  async getMyTransactions(agentId: string): Promise<any[]> {
+    const { data } = await api.get(`/agent/${agentId}/transactions`);
+    return data;
+  },
 };

@@ -27,6 +27,7 @@ const navIconMap: Record<string, any> = {
   "/agent/transfer": ArrowRight,
   "/agent/topup": ArrowUpFromLine,
   "/agent/commission": HandCoins,
+  "/agent/activity": Activity,
   "/transfers": ArrowLeftRight,
   "/audit": ScrollText,
   "/pending-transfers": Clock,
@@ -52,13 +53,14 @@ const navLabelMap: Record<string, string> = {
   "/agent/transfer": "Cash Transfer",
   "/agent/topup": "Top Up Agent",
   "/agent/commission": "Commission",
+  "/agent/activity": "Activity",
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
   "/pending-transfers": "Pending Transfers",
 };
 
 const NAV_SECTIONS = [
-  { label: "Monitor", paths: ["/", "/notifications", "/live", "/system", "/pending-transfers"] },
+  { label: "Monitor", paths: ["/", "/notifications", "/live", "/system", "/agent/activity", "/pending-transfers"] },
   { label: "Administration", paths: ["/admins"] },
   { label: "Finance", paths: ["/treasury", "/payouts", "/transfers"] },
   { label: "Compliance", paths: ["/cases", "/fraud", "/audit"] },

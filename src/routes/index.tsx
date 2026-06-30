@@ -23,6 +23,7 @@ import AgentPayout from "../pages/admin/AgentPayout";
 import AgentTransfer from "../pages/admin/AgentTransfer";
 import AgentCommissionWithdraw from "../pages/admin/AgentCommissionWithdraw";
 import AgentTopUpAgent from "../pages/admin/AgentTopUpAgent";
+import AgentActivity from "../pages/admin/AgentActivity";
 import AdminAdmins from "../pages/admin/Admins";
 import AdminTreasury from "../pages/admin/Treasury";
 import AdminTransfers from "../pages/admin/Transfers";
@@ -97,6 +98,7 @@ export const router = createBrowserRouter([
       { path: "agent/transfer", element: <ProtectedRoute requiredPath="/agent/transfer"><AgentTransfer /></ProtectedRoute> },
       { path: "agent/topup", element: <ProtectedRoute requiredPath="/agent/topup"><AgentTopUpAgent /></ProtectedRoute> },
       { path: "agent/commission", element: <ProtectedRoute requiredPath="/agent/commission"><AgentCommissionWithdraw /></ProtectedRoute> },
+      { path: "agent/activity", element: <ProtectedRoute requiredPath="/agent/activity"><AgentActivity /></ProtectedRoute> },
       { path: "transfers", element: <ProtectedRoute requiredPath="/transfers"><AdminTransfers /></ProtectedRoute> },
       { path: "audit", element: <ProtectedRoute requiredPath="/audit"><AdminAudit /></ProtectedRoute> },
       { path: "pending-transfers", element: (
