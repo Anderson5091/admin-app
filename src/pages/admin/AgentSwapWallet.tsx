@@ -18,8 +18,8 @@ export default function AgentSwapWallet() {
   const { loading, result, swapOffchain, clearResult } = useAgentStore();
   const [dashboard, setDashboard] = useState<AgentDetail | null>(null);
   const [dashLoading, setDashLoading] = useState(true);
-  const [direction, setDirection] = useState<"TO_MAIN" | "TO_OFFCHAIN">("TO_MAIN");
   const [amount, setAmount] = useState("");
+  const direction = "TO_MAIN";
 
   const loadDashboard = async () => {
     if (!profile?.id) return;
@@ -70,11 +70,7 @@ export default function AgentSwapWallet() {
 
   const offchainBal = dashboard?.offchainLedgerBalance ?? 0;
   const mainBal = dashboard?.walletBalance ?? 0;
-  const sourceLabel = direction === "TO_MAIN" ? "Offchain Wallet" : "Main Wallet";
-  const destLabel = direction === "TO_MAIN" ? "Main Wallet" : "Offchain Wallet";
-  const sourceBal = direction === "TO_MAIN" ? offchainBal : mainBal;
-  const destBal = direction === "TO_MAIN" ? mainBal : offchainBal;
-  const maxAmount = sourceBal;
+  const maxAmount = offchainBal;
   const canSubmit = !loading && Number(amount) > 0 && Number(amount) <= maxAmount;
 
   const swapTxs = dashboard?.transactions?.filter((t) => t.type === "OFFCHAIN_SWAP") ?? [];
@@ -119,36 +115,30 @@ export default function AgentSwapWallet() {
         <>
           {/* Wallet Cards */}
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <div className={`rounded-xl p-4 text-left border ${direction === "TO_MAIN" ? "bg-warning-dim border-warning/20" : "bg-primary-dim border-primary/20"}`}>
+            <div className="rounded-xl p-4 text-left border bg-warning-dim border-warning/20">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-card-alt">
-                  <Wallet size={16} className={direction === "TO_MAIN" ? "text-warning" : "text-primary"} />
+                  <Wallet size={16} className="text-warning" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-text-primary">{sourceBal.toLocaleString()}</p>
-                  <p className="text-xs text-text-secondary">{sourceLabel}</p>
-                  <p className="text-[9px] text-text-subtle">USDT — {direction === "TO_MAIN" ? "offchain ledger" : "on-chain"}</p>
+                  <p className="text-2xl font-bold text-text-primary">{offchainBal.toLocaleString()}</p>
+                  <p className="text-xs text-text-secondary">Offchain Wallet</p>
+                  <p className="text-[9px] text-text-subtle">USDT — offchain ledger</p>
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => {
-                setDirection(direction === "TO_MAIN" ? "TO_OFFCHAIN" : "TO_MAIN");
-                setAmount("");
-              }}
-              className="flex items-center justify-center p-2 rounded-lg hover:bg-card-alt transition-colors"
-            >
+            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-card-alt transition-colors cursor-default">
               <ArrowLeftRight size={20} className="text-text-subtle" />
-            </button>
-            <div className={`rounded-xl p-4 text-left border ${direction === "TO_OFFCHAIN" ? "bg-warning-dim border-warning/20" : "bg-primary-dim border-primary/20"}`}>
+            </div>
+            <div className="rounded-xl p-4 text-left border opacity-60 border-primary/20">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-card-alt">
-                  <Wallet size={16} className={direction === "TO_OFFCHAIN" ? "text-warning" : "text-primary"} />
+                  <Wallet size={16} className="text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-text-primary">{destBal.toLocaleString()}</p>
-                  <p className="text-xs text-text-secondary">{destLabel}</p>
-                  <p className="text-[9px] text-text-subtle">USDT — {direction === "TO_OFFCHAIN" ? "offchain ledger" : "on-chain"}</p>
+                  <p className="text-2xl font-bold text-text-primary">{mainBal.toLocaleString()}</p>
+                  <p className="text-xs text-text-secondary">Main Wallet</p>
+                  <p className="text-[9px] text-text-subtle">USDT — on-chain</p>
                 </div>
               </div>
             </div>
