@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { useAgentStore } from "../../features/agent/agent.store";
@@ -7,20 +7,8 @@ import Card from "../../components/ui/Card";
 import {
   ArrowLeft, Send, DollarSign, Percent, MapPin,
   Loader2, CheckCircle, AlertCircle, Search, User, Mail, Phone,
-  Clock,
+  ArrowRight,
 } from "lucide-react";
-
-interface RecentWithdrawal {
-  id: string;
-  amount: number;
-  netAmount: number;
-  commission: number;
-  userRef: string;
-  reference: string | null;
-  metadata: any;
-  user: { fullName: string | null; email: string; phone: string | null } | null;
-  createdAt: string;
-}
 
 export default function AgentWithdraw() {
   const navigate = useNavigate();
@@ -37,25 +25,7 @@ export default function AgentWithdraw() {
   const [destinationAddress, setDestinationAddress] = useState("");
   const [commissionPercent, setCommissionPercent] = useState("0");
 
-  const [recentWithdrawals, setRecentWithdrawals] = useState<RecentWithdrawal[]>([]);
-  const [withdrawalsLoading, setWithdrawalsLoading] = useState(true);
-
-  const loadRecentWithdrawals = useCallback(async () => {
-    if (!agentId) return;
-    setWithdrawalsLoading(true);
-    try {
-      const data = await AgentApi.getRecentWithdrawals(agentId);
-      setRecentWithdrawals(data);
-    } catch {
-      // handled
-    } finally {
-      setWithdrawalsLoading(false);
-    }
-  }, [agentId]);
-
-  useEffect(() => {
-    loadRecentWithdrawals();
-  }, [loadRecentWithdrawals]);
+  const [showForm, setShowForm] = useState(false);
 
   const handleLookup = useCallback(async () => {
     if (!identifier.trim()) return;
@@ -69,6 +39,7 @@ export default function AgentWithdraw() {
         return;
       }
       setFoundUser(user);
+      setShowForm(false);
     } catch (err: any) {
       setLookupError(err?.response?.data?.error || err?.message || "User not found");
     } finally {
@@ -84,7 +55,6 @@ export default function AgentWithdraw() {
       destinationAddress,
       commissionPercent: Number(commissionPercent) || 0,
     });
-    loadRecentWithdrawals();
   };
 
   const canSubmit = foundUser && amount && destinationAddress && Number(amount) > 0 && !loading;
@@ -137,9 +107,15 @@ export default function AgentWithdraw() {
           </div>
         )}
 
-        {foundUser && (
-          <div className="bg-card-alt rounded-lg p-4 border border-border space-y-2">
-            <p className="text-[10px] text-text-subtle uppercase tracking-wider font-semibold">User Found</p>
+        {foundUser && !showForm && (
+          <button
+            onClick={() => setShowForm(true)}
+            className="w-full bg-card-alt rounded-lg p-4 border border-border space-y-2 hover:bg-card transition-colors text-left cursor-pointer"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] text-text-subtle uppercase tracking-wider font-semibold">User Found</p>
+              <ArrowRight size={16} className="text-warning" />
+            </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-warning-dim flex items-center justify-center">
                 <User size={18} className="text-warning" />
@@ -153,65 +129,12 @@ export default function AgentWithdraw() {
               </div>
               <span className="text-[10px] font-mono text-text-subtle">{foundUser.id}</span>
             </div>
-          </div>
-        )}
-      </Card>
-
-      {/* Recent Withdrawals Card */}
-      <Card className="p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-border">
-          <Clock size={18} className="text-warning" />
-          <h2 className="text-lg font-bold text-text-primary">Recent Withdrawals</h2>
-        </div>
-
-        {withdrawalsLoading ? (
-          <div className="flex justify-center py-6">
-            <div className="animate-spin w-5 h-5 border-2 border-warning border-t-transparent rounded-full" />
-          </div>
-        ) : recentWithdrawals.length === 0 ? (
-          <p className="text-text-subtle text-sm py-4 text-center">No withdrawals yet</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-text-subtle uppercase border-b border-border">
-                  <th className="text-left py-2 pr-3">User</th>
-                  <th className="text-right py-2 pr-3">Amount</th>
-                  <th className="text-right py-2 pr-3">Commission</th>
-                  <th className="text-right py-2 pr-3">Net</th>
-                  <th className="text-right py-2">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentWithdrawals.map((w) => (
-                  <tr key={w.id} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-warning-dim flex items-center justify-center shrink-0">
-                          <User size={10} className="text-warning" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-text-primary truncate">{w.user?.fullName || w.user?.email || w.userRef?.slice(0, 8)}</p>
-                          {w.user?.fullName && w.user?.email && (
-                            <p className="text-[9px] text-text-subtle truncate">{w.user.email}</p>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-2 pr-3 text-right text-text-primary font-bold">${w.amount.toLocaleString()}</td>
-                    <td className="py-2 pr-3 text-right text-warning">${w.commission.toLocaleString()}</td>
-                    <td className="py-2 pr-3 text-right text-text-primary">${w.netAmount.toLocaleString()}</td>
-                    <td className="py-2 text-right text-text-subtle">{new Date(w.createdAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          </button>
         )}
       </Card>
 
       {/* Withdraw Card */}
-      {foundUser && (
+      {foundUser && showForm && (
         <Card className="p-6 space-y-5">
           <div className="flex items-center gap-2 pb-4 border-b border-border">
             <Send size={18} className="text-warning" />
