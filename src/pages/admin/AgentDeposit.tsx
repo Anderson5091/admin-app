@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { useAgentStore } from "../../features/agent/agent.store";
@@ -7,8 +7,21 @@ import Card from "../../components/ui/Card";
 import {
   ArrowLeft, Wallet, DollarSign, Percent,
   Loader2, CheckCircle, AlertCircle, Search, User, Mail, Phone,
-  ArrowRight,
+  Clock, ArrowRight,
 } from "lucide-react";
+
+type Step = "search" | "user" | "form";
+
+interface RecentDeposit {
+  id: string;
+  amount: number;
+  netAmount: number;
+  commission: number;
+  userRef: string;
+  reference: string | null;
+  user: { fullName: string | null; email: string; phone: string | null } | null;
+  createdAt: string;
+}
 
 export default function AgentDeposit() {
   const navigate = useNavigate();
@@ -16,6 +29,7 @@ export default function AgentDeposit() {
   const agentId = profile?.id || "";
   const { loading, result, deposit } = useAgentStore();
 
+  const [step, setStep] = useState<Step>("search");
   const [identifier, setIdentifier] = useState("");
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState("");
@@ -25,7 +39,24 @@ export default function AgentDeposit() {
   const [usdtAmount, setUsdtAmount] = useState("");
   const [commissionPercent, setCommissionPercent] = useState("0");
 
-  const [showForm, setShowForm] = useState(false);
+  const [recentDeposits, setRecentDeposits] = useState<RecentDeposit[]>([]);
+  const [depositsLoading, setDepositsLoading] = useState(true);
+
+  const loadRecentDeposits = useCallback(async () => {
+    if (!agentId) return;
+    setDepositsLoading(true);
+    try {
+      const data = await AgentApi.getRecentDeposits(agentId);
+      setRecentDeposits(data);
+    } catch {
+    } finally {
+      setDepositsLoading(false);
+    }
+  }, [agentId]);
+
+  useEffect(() => {
+    loadRecentDeposits();
+  }, [loadRecentDeposits]);
 
   const handleLookup = useCallback(async () => {
     if (!identifier.trim()) return;
@@ -39,7 +70,7 @@ export default function AgentDeposit() {
         return;
       }
       setFoundUser(user);
-      setShowForm(false);
+      setStep("user");
     } catch (err: any) {
       setLookupError(err?.response?.data?.error || err?.message || "User not found");
     } finally {
@@ -59,63 +90,153 @@ export default function AgentDeposit() {
 
   const canSubmit = foundUser && usdtAmount && fiatAmount && Number(usdtAmount) > 0 && !loading;
 
+  const handleBack = () => {
+    if (step === "form") {
+      setStep("user");
+    } else if (step === "user") {
+      setStep("search");
+      setFoundUser(null);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-2xl">
-      <div className="flex items-center gap-3">
-        <button onClick={() => navigate("/")} className="p-1.5 hover:bg-card-alt rounded-lg transition-colors">
-          <ArrowLeft size={18} className="text-text-secondary" />
-        </button>
+      {/* Header */}
+      {step === "search" ? (
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Cash Deposit</h1>
           <p className="text-text-secondary text-sm mt-0.5">Take cash from user, credit their wallet from agent treasury</p>
         </div>
-      </div>
-
-      {/* Search User Card */}
-      <Card className="p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-border">
-          <Search size={18} className="text-primary" />
-          <h2 className="text-lg font-bold text-text-primary">Find User</h2>
-        </div>
-
+      ) : step === "user" ? (
         <div className="flex items-center gap-3">
-          <div className="flex-1 relative">
-            <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
-            <input
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLookup()}
-              placeholder="Search by User ID, Email, or Phone Number"
-              className="w-full bg-card-alt border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-              disabled={lookupLoading}
-            />
-          </div>
-          <button
-            onClick={handleLookup}
-            disabled={lookupLoading || !identifier.trim()}
-            className="flex items-center gap-2 px-5 py-2.5 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {lookupLoading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
-            {lookupLoading ? "Searching..." : "Search"}
+          <button onClick={handleBack} className="p-1.5 hover:bg-card-alt rounded-lg transition-colors">
+            <ArrowLeft size={18} className="text-text-secondary" />
           </button>
-        </div>
-
-        {lookupError && (
-          <div className="flex items-start gap-2 px-4 py-3 rounded-lg text-sm bg-danger/10 text-danger">
-            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-            <p>{lookupError}</p>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">Cash Deposit</h1>
+            <p className="text-text-secondary text-sm mt-0.5">Select user to continue</p>
           </div>
-        )}
-
-        {foundUser && !showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="w-full bg-card-alt rounded-lg p-4 border border-border space-y-2 hover:bg-card transition-colors text-left cursor-pointer"
-          >
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] text-text-subtle uppercase tracking-wider font-semibold">User Found</p>
-              <ArrowRight size={16} className="text-primary" />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3">
+          <button onClick={handleBack} className="p-1.5 hover:bg-card-alt rounded-lg transition-colors">
+            <ArrowLeft size={18} className="text-text-secondary" />
+          </button>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-text-primary">Cash Deposit</h1>
+              <ArrowRight size={20} className="text-primary" />
             </div>
+            <p className="text-text-secondary text-sm mt-0.5">Complete deposit for {foundUser?.fullName || foundUser?.email}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Step 1: Search + Recent */}
+      {step === "search" && (
+        <>
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-4 border-b border-border">
+              <Search size={18} className="text-primary" />
+              <h2 className="text-lg font-bold text-text-primary">Find User</h2>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 relative">
+                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
+                <input
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleLookup()}
+                  placeholder="Search by User ID, Email, or Phone Number"
+                  className="w-full bg-card-alt border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
+                  disabled={lookupLoading}
+                />
+              </div>
+              <button
+                onClick={handleLookup}
+                disabled={lookupLoading || !identifier.trim()}
+                className="flex items-center gap-2 px-5 py-2.5 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {lookupLoading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+                {lookupLoading ? "Searching..." : "Search"}
+              </button>
+            </div>
+
+            {lookupError && (
+              <div className="flex items-start gap-2 px-4 py-3 rounded-lg text-sm bg-danger/10 text-danger">
+                <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                <p>{lookupError}</p>
+              </div>
+            )}
+          </Card>
+
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-4 border-b border-border">
+              <Clock size={18} className="text-primary" />
+              <h2 className="text-lg font-bold text-text-primary">Recent Deposits</h2>
+            </div>
+
+            {depositsLoading ? (
+              <div className="flex justify-center py-6">
+                <div className="animate-spin w-5 h-5 border-2 border-primary border-t-transparent rounded-full" />
+              </div>
+            ) : recentDeposits.length === 0 ? (
+              <p className="text-text-subtle text-sm py-4 text-center">No deposits yet</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-text-subtle uppercase border-b border-border">
+                      <th className="text-left py-2 pr-3">User</th>
+                      <th className="text-right py-2 pr-3">Amount</th>
+                      <th className="text-right py-2 pr-3">Commission</th>
+                      <th className="text-right py-2 pr-3">Net</th>
+                      <th className="text-right py-2">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentDeposits.map((d) => (
+                      <tr key={d.id} className="border-b border-border last:border-0">
+                        <td className="py-2 pr-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-primary-dim flex items-center justify-center shrink-0">
+                              <User size={10} className="text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-text-primary truncate">{d.user?.fullName || d.user?.email || d.userRef?.slice(0, 8)}</p>
+                              {d.user?.fullName && d.user?.email && (
+                                <p className="text-[9px] text-text-subtle truncate">{d.user.email}</p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-2 pr-3 text-right text-text-primary font-bold">${d.amount.toLocaleString()}</td>
+                        <td className="py-2 pr-3 text-right text-warning">${d.commission.toLocaleString()}</td>
+                        <td className="py-2 pr-3 text-right text-text-primary">${d.netAmount.toLocaleString()}</td>
+                        <td className="py-2 text-right text-text-subtle">{new Date(d.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </>
+      )}
+
+      {/* Step 2: User Found */}
+      {step === "user" && foundUser && (
+        <Card className="p-6 space-y-4">
+          <div className="flex items-center gap-2 pb-4 border-b border-border">
+            <User size={18} className="text-primary" />
+            <h2 className="text-lg font-bold text-text-primary">User Found</h2>
+          </div>
+
+          <button
+            onClick={() => setStep("form")}
+            className="w-full bg-card-alt rounded-lg p-4 border border-border hover:bg-card transition-colors text-left cursor-pointer"
+          >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary-dim flex items-center justify-center">
                 <User size={18} className="text-primary" />
@@ -130,15 +251,28 @@ export default function AgentDeposit() {
               <span className="text-[10px] font-mono text-text-subtle">{foundUser.id}</span>
             </div>
           </button>
-        )}
-      </Card>
 
-      {/* Deposit Card */}
-      {foundUser && showForm && (
+          <div className="flex justify-end pt-2">
+            <button
+              onClick={() => setStep("form")}
+              className="flex items-center gap-2 px-6 py-2.5 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Next Step
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </Card>
+      )}
+
+      {/* Step 3: Deposit Form */}
+      {step === "form" && foundUser && (
         <Card className="p-6 space-y-5">
           <div className="flex items-center gap-2 pb-4 border-b border-border">
             <Wallet size={18} className="text-primary" />
-            <h2 className="text-lg font-bold text-text-primary">Deposit for {foundUser.fullName || foundUser.email}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-text-primary">Deposit</h2>
+              <ArrowRight size={18} className="text-primary" />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
