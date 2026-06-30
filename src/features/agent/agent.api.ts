@@ -17,7 +17,7 @@ export const AgentApi = {
 
   async withdraw(
     agentId: string,
-    payload: { userId: string; amount: number; destinationAddress: string; commissionPercent?: number }
+    payload: { userId: string; amount: number; destinationAddress: string; commissionPercent?: number; destinationType?: "OFFCHAIN" | "MAIN" }
   ): Promise<{ id: string; status: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
     const { data } = await api.post(`/agent/${agentId}/withdraw`, payload);
     return data;

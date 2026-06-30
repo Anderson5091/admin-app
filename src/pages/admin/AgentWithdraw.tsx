@@ -39,6 +39,9 @@ export default function AgentWithdraw() {
   const [amount, setAmount] = useState("");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [commissionPercent, setCommissionPercent] = useState("0");
+  const [destinationType, setDestinationType] = useState<"OFFCHAIN" | "MAIN">("OFFCHAIN");
+
+  const isPartner = profile?.role === "AGENT_PARTNER";
 
   const [recentWithdrawals, setRecentWithdrawals] = useState<RecentWithdrawal[]>([]);
   const [withdrawalsLoading, setWithdrawalsLoading] = useState(true);
@@ -90,6 +93,7 @@ export default function AgentWithdraw() {
       amount: Number(amount),
       destinationAddress,
       commissionPercent: Number(commissionPercent) || 0,
+      destinationType,
     });
   };
 
@@ -340,6 +344,26 @@ export default function AgentWithdraw() {
                 />
                 <p className="text-[10px] text-text-subtle mt-1">Where the withdrawn funds will be sent</p>
               </div>
+
+              {isPartner && (
+                <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-card-alt border border-border">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-text-secondary">Destination:</span>
+                    <span className={`text-sm font-medium ${destinationType === "OFFCHAIN" ? "text-warning" : "text-primary"}`}>
+                      {destinationType === "OFFCHAIN" ? "Pending OffChain" : "Main Wallet"}
+                    </span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={destinationType === "MAIN"}
+                      onChange={(e) => setDestinationType(e.target.checked ? "MAIN" : "OFFCHAIN")}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-5 bg-card rounded-full peer peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+                  </label>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm text-text-secondary mb-1.5">
