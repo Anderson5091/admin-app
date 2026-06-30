@@ -110,7 +110,7 @@ export default function AgentDashboard() {
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
   const kpiCards = [
-    { label: "Wallet", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT" },
+    { label: "Wallet", value: agentDetail?.walletBalance ?? "—", sub: agentDetail?.offchainLedgerBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", subLabel: "OffChain" },
     { label: "Commission", value: agentDetail?.commissionLedgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: "USDT", isCommission: true },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
     { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
@@ -154,7 +154,13 @@ export default function AgentDashboard() {
                   )}
                 </div>
                 <p className="text-xs text-text-secondary">{kpi.label}</p>
-                {kpi.suffix && <p className="text-[9px] text-text-subtle">{kpi.suffix}</p>}
+                {kpi.sub !== undefined && (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-lg font-bold text-text-primary">{typeof kpi.sub === "number" ? kpi.sub.toLocaleString() : kpi.sub}</span>
+                    <span className="text-[10px] text-text-subtle">{kpi.subLabel}</span>
+                  </div>
+                )}
+                {kpi.suffix && !kpi.sub && <p className="text-[9px] text-text-subtle">{kpi.suffix}</p>}
               </div>
             </div>
           </Card>
