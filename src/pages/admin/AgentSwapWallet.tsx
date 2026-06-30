@@ -235,47 +235,6 @@ export default function AgentSwapWallet() {
             </div>
           </Card>
 
-          {/* Wallets List */}
-          <Card>
-            <div className="flex items-center gap-2 mb-4">
-              <Wallet size={16} className="text-primary" />
-              <h2 className="text-lg font-bold text-text-primary">Wallets</h2>
-            </div>
-            {dashboard?.wallets && dashboard.wallets.length > 0 ? (
-              <div className="space-y-3">
-                {dashboard.wallets.map((w) => (
-                  <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary-dim">
-                        <Wallet size={16} className="text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-text-primary">{w.walletType}</p>
-                        <p className="text-[10px] text-text-subtle">{w.network}</p>
-                      </div>
-                    </div>
-                    <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
-                  </div>
-                ))}
-                {/* Offchain ledger display */}
-                <div className="bg-card-alt rounded-lg p-4 border border-border flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-warning-dim">
-                      <Wallet size={16} className="text-warning" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-text-primary">Offchain Ledger</p>
-                      <p className="text-[10px] text-text-subtle">ledger balance</p>
-                    </div>
-                  </div>
-                  <p className="text-lg font-bold text-warning">{offchainBal.toLocaleString()} USDT</p>
-                </div>
-              </div>
-            ) : (
-              <p className="text-text-subtle text-sm py-4 text-center">No wallets found</p>
-            )}
-          </Card>
-
           {/* Swap History */}
           {swapTxs.length > 0 && (
             <Card>
