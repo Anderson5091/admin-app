@@ -27,6 +27,7 @@ const navIconMap: Record<string, any> = {
   "/agent/transfer": ArrowRight,
   "/agent/topup": ArrowUpFromLine,
   "/agent/commission": HandCoins,
+  "/agent/swap-wallet": ArrowLeftRight,
   "/agent/activity": Activity,
   "/transfers": ArrowLeftRight,
   "/audit": ScrollText,
@@ -53,6 +54,7 @@ const navLabelMap: Record<string, string> = {
   "/agent/transfer": "Cash Transfer",
   "/agent/topup": "Top Up Agent",
   "/agent/commission": "Commission",
+  "/agent/swap-wallet": "Swap Wallet",
   "/agent/activity": "Activity",
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
@@ -67,6 +69,7 @@ const NAV_SECTIONS = [
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },
   { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payout", "/agent/transfer", "/agent/topup"] },
+  { label: "Wallet", paths: ["/agent/commission", "/agent/swap-wallet"] },
 ];
 
 const roleColors: Record<string, string> = {

@@ -26,6 +26,7 @@ interface AgentActionState {
     commissionPercent?: number;
   }) => Promise<void>;
   withdrawCommission: (agentId: string) => Promise<void>;
+  swapOffchain: (agentId: string, direction: "TO_MAIN" | "TO_OFFCHAIN", amount?: number) => Promise<void>;
   clearResult: () => void;
 }
 
@@ -113,6 +114,21 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Withdraw commission failed";
+      set({ loading: false, result: { success: false, message: msg } });
+    }
+  },
+
+  swapOffchain: async (agentId, direction, amount) => {
+    set({ loading: true, result: null });
+    try {
+      const res = await AgentApi.swapOffchain(agentId, direction, amount);
+      const label = direction === "TO_MAIN" ? "Offchain → Main" : "Main → Offchain";
+      set({
+        loading: false,
+        result: { success: true, message: `Swap completed — ${res.amount} USDT (${label})`, reference: res.reference },
+      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || "Swap failed";
       set({ loading: false, result: { success: false, message: msg } });
     }
   },

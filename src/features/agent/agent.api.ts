@@ -113,4 +113,9 @@ export const AgentApi = {
     const { data } = await api.get(`/agent/${agentId}/transactions`);
     return data;
   },
+
+  async swapOffchain(agentId: string, direction: "TO_MAIN" | "TO_OFFCHAIN", amount?: number): Promise<{ id: string; type: string; amount: number; status: string; reference: string }> {
+    const { data } = await api.post(`/agent/${agentId}/swap-offchain`, { direction, amount });
+    return data;
+  },
 };
