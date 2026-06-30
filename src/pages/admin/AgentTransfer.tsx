@@ -18,9 +18,9 @@ export default function AgentTransfer() {
   const navigate = useNavigate();
   const profile = useAuthStore((s) => s.profile);
   const agentId = profile?.id || "";
+  const agentName = profile?.email || "Agent";
   const { loading, result, transfer, clearResult } = useAgentStore();
 
-  const [userId, setUserId] = useState("");
   const [amount, setAmount] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("BANK_TRANSFER");
   const [beneficiaryId, setBeneficiaryId] = useState("");
@@ -44,7 +44,6 @@ export default function AgentTransfer() {
       : { fullName, country, bankName: bankName || undefined, accountNumber: accountNumber || undefined, mobileWalletNumber: mobileWalletNumber || undefined, mobileProvider: mobileProvider || undefined, cashPickupLocation: cashPickupLocation || undefined };
 
     await transfer(agentId, {
-      userId: userId || undefined,
       amount: Number(amount),
       payoutMethod,
       beneficiaryId: useExistingBeneficiary ? beneficiaryId || undefined : undefined,
@@ -57,7 +56,7 @@ export default function AgentTransfer() {
     if (result && result.success) {
       const t = setTimeout(() => {
         clearResult();
-        setUserId(""); setAmount(""); setBeneficiaryId(""); setCommissionPercent("0");
+        setAmount(""); setBeneficiaryId(""); setCommissionPercent("0");
         setFullName(""); setCountry(""); setBankName(""); setAccountNumber("");
         setMobileWalletNumber(""); setMobileProvider(""); setCashPickupLocation("");
       }, 4000);
@@ -76,7 +75,7 @@ export default function AgentTransfer() {
         </button>
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Cash Transfer</h1>
-          <p className="text-text-secondary text-sm mt-0.5">Send cash to a beneficiary — for registered or walk-in users</p>
+          <p className="text-text-secondary text-sm mt-0.5">Send cash to a beneficiary from agent wallet</p>
         </div>
       </div>
 
@@ -86,18 +85,18 @@ export default function AgentTransfer() {
           <h2 className="text-lg font-bold text-text-primary">Transfer Details</h2>
         </div>
 
-        <div>
-          <label className="block text-sm text-text-secondary mb-1.5">
-            <User size={14} className="inline mr-1" />
-            User ID <span className="text-text-subtle">(optional — leave blank for walk-in)</span>
-          </label>
-          <input
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="Registered user's ID (or empty for non-registered)"
-            className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-            disabled={loading}
-          />
+        {/* Sender Info (Agent) */}
+        <div className="bg-card-alt rounded-lg p-4 border border-border">
+          <p className="text-[10px] text-text-subtle uppercase tracking-wider font-semibold mb-2">Sender (Agent)</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary-dim flex items-center justify-center">
+              <User size={18} className="text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-text-primary">{agentName}</p>
+              <p className="text-[11px] text-text-secondary font-mono">{agentId}</p>
+            </div>
+          </div>
         </div>
 
         <div>
