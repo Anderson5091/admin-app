@@ -5,7 +5,7 @@ import { useAgentStore } from "../../features/agent/agent.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import {
-  ArrowLeft, Send, DollarSign, Percent, MapPin,
+  ArrowLeft, Send, DollarSign, Percent,
   Loader2, CheckCircle, AlertCircle, Search, User, Mail, Phone,
   Clock, ArrowRight,
 } from "lucide-react";
@@ -37,7 +37,6 @@ export default function AgentWithdraw() {
   const [foundUser, setFoundUser] = useState<{ id: string; email: string; fullName: string | null; phone: string | null } | null>(null);
 
   const [amount, setAmount] = useState("");
-  const [destinationAddress, setDestinationAddress] = useState("");
   const [commissionPercent, setCommissionPercent] = useState("0");
   const [destinationType, setDestinationType] = useState<"OFFCHAIN" | "MAIN">("OFFCHAIN");
 
@@ -87,23 +86,21 @@ export default function AgentWithdraw() {
   }, [identifier]);
 
   const handleSubmit = async () => {
-    if (!foundUser || !amount || !destinationAddress) return;
+    if (!foundUser || !amount) return;
     await withdraw(agentId, {
       userId: foundUser.id,
       amount: Number(amount),
-      destinationAddress,
       commissionPercent: Number(commissionPercent) || 0,
       destinationType,
     });
   };
 
-  const canSubmit = foundUser && amount && destinationAddress && Number(amount) > 0 && !loading;
+  const canSubmit = foundUser && amount && Number(amount) > 0 && !loading;
 
   const handleDone = () => {
     setStep("search");
     setFoundUser(null);
     setAmount("");
-    setDestinationAddress("");
     setCommissionPercent("0");
     useAgentStore.getState().clearResult();
     loadRecentWithdrawals();
@@ -328,21 +325,6 @@ export default function AgentWithdraw() {
                   min="0"
                 />
                 <p className="text-[10px] text-text-subtle mt-1">Amount to withdraw from user's wallet</p>
-              </div>
-
-              <div>
-                <label className="block text-sm text-text-secondary mb-1.5">
-                  <MapPin size={14} className="inline mr-1" />
-                  Destination Address *
-                </label>
-                <input
-                  value={destinationAddress}
-                  onChange={(e) => setDestinationAddress(e.target.value)}
-                  placeholder="Blockchain address or withdrawal destination"
-                  className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-                  disabled={loading}
-                />
-                <p className="text-[10px] text-text-subtle mt-1">Where the withdrawn funds will be sent</p>
               </div>
 
               {isPartner && (

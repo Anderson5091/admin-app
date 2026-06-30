@@ -6,7 +6,7 @@ interface AgentActionState {
   result: { success: boolean; message: string; reference?: string } | null;
 
   deposit: (agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number; commissionPercent?: number }) => Promise<void>;
-  withdraw: (agentId: string, payload: { userId: string; amount: number; destinationAddress: string; commissionPercent?: number; destinationType?: "OFFCHAIN" | "MAIN" }) => Promise<void>;
+  withdraw: (agentId: string, payload: { userId: string; amount: number; commissionPercent?: number; destinationType?: "OFFCHAIN" | "MAIN" }) => Promise<void>;
   topupPartner: (payload: { partnerAgentId: string; usdtAmount: number }) => Promise<void>;
   payout: (agentId: string, payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string; commissionPercent?: number }) => Promise<void>;
   transfer: (agentId: string, payload: {
