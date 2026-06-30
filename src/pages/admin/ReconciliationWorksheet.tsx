@@ -147,8 +147,8 @@ export default function ReconciliationWorksheet() {
         </button>
       </div>
 
-      <div className="grid grid-cols-[1fr_2fr] gap-6">
-        <div className="space-y-4">
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -216,46 +216,44 @@ export default function ReconciliationWorksheet() {
           </Card>
         </div>
 
-        <div className="space-y-4">
-          <Card>
-            <div className="flex items-center gap-2 mb-4">
-              <Clock size={16} className="text-primary" />
-              <h2 className="text-lg font-bold text-text-primary">Transaction Details</h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-text-subtle uppercase border-b border-border">
-                    <th className="text-left py-2 pr-4">Date</th>
-                    <th className="text-left py-2 pr-4">Type</th>
-                    <th className="text-right py-2 pr-4">Amount</th>
-                    <th className="text-left py-2 pr-4">Description</th>
+        <Card>
+          <div className="flex items-center gap-2 mb-4">
+            <Clock size={16} className="text-primary" />
+            <h2 className="text-lg font-bold text-text-primary">Transaction Details</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-text-subtle uppercase border-b border-border">
+                  <th className="text-left py-2 pr-4">Date</th>
+                  <th className="text-left py-2 pr-4">Type</th>
+                  <th className="text-right py-2 pr-4">Amount</th>
+                  <th className="text-left py-2 pr-4">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.data.transactions.map((tx, index) => (
+                  <tr key={tx.date + tx.type + index} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-4 text-text-secondary">{tx.date}</td>
+                    <td className="py-2 pr-4">
+                      <Badge variant={
+                        tx.type === "CASH_DEPOSIT" ? "success" :
+                        tx.type === "CASH_WITHDRAWAL" ? "danger" :
+                        tx.type === "TREASURY_TOPUP" ? "warning" : "info"
+                      }>
+                        {tx.type.replace("_", " ")}
+                      </Badge>
+                    </td>
+                    <td className="py-2 pr-4 text-right text-primary font-bold">
+                      {tx.type === "CASH_DEPOSIT" || tx.type === "TREASURY_TOPUP" ? "+" : "-"}${tx.amount.toLocaleString()}
+                    </td>
+                    <td className="py-2 pr-4 text-text-secondary">{tx.description}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {state.data.transactions.map((tx, index) => (
-                    <tr key={tx.date + tx.type + index} className="border-b border-border last:border-0">
-                      <td className="py-2 pr-4 text-text-secondary">{tx.date}</td>
-                      <td className="py-2 pr-4">
-                        <Badge variant={
-                          tx.type === "CASH_DEPOSIT" ? "success" :
-                          tx.type === "CASH_WITHDRAWAL" ? "danger" :
-                          tx.type === "TREASURY_TOPUP" ? "warning" : "info"
-                        }>
-                          {tx.type.replace("_", " ")}
-                        </Badge>
-                      </td>
-                      <td className="py-2 pr-4 text-right text-primary font-bold">
-                        {tx.type === "CASH_DEPOSIT" || tx.type === "TREASURY_TOPUP" ? "+" : "-"}${tx.amount.toLocaleString()}
-                      </td>
-                      <td className="py-2 pr-4 text-text-secondary">{tx.description}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </div>
     </div>
   );
