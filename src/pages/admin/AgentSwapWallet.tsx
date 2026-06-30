@@ -18,8 +18,6 @@ export default function AgentSwapWallet() {
   const { loading, result, swapOffchain, clearResult } = useAgentStore();
   const [dashboard, setDashboard] = useState<AgentDetail | null>(null);
   const [dashLoading, setDashLoading] = useState(true);
-  const [amount, setAmount] = useState("");
-  const direction = "TO_MAIN";
 
   const loadDashboard = async () => {
     if (!profile?.id) return;
@@ -41,7 +39,6 @@ export default function AgentSwapWallet() {
   useEffect(() => {
     if (result && result.success) {
       loadDashboard();
-      setAmount("");
       const t = setTimeout(clearResult, 5000);
       return () => clearTimeout(t);
     }
@@ -70,20 +67,9 @@ export default function AgentSwapWallet() {
 
   const offchainBal = dashboard?.offchainLedgerBalance ?? 0;
   const mainBal = dashboard?.walletBalance ?? 0;
-  const maxAmount = offchainBal;
-  const canSubmit = !loading && Number(amount) > 0 && Number(amount) <= maxAmount;
-
+  const mainWallet = dashboard?.wallets?.find((w) => w.walletType === "MAIN");
+  const balanceTooLow = offchainBal < 10;
   const swapTxs = dashboard?.transactions?.filter((t) => t.type === "OFFCHAIN_SWAP") ?? [];
-
-  const handleSwap = () => {
-    if (!profile?.id || !canSubmit) return;
-    swapOffchain(profile.id, direction, Number(amount));
-  };
-
-  const handleSwapAll = () => {
-    if (!profile?.id) return;
-    setAmount(String(maxAmount));
-  };
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -94,7 +80,7 @@ export default function AgentSwapWallet() {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-text-primary">Swap Wallet</h1>
-            <p className="text-text-secondary text-sm mt-0.5">Transfer between offchain and main wallet</p>
+            <p className="text-text-secondary text-sm mt-0.5">Move pending offchain funds to your treasury wallet</p>
           </div>
         </div>
         <button
@@ -113,71 +99,53 @@ export default function AgentSwapWallet() {
         </div>
       ) : (
         <>
-          {/* Wallet Cards */}
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <div className="rounded-xl p-4 text-left border bg-warning-dim border-warning/20">
+            <div className="bg-warning-dim border border-warning/20 rounded-xl p-4 text-left">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-card-alt">
+                <div className="p-2 rounded-lg bg-warning-dim">
                   <Wallet size={16} className="text-warning" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-text-primary">{offchainBal.toLocaleString()}</p>
-                  <p className="text-xs text-text-secondary">Offchain Wallet</p>
+                  <p className="text-xs text-text-secondary">Pending OffChain</p>
                   <p className="text-[9px] text-text-subtle">USDT — offchain ledger</p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-card-alt transition-colors cursor-default">
+            <div className="flex items-center justify-center">
               <ArrowLeftRight size={20} className="text-text-subtle" />
             </div>
-            <div className="rounded-xl p-4 text-left border opacity-60 border-primary/20">
+            <div className="bg-primary-dim border border-primary/20 rounded-xl p-4 text-left">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-card-alt">
+                <div className="p-2 rounded-lg bg-primary-dim">
                   <Wallet size={16} className="text-primary" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-text-primary">{mainBal.toLocaleString()}</p>
                   <p className="text-xs text-text-secondary">Main Wallet</p>
-                  <p className="text-[9px] text-text-subtle">USDT — on-chain</p>
+                  <p className="text-[9px] text-text-subtle">{mainWallet?.network || "BASE"} — on-chain</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Swap Card */}
           <Card className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-4 border-b border-border">
               <ArrowLeftRight size={18} className="text-primary" />
-              <h2 className="text-lg font-bold text-text-primary">Swap</h2>
+              <h2 className="text-lg font-bold text-text-primary">Swap Pending OffChain</h2>
             </div>
 
-            <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                Amount (USDT)
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0"
-                  className="flex-1 bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-                  disabled={loading}
-                  min="0"
-                  max={maxAmount}
-                />
-                <button
-                  onClick={handleSwapAll}
-                  disabled={loading || maxAmount <= 0}
-                  className="px-3 py-2.5 text-xs font-semibold bg-card-alt border border-border rounded-lg text-text-secondary hover:text-text-primary hover:bg-card transition-colors disabled:opacity-50"
-                >
-                  Max
-                </button>
-              </div>
-              <p className="text-[10px] text-text-subtle mt-1">
-                Available: {maxAmount.toLocaleString()} USDT
-              </p>
+            <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-card-alt">
+              <span className="text-sm text-text-secondary">Available to swap</span>
+              <span className="text-lg font-bold text-primary">{offchainBal.toLocaleString()} USDT</span>
             </div>
+
+            {balanceTooLow && (
+              <div className="flex items-start gap-3 px-4 py-3 rounded-lg text-sm bg-warning/10 text-warning">
+                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                <p>Minimum swap is 10 USDT. Add more pending funds before swapping.</p>
+              </div>
+            )}
 
             {result && (
               <div className={`flex items-start gap-3 px-4 py-3 rounded-lg text-sm ${
@@ -200,17 +168,16 @@ export default function AgentSwapWallet() {
                 Back
               </button>
               <button
-                onClick={handleSwap}
-                disabled={!canSubmit}
+                onClick={() => profile?.id && swapOffchain(profile.id, "TO_MAIN", offchainBal)}
+                disabled={loading || balanceTooLow}
                 className="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
               >
                 {loading && <Loader2 size={14} className="animate-spin" />}
-                {loading ? "Processing..." : `Swap ${Number(amount) > 0 ? Number(amount).toLocaleString() : ""} USDT`}
+                {loading ? "Processing..." : `Swap All (${offchainBal} USDT)`}
               </button>
             </div>
           </Card>
 
-          {/* Swap History */}
           {swapTxs.length > 0 && (
             <Card>
               <div className="flex items-center gap-2 mb-4">
@@ -221,28 +188,23 @@ export default function AgentSwapWallet() {
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="text-text-subtle uppercase border-b border-border">
-                      <th className="text-left py-2 pr-4">Direction</th>
+                      <th className="text-left py-2 pr-4">Type</th>
                       <th className="text-right py-2 pr-4">Amount</th>
                       <th className="text-right py-2">Date</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {swapTxs.slice(0, 20).map((tx) => {
-                      const dir = tx.metadata?.direction;
-                      return (
-                        <tr key={tx.id} className="border-b border-border last:border-0">
-                          <td className="py-2 pr-4">
-                            <Badge variant={dir === "TO_MAIN" ? "success" : "info"}>
-                              {dir === "TO_MAIN" ? "Offchain → Main" : "Main → Offchain"}
-                            </Badge>
-                          </td>
-                          <td className="py-2 pr-4 text-right text-text-primary font-bold">
-                            ${tx.amount.toLocaleString()}
-                          </td>
-                          <td className="py-2 text-right text-text-subtle">{new Date(tx.createdAt).toLocaleDateString()}</td>
-                        </tr>
-                      );
-                    })}
+                    {swapTxs.slice(0, 20).map((tx) => (
+                      <tr key={tx.id} className="border-b border-border last:border-0">
+                        <td className="py-2 pr-4">
+                          <Badge variant="info">Swapped</Badge>
+                        </td>
+                        <td className="py-2 pr-4 text-right text-text-primary font-bold">
+                          -${tx.amount.toLocaleString()}
+                        </td>
+                        <td className="py-2 text-right text-text-subtle">{new Date(tx.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
