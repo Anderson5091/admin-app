@@ -161,11 +161,13 @@ export default function AgentSwapWallet() {
               </button>
               <button
                 onClick={() => profile?.id && swapOffchain(profile.id, "TO_MAIN", offchainBal)}
-                disabled={loading}
-                className="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                disabled={loading || offchainBal <= 0}
+                className={`px-6 py-2 text-sm rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 ${
+                  loading || offchainBal <= 0 ? "bg-card text-text-subtle cursor-not-allowed" : "bg-primary text-white"
+                }`}
               >
                 {loading && <Loader2 size={14} className="animate-spin" />}
-                {loading ? "Processing..." : `Swap All (${offchainBal} USDT)`}
+                {loading ? "Processing..." : offchainBal <= 0 ? "No funds to swap" : `Swap All (${offchainBal} USDT)`}
               </button>
             </div>
           </Card>
