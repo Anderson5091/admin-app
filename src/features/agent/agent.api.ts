@@ -2,6 +2,11 @@ import { api } from "../../api/client";
 import type { AgentDetail } from "../admin/admin.types";
 
 export const AgentApi = {
+  async lookupUser(identifier: string): Promise<{ id: string; email: string; fullName: string | null; phone: string | null } | null> {
+    const { data } = await api.post("/agent/lookup-user", { identifier });
+    return data;
+  },
+
   async addBalance(
     agentId: string,
     payload: { userId: string; fiatAmount: string; usdtAmount: number; commissionPercent?: number }
@@ -94,6 +99,21 @@ export const AgentApi = {
 
   async executePayout(agentId: string, transferId: string): Promise<{ success: boolean; message: string; transferId: string }> {
     const { data } = await api.post(`/agent/${agentId}/execute-payout`, { transferId });
+    return data;
+  },
+
+  async getPendingTransferDetail(referenceId: string): Promise<any> {
+    const { data } = await api.get(`/agent/pending-transfer/${referenceId}`);
+    return data;
+  },
+
+  async getRecentWithdrawals(agentId: string): Promise<any[]> {
+    const { data } = await api.get(`/agent/${agentId}/recent-withdrawals`);
+    return data;
+  },
+
+  async getRecentDeposits(agentId: string): Promise<any[]> {
+    const { data } = await api.get(`/agent/${agentId}/recent-deposits`);
     return data;
   },
 };

@@ -49,7 +49,7 @@ const navLabelMap: Record<string, string> = {
   "/agent/deposit": "Cash Deposit",
   "/agent/withdraw": "Cash Withdraw",
   "/agent/payout": "Payout",
-  "/agent/transfer": "Transfer",
+  "/agent/transfer": "Cash Transfer",
   "/agent/topup": "Top Up Agent",
   "/agent/commission": "Commission",
   "/transfers": "Transfers",

@@ -4,6 +4,7 @@ import AdminLayout from "../pages/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
 import AgentDashboard from "../pages/admin/AgentDashboard";
 import PendingTransfers from "../pages/admin/PendingTransfers";
+import PayoutExecute from "../pages/admin/PayoutExecute";
 import LiveFeed from "../pages/admin/LiveFeed";
 import Users from "../pages/admin/Users";
 import KycReview from "../pages/admin/KycReview";
@@ -102,6 +103,13 @@ export const router = createBrowserRouter([
         <ProtectedRoute requiredPath="/">
           <RouteGuard adminFallback={<Navigate to="/" replace />}>
             <PendingTransfers />
+          </RouteGuard>
+        </ProtectedRoute>
+      )},
+      { path: "pending-transfers/:referenceId", element: (
+        <ProtectedRoute requiredPath="/">
+          <RouteGuard adminFallback={<Navigate to="/" replace />}>
+            <PayoutExecute />
           </RouteGuard>
         </ProtectedRoute>
       )},
