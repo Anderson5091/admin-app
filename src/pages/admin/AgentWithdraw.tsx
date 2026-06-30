@@ -91,6 +91,16 @@ export default function AgentWithdraw() {
 
   const canSubmit = foundUser && amount && destinationAddress && Number(amount) > 0 && !loading;
 
+  const handleDone = () => {
+    setStep("search");
+    setFoundUser(null);
+    setAmount("");
+    setDestinationAddress("");
+    setCommissionPercent("0");
+    useAgentStore.getState().clearResult();
+    loadRecentWithdrawals();
+  };
+
   const handleBack = () => {
     if (step === "form") {
       setStep("user");
@@ -268,91 +278,109 @@ export default function AgentWithdraw() {
       {/* Step 3: Withdraw Form */}
       {step === "form" && foundUser && (
         <Card className="p-6 space-y-5">
-          <div className="flex items-center gap-2 pb-4 border-b border-border">
-            <Send size={18} className="text-warning" />
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-text-primary">Withdraw</h2>
-              <ArrowRight size={18} className="text-warning" />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm text-text-secondary mb-1.5">
-              <DollarSign size={14} className="inline mr-1" />
-              USDT Amount *
-            </label>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="e.g. 1000"
-              className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-              disabled={loading}
-              min="0"
-            />
-            <p className="text-[10px] text-text-subtle mt-1">Amount to withdraw from user's wallet</p>
-          </div>
-
-          <div>
-            <label className="block text-sm text-text-secondary mb-1.5">
-              <MapPin size={14} className="inline mr-1" />
-              Destination Address *
-            </label>
-            <input
-              value={destinationAddress}
-              onChange={(e) => setDestinationAddress(e.target.value)}
-              placeholder="Blockchain address or withdrawal destination"
-              className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-              disabled={loading}
-            />
-            <p className="text-[10px] text-text-subtle mt-1">Where the withdrawn funds will be sent</p>
-          </div>
-
-          <div>
-            <label className="block text-sm text-text-secondary mb-1.5">
-              <Percent size={14} className="inline mr-1" />
-              Commission %
-            </label>
-            <input
-              type="number"
-              value={commissionPercent}
-              onChange={(e) => setCommissionPercent(e.target.value)}
-              placeholder="0"
-              className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-[200px]"
-              disabled={loading}
-              min="0"
-              max="100"
-            />
-          </div>
-
-          {result && (
-            <div className={`flex items-start gap-3 px-4 py-3 rounded-lg text-sm ${
-              result.success ? "bg-warning/10 text-warning" : "bg-danger/10 text-danger"
-            }`}>
-              {result.success ? <CheckCircle size={18} className="shrink-0 mt-0.5" /> : <AlertCircle size={18} className="shrink-0 mt-0.5" />}
-              <div>
-                <p>{result.message}</p>
-                {result.reference && <p className="text-[10px] mt-1 opacity-70">Ref: {result.reference}</p>}
+          {result?.success ? (
+            <>
+              <div className="flex flex-col items-center gap-4 py-6">
+                <CheckCircle size={48} className="text-warning" />
+                <div className="text-center">
+                  <p className="text-lg font-bold text-text-primary">Withdrawal Successful</p>
+                  <p className="text-sm text-text-secondary mt-1">{result.message}</p>
+                  {result.reference && <p className="text-[10px] text-text-subtle mt-1 font-mono">Ref: {result.reference}</p>}
+                </div>
+                <button
+                  onClick={handleDone}
+                  className="mt-4 px-8 py-2.5 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  OK
+                </button>
               </div>
-            </div>
-          )}
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 pb-4 border-b border-border">
+                <Send size={18} className="text-warning" />
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-text-primary">Withdraw</h2>
+                  <ArrowRight size={18} className="text-warning" />
+                </div>
+              </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-            <button
-              onClick={() => navigate("/")}
-              className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="px-6 py-2 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
-            >
-              {loading && <Loader2 size={14} className="animate-spin" />}
-              {loading ? "Processing..." : "Confirm Withdrawal"}
-            </button>
-          </div>
+              <div>
+                <label className="block text-sm text-text-secondary mb-1.5">
+                  <DollarSign size={14} className="inline mr-1" />
+                  USDT Amount *
+                </label>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="e.g. 1000"
+                  className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
+                  disabled={loading}
+                  min="0"
+                />
+                <p className="text-[10px] text-text-subtle mt-1">Amount to withdraw from user's wallet</p>
+              </div>
+
+              <div>
+                <label className="block text-sm text-text-secondary mb-1.5">
+                  <MapPin size={14} className="inline mr-1" />
+                  Destination Address *
+                </label>
+                <input
+                  value={destinationAddress}
+                  onChange={(e) => setDestinationAddress(e.target.value)}
+                  placeholder="Blockchain address or withdrawal destination"
+                  className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
+                  disabled={loading}
+                />
+                <p className="text-[10px] text-text-subtle mt-1">Where the withdrawn funds will be sent</p>
+              </div>
+
+              <div>
+                <label className="block text-sm text-text-secondary mb-1.5">
+                  <Percent size={14} className="inline mr-1" />
+                  Commission %
+                </label>
+                <input
+                  type="number"
+                  value={commissionPercent}
+                  onChange={(e) => setCommissionPercent(e.target.value)}
+                  placeholder="0"
+                  className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-[200px]"
+                  disabled={loading}
+                  min="0"
+                  max="100"
+                />
+              </div>
+
+              {result && !result.success && (
+                <div className="flex items-start gap-3 px-4 py-3 rounded-lg text-sm bg-danger/10 text-danger">
+                  <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                  <div>
+                    <p>{result.message}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+                <button
+                  onClick={() => navigate("/")}
+                  className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={!canSubmit}
+                  className="px-6 py-2 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                >
+                  {loading && <Loader2 size={14} className="animate-spin" />}
+                  {loading ? "Processing..." : "Confirm Withdrawal"}
+                </button>
+              </div>
+            </>
+          )}
         </Card>
       )}
     </div>

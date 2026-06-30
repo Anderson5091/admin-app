@@ -90,6 +90,16 @@ export default function AgentDeposit() {
 
   const canSubmit = foundUser && usdtAmount && fiatAmount && Number(usdtAmount) > 0 && !loading;
 
+  const handleDone = () => {
+    setStep("search");
+    setFoundUser(null);
+    setFiatAmount("");
+    setUsdtAmount("");
+    setCommissionPercent("0");
+    useAgentStore.getState().clearResult();
+    loadRecentDeposits();
+  };
+
   const handleBack = () => {
     if (step === "form") {
       setStep("user");
@@ -267,94 +277,112 @@ export default function AgentDeposit() {
       {/* Step 3: Deposit Form */}
       {step === "form" && foundUser && (
         <Card className="p-6 space-y-5">
-          <div className="flex items-center gap-2 pb-4 border-b border-border">
-            <Wallet size={18} className="text-primary" />
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-text-primary">Deposit</h2>
-              <ArrowRight size={18} className="text-primary" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                <DollarSign size={14} className="inline mr-1" />
-                Fiat Amount Received *
-              </label>
-              <input
-                type="number"
-                value={fiatAmount}
-                onChange={(e) => setFiatAmount(e.target.value)}
-                placeholder="e.g. 5000"
-                className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-                disabled={loading}
-                min="0"
-              />
-              <p className="text-[10px] text-text-subtle mt-1">Cash amount taken from user (local currency)</p>
-            </div>
-            <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                <DollarSign size={14} className="inline mr-1" />
-                USDT Amount *
-              </label>
-              <input
-                type="number"
-                value={usdtAmount}
-                onChange={(e) => setUsdtAmount(e.target.value)}
-                placeholder="e.g. 5000"
-                className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
-                disabled={loading}
-                min="0"
-              />
-              <p className="text-[10px] text-text-subtle mt-1">USDT to credit to user's wallet</p>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm text-text-secondary mb-1.5">
-              <Percent size={14} className="inline mr-1" />
-              Commission %
-            </label>
-            <input
-              type="number"
-              value={commissionPercent}
-              onChange={(e) => setCommissionPercent(e.target.value)}
-              placeholder="0"
-              className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-[200px]"
-              disabled={loading}
-              min="0"
-              max="100"
-            />
-          </div>
-
-          {result && (
-            <div className={`flex items-start gap-3 px-4 py-3 rounded-lg text-sm ${
-              result.success ? "bg-primary/10 text-primary" : "bg-danger/10 text-danger"
-            }`}>
-              {result.success ? <CheckCircle size={18} className="shrink-0 mt-0.5" /> : <AlertCircle size={18} className="shrink-0 mt-0.5" />}
-              <div>
-                <p>{result.message}</p>
-                {result.reference && <p className="text-[10px] mt-1 opacity-70">Ref: {result.reference}</p>}
+          {result?.success ? (
+            <>
+              <div className="flex flex-col items-center gap-4 py-6">
+                <CheckCircle size={48} className="text-primary" />
+                <div className="text-center">
+                  <p className="text-lg font-bold text-text-primary">Deposit Successful</p>
+                  <p className="text-sm text-text-secondary mt-1">{result.message}</p>
+                  {result.reference && <p className="text-[10px] text-text-subtle mt-1 font-mono">Ref: {result.reference}</p>}
+                </div>
+                <button
+                  onClick={handleDone}
+                  className="mt-4 px-8 py-2.5 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  OK
+                </button>
               </div>
-            </div>
-          )}
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 pb-4 border-b border-border">
+                <Wallet size={18} className="text-primary" />
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-text-primary">Deposit</h2>
+                  <ArrowRight size={18} className="text-primary" />
+                </div>
+              </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-            <button
-              onClick={() => navigate("/")}
-              className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
-            >
-              {loading && <Loader2 size={14} className="animate-spin" />}
-              {loading ? "Processing..." : "Confirm Deposit"}
-            </button>
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-text-secondary mb-1.5">
+                    <DollarSign size={14} className="inline mr-1" />
+                    Fiat Amount Received *
+                  </label>
+                  <input
+                    type="number"
+                    value={fiatAmount}
+                    onChange={(e) => setFiatAmount(e.target.value)}
+                    placeholder="e.g. 5000"
+                    className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
+                    disabled={loading}
+                    min="0"
+                  />
+                  <p className="text-[10px] text-text-subtle mt-1">Cash amount taken from user (local currency)</p>
+                </div>
+                <div>
+                  <label className="block text-sm text-text-secondary mb-1.5">
+                    <DollarSign size={14} className="inline mr-1" />
+                    USDT Amount *
+                  </label>
+                  <input
+                    type="number"
+                    value={usdtAmount}
+                    onChange={(e) => setUsdtAmount(e.target.value)}
+                    placeholder="e.g. 5000"
+                    className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
+                    disabled={loading}
+                    min="0"
+                  />
+                  <p className="text-[10px] text-text-subtle mt-1">USDT to credit to user's wallet</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-text-secondary mb-1.5">
+                  <Percent size={14} className="inline mr-1" />
+                  Commission %
+                </label>
+                <input
+                  type="number"
+                  value={commissionPercent}
+                  onChange={(e) => setCommissionPercent(e.target.value)}
+                  placeholder="0"
+                  className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-[200px]"
+                  disabled={loading}
+                  min="0"
+                  max="100"
+                />
+              </div>
+
+              {result && !result.success && (
+                <div className="flex items-start gap-3 px-4 py-3 rounded-lg text-sm bg-danger/10 text-danger">
+                  <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                  <div>
+                    <p>{result.message}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+                <button
+                  onClick={() => navigate("/")}
+                  className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={!canSubmit}
+                  className="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                >
+                  {loading && <Loader2 size={14} className="animate-spin" />}
+                  {loading ? "Processing..." : "Confirm Deposit"}
+                </button>
+              </div>
+            </>
+          )}
         </Card>
       )}
     </div>
