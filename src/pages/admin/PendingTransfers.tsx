@@ -60,7 +60,7 @@ export default function PendingTransfers() {
     }
   };
 
-  const handleCameraClick = (transferId: string) => {
+  const handleCameraClick = (_transferId: string) => {
     setPhotoData(null);
     fileInputRef.current?.click();
   };

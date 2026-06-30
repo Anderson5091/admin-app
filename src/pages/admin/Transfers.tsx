@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
-import Badge from "../../components/ui/Badge";
-import { Search, ArrowUpDown, ExternalLink } from "lucide-react";
+import { Search } from "lucide-react";
 
 const statusColor: Record<string, string> = {
   DRAFT: "text-text-subtle bg-card-alt",

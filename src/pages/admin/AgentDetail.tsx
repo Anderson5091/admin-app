@@ -4,14 +4,9 @@ import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
-  ArrowLeft, UserCog, DollarSign, TrendingUp, Activity,
+  ArrowLeft, DollarSign, Activity,
   Wallet, Clock, BarChart3, HandCoins, RefreshCw,
 } from "lucide-react";
-
-const typeColors: Record<string, string> = {
-  PARTNER: "text-purple-400 bg-purple-900/30 border-purple-700/30",
-  INTERNAL: "text-primary bg-primary-dim border-primary-border",
-};
 
 export default function AgentDetail() {
   const { id } = useParams();
