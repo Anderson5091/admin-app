@@ -31,6 +31,7 @@ import AdminTransfers from "../pages/admin/Transfers";
 import AdminAudit from "../pages/admin/Audit";
 import SystemHealth from "../pages/admin/system/SystemHealth";
 import Forbidden from "../pages/admin/Forbidden";
+import ReconciliationWorksheet from "../pages/admin/ReconciliationWorksheet";
 import { getToken } from "../utils/token";
 import { useAuthStore } from "../features/admin/auth.store";
 import { canAccess } from "../features/admin/roles";
@@ -98,8 +99,9 @@ export const router = createBrowserRouter([
       { path: "agent/payout", element: <ProtectedRoute requiredPath="/agent/payout"><AgentPayout /></ProtectedRoute> },
       { path: "agent/transfer", element: <ProtectedRoute requiredPath="/agent/transfer"><AgentTransfer /></ProtectedRoute> },
       { path: "agent/topup", element: <ProtectedRoute requiredPath="/agent/topup"><AgentTopUpAgent /></ProtectedRoute> },
-      { path: "agent/commission", element: <ProtectedRoute requiredPath="/agent/commission"><AgentCommissionWithdraw /></ProtectedRoute> },
-      { path: "agent/swap-wallet", element: <ProtectedRoute requiredPath="/agent/swap-wallet"><AgentSwapWallet /></ProtectedRoute> },
+{ path: "agent/commission", element: <ProtectedRoute requiredPath="/agent/commission"><AgentCommissionWithdraw /></ProtectedRoute> },
+       { path: "agent/reconciliation", element: <ProtectedRoute requiredPath="/agent/reconciliation"><ReconciliationWorksheet /></ProtectedRoute> },
+       { path: "agent/swap-wallet", element: <ProtectedRoute requiredPath="/agent/swap-wallet"><AgentSwapWallet /></ProtectedRoute> },
       { path: "agent/activity", element: <ProtectedRoute requiredPath="/agent/activity"><AgentActivity /></ProtectedRoute> },
       { path: "transfers", element: <ProtectedRoute requiredPath="/transfers"><AdminTransfers /></ProtectedRoute> },
       { path: "audit", element: <ProtectedRoute requiredPath="/audit"><AdminAudit /></ProtectedRoute> },
