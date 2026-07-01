@@ -57,13 +57,13 @@ export default function Treasury() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">Treasury & Liquidity</h1>
-          <p className="text-text-secondary text-sm mt-1">Institutional liquidity management & reserve monitoring</p>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Treasury & Liquidity</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Institutional liquidity management & reserve monitoring</p>
         </div>
         <button
           onClick={() => fetchTreasuryOverview()}
-          className="flex items-center gap-1.5 text-xs text-text-subtle hover:text-text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-card-alt"
+          className="flex items-center gap-1.5 text-xs text-text-subtle hover:text-text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-card-alt shrink-0"
         >
           <RefreshCw size={14} />
           Refresh
@@ -71,48 +71,48 @@ export default function Treasury() {
       </div>
 
       {/* Liquidity Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-secondary-dim text-secondary">
-              <Database size={18} />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-secondary-dim text-secondary">
+              <Database size={16} className="sm:w-[18px] sm:h-[18px]" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">{fmt(tLiquidity)}</p>
-              <p className="text-xs text-text-secondary">Total Liquidity</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4 border-l-4 border-l-danger">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-danger-dim text-danger">
-              <Thermometer size={18} />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">{fmt(tHot)}</p>
-              <p className="text-xs text-danger font-medium">Hot Wallet</p>
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tLiquidity)}</p>
+              <p className="text-[10px] sm:text-xs text-text-secondary truncate">Total Liquidity</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 border-l-4 border-l-warning">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-warning-dim text-warning">
-              <Wallet size={18} />
+        <Card className="p-3 sm:p-4 border-l-4 border-l-danger">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-danger-dim text-danger">
+              <Thermometer size={16} className="sm:w-[18px] sm:h-[18px]" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">{fmt(tWarm)}</p>
-              <p className="text-xs text-warning font-medium">Warm Wallet</p>
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tHot)}</p>
+              <p className="text-[10px] sm:text-xs text-danger font-medium truncate">Hot Wallet</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 border-l-4 border-l-secondary">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-secondary-dim text-secondary">
-              <Shield size={18} />
+        <Card className="p-3 sm:p-4 border-l-4 border-l-warning">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-warning-dim text-warning">
+              <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">{fmt(tCold)}</p>
-              <p className="text-xs text-secondary font-medium">Cold Storage</p>
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tWarm)}</p>
+              <p className="text-[10px] sm:text-xs text-warning font-medium truncate">Warm Wallet</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-3 sm:p-4 border-l-4 border-l-secondary">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-secondary-dim text-secondary">
+              <Shield size={16} className="sm:w-[18px] sm:h-[18px]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tCold)}</p>
+              <p className="text-[10px] sm:text-xs text-secondary font-medium truncate">Cold Storage</p>
             </div>
           </div>
         </Card>
@@ -124,7 +124,7 @@ export default function Treasury() {
           <Database size={16} className="text-primary" />
           <h2 className="text-lg font-bold text-text-primary">Network Allocation</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {tNetworks.map((network) => {
             const netWallets = tWallets.filter((w) => w.network === network);
             const netTotal = netWallets.reduce((s, w) => s + (w.balance ?? 0), 0) || 1;
@@ -143,7 +143,7 @@ export default function Treasury() {
                           {type}
                         </span>
                         <div className="flex items-center gap-2">
-                          <div className="w-20 h-1.5 bg-border rounded-full overflow-hidden">
+                          <div className="w-20 h-1.5 bg-border rounded-full overflow-hidden hidden sm:block">
                             <div className={`h-full rounded-full ${type === "HOT" ? "bg-danger" : type === "WARM" ? "bg-warning" : "bg-secondary"}`}
                               style={{ width: `${pct}%` }} />
                           </div>
@@ -165,7 +165,7 @@ export default function Treasury() {
           <Wallet size={16} className="text-primary" />
           <h2 className="text-lg font-bold text-text-primary">Wallet Inventory</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {(["HOT", "WARM", "COLD"] as const).map((type) => (
             <div key={type} className={`border-l-4 rounded-lg p-4 ${walletTypeBg[type]}`}>
               <div className="flex items-center gap-2 mb-3">
@@ -184,7 +184,7 @@ export default function Treasury() {
                       {w.address ? (
                         <button
                           onClick={() => navigator.clipboard.writeText(w.address)}
-                          className="text-[9px] font-mono text-text-subtle hover:text-text-primary truncate max-w-[120px] flex items-center gap-0.5"
+                          className="text-[9px] font-mono text-text-subtle hover:text-text-primary truncate max-w-[80px] sm:max-w-[120px] flex items-center gap-0.5"
                           title={w.address}
                         >
                           {w.address.slice(0, 6)}...{w.address.slice(-4)}
@@ -225,7 +225,7 @@ export default function Treasury() {
                 {rebalanceMessage}
               </div>
             )}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {tNetworks.map((network) => (
                 <button
                   key={network}
@@ -253,9 +253,9 @@ export default function Treasury() {
                 <div key={m.id} className="flex items-start gap-3 pb-2 border-b border-border last:border-0">
                   <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${m.status === "COMPLETED" ? "bg-primary" : "bg-warning"}`} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-[10px] font-semibold uppercase text-text-secondary">{m.fromWallet}</span>
-                      <ArrowUpDown size={10} className="text-text-subtle" />
+                      <ArrowUpDown size={10} className="text-text-subtle shrink-0" />
                       <span className="text-[10px] font-semibold uppercase text-text-secondary">{m.toWallet}</span>
                       <span className={`text-[10px] font-semibold ${m.status === "COMPLETED" ? "text-primary" : "text-warning"}`}>
                         {m.status}
@@ -282,14 +282,14 @@ export default function Treasury() {
         </div>
         <div className="space-y-2">
           {tSnapshots.map((s) => (
-            <div key={s.id} className="flex items-center gap-4 py-1.5 border-b border-border last:border-0">
-              <span className="text-xs text-text-subtle w-24">{new Date(s.createdAt).toLocaleDateString()}</span>
+            <div key={s.id} className="flex items-center gap-2 sm:gap-4 py-1.5 border-b border-border last:border-0">
+              <span className="text-xs text-text-subtle w-20 sm:w-24 shrink-0">{new Date(s.createdAt).toLocaleDateString()}</span>
               <div className="flex-1 h-4 rounded-full bg-card-alt overflow-hidden flex">
                 <div className="bg-danger h-full transition-all" style={{ width: `${((s.hotBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Hot: ${s.hotBalance}`} />
                 <div className="bg-warning h-full transition-all" style={{ width: `${((s.warmBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Warm: ${s.warmBalance}`} />
                 <div className="bg-secondary h-full transition-all" style={{ width: `${((s.coldBalance ?? 0) / ((s.totalBalance ?? 0) || 1)) * 100}%` }} title={`Cold: ${s.coldBalance}`} />
               </div>
-              <span className="text-xs text-text-primary font-mono w-24 text-right">{fmt(s.totalBalance)}</span>
+              <span className="text-xs text-text-primary font-mono w-20 sm:w-24 text-right shrink-0">{fmt(s.totalBalance)}</span>
             </div>
           ))}
           <div className="flex items-center gap-4 pt-2 text-[10px] text-text-subtle">

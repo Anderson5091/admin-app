@@ -49,10 +49,10 @@ export default function Partners() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Partner Network</h1>
-          <p className="text-text-secondary text-sm mt-1">Manage payout partners and monitor SLA performance</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Partner Network</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Manage payout partners and monitor SLA performance</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -77,10 +77,10 @@ export default function Partners() {
       {reconcileResult && (
         <Card className="p-4 border-l-4 border-l-primary">
           <div className="flex items-center gap-3">
-            <Activity size={18} className="text-primary" />
-            <div className="flex-1">
+            <Activity size={18} className="text-primary shrink-0" />
+            <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-text-primary">Reconciliation Complete</h3>
-              <div className="flex gap-4 mt-1 text-xs text-text-secondary">
+              <div className="flex flex-wrap gap-4 mt-1 text-xs text-text-secondary">
                 <span>{reconcileResult.total} total</span>
                 <span className="text-primary">{reconcileResult.matched} matched</span>
                 <span className="text-warning">{reconcileResult.unmatched} unmatched</span>
@@ -95,7 +95,7 @@ export default function Partners() {
       {showForm && (
         <Card className="p-4 space-y-3">
           <h3 className="text-sm font-bold text-text-primary">Register New Partner</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               placeholder="Partner Name"
               value={formData.name}
@@ -128,7 +128,7 @@ export default function Partners() {
               placeholder="Base URL (optional)"
               value={formData.baseUrl}
               onChange={(e) => setFormData({ ...formData, baseUrl: e.target.value })}
-              className="bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary col-span-2"
+              className="bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary sm:col-span-2"
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -157,13 +157,13 @@ export default function Partners() {
 
           return (
             <Card key={partner.id} className="p-4">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
                   <div className={`p-2.5 rounded-lg shrink-0 ${colorClass}`}>
                     <Icon size={18} />
                   </div>
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-sm font-bold text-text-primary">{partner.name}</h3>
                       <Badge variant={partner.status === "ACTIVE" ? "success" : "danger"}>
                         {partner.status}
@@ -175,7 +175,7 @@ export default function Partners() {
                       {partner.priority && ` · Priority ${partner.priority}`}
                     </p>
                     {partner.baseUrl && (
-                      <p className="text-[10px] text-text-subtle mt-1 font-mono truncate max-w-[300px]">{partner.baseUrl}</p>
+                      <p className="text-[10px] text-text-subtle mt-1 font-mono truncate max-w-[200px] sm:max-w-[300px]">{partner.baseUrl}</p>
                     )}
                   </div>
                 </div>
@@ -187,15 +187,18 @@ export default function Partners() {
                         <p className="text-sm font-bold text-primary">{metrics.successRate}%</p>
                         <p className="text-[9px] text-text-subtle uppercase">Success</p>
                       </div>
-                      <div className="w-px h-8 bg-border" />
-                      <div>
+                      <div className="w-px h-8 bg-border hidden sm:block" />
+                      <div className="hidden sm:block">
                         <p className="text-sm font-bold text-secondary">{metrics.avgResponseTimeMs}ms</p>
                         <p className="text-[9px] text-text-subtle uppercase">Response</p>
                       </div>
-                      <div className="w-px h-8 bg-border" />
-                      <div>
+                      <div className="w-px h-8 bg-border hidden sm:block" />
+                      <div className="hidden sm:block">
                         <p className="text-sm font-bold text-warning">{metrics.failureCount}</p>
                         <p className="text-[9px] text-text-subtle uppercase">Failed</p>
+                      </div>
+                      <div className="block sm:hidden text-left text-xs">
+                        <p className="text-text-secondary">{metrics.avgResponseTimeMs}ms | {metrics.failureCount} fail</p>
                       </div>
                     </div>
                   )}

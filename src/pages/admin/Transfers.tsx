@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
+
 import { Search } from "lucide-react";
 
 const statusColor: Record<string, string> = {
@@ -40,24 +41,25 @@ export default function Transfers() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Transfers</h1>
-          <p className="text-text-secondary text-sm mt-1">Track and monitor all platform transfers</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Transfers</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Track and monitor all platform transfers</p>
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
           <input
             type="text"
             placeholder="Search by user or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm placeholder-text-subtle focus:outline-none focus:ring-2 focus:ring-primary/40 w-64"
+            className="w-full sm:w-64 pl-9 pr-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm placeholder-text-subtle focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
       </div>
 
-      <Card className="p-0 overflow-hidden">
+      {/* Desktop Table */}
+      <Card className="p-0 overflow-hidden hidden sm:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -105,6 +107,41 @@ export default function Transfers() {
           </table>
         </div>
       </Card>
+
+      {/* Mobile Cards */}
+      <div className="sm:hidden space-y-3">
+        {filtered.map((t) => (
+          <Card key={t.id} className="p-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-text-primary">{t.userName}</span>
+                <span className="text-sm font-mono font-bold text-text-primary">${t.amount.toLocaleString()}</span>
+              </div>
+              <p className="text-[10px] text-text-subtle">{t.userEmail}</p>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-text-secondary">Fee: ${t.fee.toLocaleString()}</span>
+                <span className="text-text-secondary">·</span>
+                <span className="text-text-secondary">{t.payoutMethod?.replace(/_/g, " ") || "—"}</span>
+                <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${statusColor[t.status] || "text-text-subtle bg-card-alt"}`}>
+                  {t.status.replace(/_/g, " ")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-text-secondary pt-1 border-t border-border">
+                <span>{t.partner || "—"}</span>
+                <span>{new Date(t.createdAt).toLocaleDateString()}</span>
+              </div>
+              {t.referenceId && (
+                <p className="text-[10px] font-mono text-text-subtle truncate">Ref: {t.referenceId}</p>
+              )}
+            </div>
+          </Card>
+        ))}
+        {filtered.length === 0 && (
+          <Card className="p-8">
+            <p className="text-center text-text-subtle text-sm">No transfers found</p>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

@@ -37,24 +37,25 @@ export default function Users() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Users</h1>
-          <p className="text-text-secondary text-sm mt-1">Manage platform users</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Users</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Manage platform users</p>
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
           <input
             type="text"
             placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm placeholder-text-subtle focus:outline-none focus:ring-2 focus:ring-primary/40 w-64"
+            className="w-full sm:w-64 pl-9 pr-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm placeholder-text-subtle focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
       </div>
 
-      <Card className="p-0 overflow-hidden">
+      {/* Desktop Table */}
+      <Card className="p-0 overflow-hidden hidden sm:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -90,6 +91,40 @@ export default function Users() {
           </table>
         </div>
       </Card>
+
+      {/* Mobile Cards */}
+      <div className="sm:hidden space-y-3">
+        {filtered.map((user) => (
+          <Card key={user.id} className="p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-text-primary truncate">{user.name || user.email}</p>
+                <p className="text-xs text-text-secondary truncate mt-0.5">{user.email}</p>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {statusBadge(user.status || "ACTIVE")}
+                  <Badge variant="info">Tier {user.kycTier ?? 0}</Badge>
+                </div>
+                <div className="flex items-center gap-3 mt-2 text-xs text-text-secondary">
+                  <span>{user.totalTransfers ?? 0} transfers</span>
+                  <span>${(user.totalVolume ?? 0).toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="shrink-0">
+                {user.status === "ACTIVE" || !user.status ? (
+                  <Button size="sm" variant="danger" onClick={() => toggleUserStatus(user.id)}>Freeze</Button>
+                ) : (
+                  <Button size="sm" variant="success" onClick={() => toggleUserStatus(user.id)}>Activate</Button>
+                )}
+              </div>
+            </div>
+          </Card>
+        ))}
+        {filtered.length === 0 && (
+          <Card className="p-8">
+            <p className="text-center text-text-subtle text-sm">No users found</p>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

@@ -34,18 +34,18 @@ export default function ComplianceCases() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-text-primary">Compliance Cases</h1>
-        <p className="text-text-secondary text-sm mt-1">{(complianceCases || []).filter(c => c.status !== "CLOSED").length} active cases</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Compliance Cases</h1>
+        <p className="text-text-secondary text-xs sm:text-sm mt-1">{(complianceCases || []).filter(c => c.status !== "CLOSED").length} active cases</p>
       </div>
 
       <div className="space-y-3">
         {(complianceCases || []).map((c) => (
           <Card key={c.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
                 {severityBadge(c.severity || "MEDIUM")}
                 {statusBadge(c.status || "OPEN")}
-                <div>
+                <div className="min-w-0">
                   <p className="text-text-primary font-semibold text-sm">{c.type || "N/A"}</p>
                   <p className="text-xs text-text-secondary">{c.email || "N/A"}</p>
                 </div>

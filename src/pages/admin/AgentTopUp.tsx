@@ -46,12 +46,12 @@ export default function AgentTopUp() {
           <ArrowLeft size={18} className="text-text-secondary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Top Up Partner</h1>
-          <p className="text-text-secondary text-sm mt-0.5">Add funds to a partner's wallet</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Top Up Partner</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Add funds to a partner's wallet</p>
         </div>
       </div>
 
-      <Card className="p-6 space-y-5">
+      <Card className="p-4 sm:p-6 space-y-5">
         <div className="flex items-center gap-2 pb-4 border-b border-border">
           <Users size={18} className="text-primary" />
           <h2 className="text-lg font-bold text-text-primary">Partner Selection</h2>
@@ -109,10 +109,10 @@ export default function AgentTopUp() {
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4 border-t border-border">
           <button
             onClick={() => navigate("/agents")}
-            className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+            className="w-full sm:w-auto px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
             disabled={agentActionLoading}
           >
             Cancel
@@ -120,7 +120,7 @@ export default function AgentTopUp() {
           <button
             onClick={handleSubmit}
             disabled={agentActionLoading || !partnerAgentId || !usdtAmount || Number(usdtAmount) <= 0}
-            className="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {agentActionLoading && <Loader2 size={14} className="animate-spin" />}
             {agentActionLoading ? "Processing..." : "Confirm Top Up"}

@@ -73,7 +73,6 @@ export default function AgentTransfer() {
       ? undefined
       : { fullName, country, bankName: bankName || undefined, accountNumber: accountNumber || undefined, mobileWalletNumber: mobileWalletNumber || undefined, mobileProvider: mobileProvider || undefined, cashPickupLocation: cashPickupLocation || undefined };
 
-    // On submission, if there is no walk-in/wallet user specified, pass the agent's own info
     const targetUserId = foundUser ? foundUser.id : agentId;
 
     await transfer(agentId, {
@@ -114,12 +113,12 @@ export default function AgentTransfer() {
           <ArrowLeft size={18} className="text-text-secondary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Cash Transfer</h1>
-          <p className="text-text-secondary text-sm mt-0.5">Send cash to a beneficiary from agent wallet</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Cash Transfer</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Send cash to a beneficiary from agent wallet</p>
         </div>
       </div>
 
-      <Card className="p-6 space-y-5">
+      <Card className="p-4 sm:p-6 space-y-5">
         <div className="flex items-center gap-2 pb-4 border-b border-border">
           <Send size={18} className="text-primary" />
           <h2 className="text-lg font-bold text-text-primary">Transfer Details</h2>
@@ -130,7 +129,7 @@ export default function AgentTransfer() {
           <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider">
             Sender (Optional Wallet User)
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={customerIdentifier}
@@ -143,7 +142,7 @@ export default function AgentTransfer() {
               type="button"
               onClick={handleLookupCustomer}
               disabled={loading || lookupLoading || !customerIdentifier.trim()}
-              className="px-3 py-2 text-xs bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1 shrink-0 font-medium"
+              className="px-3 py-2 text-xs bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-1 font-medium"
             >
               {lookupLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
               Verify
@@ -159,7 +158,7 @@ export default function AgentTransfer() {
           {foundUser ? (
             <div className="space-y-3 mt-2">
               <div className="flex items-center gap-3 p-2 bg-primary-dim rounded-lg border border-primary/20">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs shrink-0">
                   {foundUser.fullName ? foundUser.fullName[0].toUpperCase() : foundUser.email[0].toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -175,7 +174,7 @@ export default function AgentTransfer() {
                     setCustomerIdentifier("");
                     setDebitUserWallet(false);
                   }}
-                  className="text-[10px] text-text-subtle hover:text-danger px-2 py-1 rounded hover:bg-card transition-colors font-medium"
+                  className="text-[10px] text-text-subtle hover:text-danger px-2 py-1 rounded hover:bg-card transition-colors font-medium shrink-0"
                 >
                   Clear
                 </button>
@@ -190,7 +189,7 @@ export default function AgentTransfer() {
                     className="accent-primary"
                     disabled={loading}
                   />
-                  Debit sender's wallet balance (instead of agent treasury/cash paid at counter)
+                  Debit sender's wallet balance
                 </label>
               </div>
             </div>
@@ -264,7 +263,7 @@ export default function AgentTransfer() {
             />
           </div>
         ) : (
-          <>
+          <div className="space-y-4">
             <div>
               <label className="block text-sm text-text-secondary mb-1.5">
                 <User size={14} className="inline mr-1" />
@@ -294,7 +293,7 @@ export default function AgentTransfer() {
             </div>
 
             {payoutMethod === "BANK_TRANSFER" && (
-              <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-text-secondary mb-1.5">
                     <Building2 size={14} className="inline mr-1" />
@@ -321,11 +320,11 @@ export default function AgentTransfer() {
                     disabled={loading}
                   />
                 </div>
-              </>
+              </div>
             )}
 
             {payoutMethod === "MOBILE_MONEY" && (
-              <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-text-secondary mb-1.5">
                     <Smartphone size={14} className="inline mr-1" />
@@ -352,7 +351,7 @@ export default function AgentTransfer() {
                     disabled={loading}
                   />
                 </div>
-              </>
+              </div>
             )}
 
             {payoutMethod === "CASH_PICKUP" && (
@@ -370,7 +369,7 @@ export default function AgentTransfer() {
                 />
               </div>
             )}
-          </>
+          </div>
         )}
 
         <div>
@@ -383,7 +382,7 @@ export default function AgentTransfer() {
             value={commissionPercent}
             onChange={(e) => setCommissionPercent(e.target.value)}
             placeholder="0"
-            className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-[200px]"
+            className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-full sm:max-w-[200px]"
             disabled={loading}
             min="0"
             max="100"
@@ -402,17 +401,17 @@ export default function AgentTransfer() {
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4 border-t border-border">
           <button
             onClick={() => navigate("/")}
-            className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+            className="w-full sm:w-auto px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading && <Loader2 size={14} className="animate-spin" />}
             {loading ? "Processing..." : "Confirm Transfer"}

@@ -38,7 +38,7 @@ export default function AgentTopUpAgent() {
 
   if (!isInternal) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-center">
+      <div className="flex flex-col items-center justify-center h-64 text-center px-4">
         <div className="p-3 rounded-lg bg-warning-dim border border-warning/30 mb-4">
           <ArrowUpFromLine size={32} className="text-warning" />
         </div>
@@ -63,12 +63,12 @@ export default function AgentTopUpAgent() {
           <ArrowLeft size={18} className="text-text-secondary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Top Up Partner</h1>
-          <p className="text-text-secondary text-sm mt-0.5">Transfer USDT from system treasury to a partner's wallet</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Top Up Partner</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Transfer USDT from system treasury to a partner's wallet</p>
         </div>
       </div>
 
-      <Card className="p-6 space-y-5">
+      <Card className="p-4 sm:p-6 space-y-5">
         <div className="flex items-center gap-2 pb-4 border-b border-border">
           <ArrowUpFromLine size={18} className="text-warning" />
           <h2 className="text-lg font-bold text-text-primary">Partner Top-Up</h2>
@@ -118,10 +118,10 @@ export default function AgentTopUpAgent() {
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4 border-t border-border">
           <button
             onClick={() => navigate("/")}
-            className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+            className="w-full sm:w-auto px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
             disabled={loading}
           >
             Cancel
@@ -129,7 +129,7 @@ export default function AgentTopUpAgent() {
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="px-6 py-2 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-2 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading && <Loader2 size={14} className="animate-spin" />}
             {loading ? "Processing..." : "Confirm Top Up"}

@@ -28,10 +28,10 @@ export default function Agents() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Local Agents</h1>
-          <p className="text-text-secondary text-sm mt-1">Manage partner and internal agents, their treasuries, and KPI performance</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Local Agents</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Manage partner and internal agents, their treasuries, and KPI performance</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -59,7 +59,7 @@ export default function Agents() {
               <X size={16} />
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               placeholder="Full Name"
               value={formData.fullName}
@@ -114,19 +114,19 @@ export default function Agents() {
       <div className="grid grid-cols-1 gap-3">
         {agents.map((agent) => (
           <Card key={agent.id} className="p-4 hover:border-primary-border transition-colors">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <Link to={`/agents/${agent.id}`} className="flex items-start gap-3 min-w-0 flex-1">
                 <div className={`p-2.5 rounded-lg shrink-0 ${typeColors[agent.type] || "bg-card text-text-secondary"}`}>
                   <UserCog size={18} />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-bold text-text-primary">{agent.fullName || agent.email}</h3>
                     <Badge variant={agent.type === "PARTNER" ? "purple" : "success"}>{agent.type}</Badge>
                     <Badge variant={agent.status === "ACTIVE" ? "success" : "danger"}>{agent.status}</Badge>
                   </div>
                   <p className="text-xs text-text-secondary mt-0.5">{agent.email}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-text-secondary">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-text-secondary">
                     <span className="flex items-center gap-1">
                       <DollarSign size={12} className="text-primary" />
                       Wallet: {(agent.walletBalance ?? 0).toLocaleString()} USDT

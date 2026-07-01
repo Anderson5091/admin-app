@@ -57,7 +57,6 @@ export default function PayoutExecute() {
       await AgentApi.executePayout(profile.id, detail.id);
       navigate("/pending-transfers", { replace: true });
     } catch {
-      // handled by api
     } finally {
       setBusy(false);
     }
@@ -70,12 +69,12 @@ export default function PayoutExecute() {
           <ArrowLeft size={18} className="text-text-secondary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Execute Payout</h1>
-          <p className="text-text-secondary text-sm mt-0.5">Review and process this payout transfer</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Execute Payout</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Review and process this payout transfer</p>
         </div>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
@@ -88,7 +87,7 @@ export default function PayoutExecute() {
             {/* Transfer Reference */}
             <div>
               <p className="text-[10px] text-text-subtle uppercase tracking-wider font-semibold mb-1">Transfer Reference</p>
-              <p className="text-sm font-mono text-text-primary bg-card-alt px-3 py-2 rounded-lg">{detail.referenceId}</p>
+              <p className="text-sm font-mono text-text-primary bg-card-alt px-3 py-2 rounded-lg break-all">{detail.referenceId}</p>
             </div>
 
             {/* Sender Info */}
@@ -97,17 +96,17 @@ export default function PayoutExecute() {
                 <User size={12} /> Sender
               </p>
               <div className="bg-card-alt rounded-lg p-3 space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Name</span>
-                  <span className="text-text-primary">{detail.sender?.fullName || "—"}</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Name</span>
+                  <span className="text-text-primary text-right">{detail.sender?.fullName || "—"}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Email</span>
-                  <span className="text-text-primary">{detail.sender?.email || "—"}</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Email</span>
+                  <span className="text-text-primary text-right break-all">{detail.sender?.email || "—"}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Phone</span>
-                  <span className="text-text-primary">{detail.sender?.phone || "—"}</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Phone</span>
+                  <span className="text-text-primary text-right">{detail.sender?.phone || "—"}</span>
                 </div>
               </div>
             </div>
@@ -118,34 +117,34 @@ export default function PayoutExecute() {
                 <Wallet size={12} /> Transfer Details
               </p>
               <div className="bg-card-alt rounded-lg p-3 space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Amount</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Amount</span>
                   <span className="text-text-primary font-bold">${detail.amount.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Fee</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Fee</span>
                   <span className="text-text-primary">${detail.fee.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Destination Amount</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Destination</span>
                   <span className="text-text-primary">${detail.destinationAmount.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Payout Method</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Method</span>
                   <Badge variant="info">{detail.payoutMethod.replace(/_/g, " ")}</Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Currency</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Currency</span>
                   <span className="text-text-primary">{detail.currency}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Status</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Status</span>
                   <Badge variant={detail.status === "PENDING_PAYOUT" ? "warning" : "info"}>
                     {detail.status.replace(/_/g, " ")}
                   </Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Date</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary shrink-0">Date</span>
                   <span className="text-text-primary">{new Date(detail.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -158,42 +157,42 @@ export default function PayoutExecute() {
                   <Building2 size={12} /> Beneficiary
                 </p>
                 <div className="bg-card-alt rounded-lg p-3 space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Full Name</span>
-                    <span className="text-text-primary font-medium">{detail.beneficiary.fullName}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-text-secondary shrink-0">Full Name</span>
+                    <span className="text-text-primary font-medium text-right">{detail.beneficiary.fullName}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Country</span>
-                    <span className="text-text-primary">{detail.beneficiary.country}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-text-secondary shrink-0">Country</span>
+                    <span className="text-text-primary text-right">{detail.beneficiary.country}</span>
                   </div>
                   {detail.beneficiary.bankName && (
-                    <div className="flex justify-between">
-                      <span className="text-text-secondary">Bank Name</span>
-                      <span className="text-text-primary">{detail.beneficiary.bankName}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-text-secondary shrink-0">Bank Name</span>
+                      <span className="text-text-primary text-right">{detail.beneficiary.bankName}</span>
                     </div>
                   )}
                   {detail.beneficiary.accountNumber && (
-                    <div className="flex justify-between">
-                      <span className="text-text-secondary">Account Number</span>
-                      <span className="text-text-primary font-mono">{detail.beneficiary.accountNumber}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-text-secondary shrink-0">Account Number</span>
+                      <span className="text-text-primary font-mono text-right">{detail.beneficiary.accountNumber}</span>
                     </div>
                   )}
                   {detail.beneficiary.mobileWalletNumber && (
-                    <div className="flex justify-between">
-                      <span className="text-text-secondary">Mobile Wallet</span>
-                      <span className="text-text-primary">{detail.beneficiary.mobileWalletNumber}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-text-secondary shrink-0">Mobile Wallet</span>
+                      <span className="text-text-primary text-right">{detail.beneficiary.mobileWalletNumber}</span>
                     </div>
                   )}
                   {detail.beneficiary.mobileProvider && (
-                    <div className="flex justify-between">
-                      <span className="text-text-secondary">Provider</span>
-                      <span className="text-text-primary">{detail.beneficiary.mobileProvider}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-text-secondary shrink-0">Provider</span>
+                      <span className="text-text-primary text-right">{detail.beneficiary.mobileProvider}</span>
                     </div>
                   )}
                   {detail.beneficiary.cashPickupLocation && (
-                    <div className="flex justify-between">
-                      <span className="text-text-secondary">Pickup Location</span>
-                      <span className="text-text-primary">{detail.beneficiary.cashPickupLocation}</span>
+                    <div className="flex justify-between gap-2">
+                      <span className="text-text-secondary shrink-0">Pickup Location</span>
+                      <span className="text-text-primary text-right">{detail.beneficiary.cashPickupLocation}</span>
                     </div>
                   )}
                 </div>
@@ -201,7 +200,7 @@ export default function PayoutExecute() {
             )}
 
             {/* Actions */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch gap-3 pt-2">
               <button
                 onClick={handleExecute}
                 disabled={busy}

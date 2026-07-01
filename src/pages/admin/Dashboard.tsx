@@ -76,8 +76,8 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Control Tower</h1>
-          <p className="text-text-secondary text-sm mt-1">Real-time overview of platform operations</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Control Tower</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Real-time overview of platform operations</p>
         </div>
         <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
           connected ? "bg-primary-dim text-primary" : "bg-danger-dim text-danger"
@@ -88,23 +88,23 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
         {kpis.map((kpi) => (
-          <Card key={kpi.label} className="p-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${kpi.color}`}>
-                <kpi.icon size={18} />
+          <Card key={kpi.label} className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className={`p-1.5 sm:p-2 rounded-lg ${kpi.color}`}>
+                <kpi.icon size={16} className="sm:w-[18px] sm:h-[18px]" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-text-primary">{kpi.value}</p>
-                <p className="text-xs text-text-secondary">{kpi.label}</p>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{kpi.value}</p>
+                <p className="text-[10px] sm:text-xs text-text-secondary truncate">{kpi.label}</p>
               </div>
             </div>
           </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Active Alerts */}
         <Card>
           <div className="flex items-center gap-2 mb-4">
@@ -160,7 +160,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Activity */}
         <Card>
           <div className="flex items-center gap-2 mb-4">

@@ -93,7 +93,7 @@ export default function ReconciliationWorksheet() {
 
   if (!state.data || !state.data.reconciliations) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-center">
+      <div className="flex flex-col items-center justify-center h-64 text-center px-4">
         <div className="p-3 rounded-lg bg-warning-dim border border-warning/30 mb-4">
           <DollarSign size={32} className="text-warning" />
         </div>
@@ -113,7 +113,7 @@ export default function ReconciliationWorksheet() {
 
   if (state.error) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-center">
+      <div className="flex flex-col items-center justify-center h-64 text-center px-4">
         <div className="p-3 rounded-lg bg-warning-dim border border-warning/30 mb-4">
           <DollarSign size={32} className="text-warning" />
         </div>
@@ -135,14 +135,14 @@ export default function ReconciliationWorksheet() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/")} className="p-1.5 hover:bg-card-alt rounded-lg transition-colors">
             <ArrowLeft size={18} className="text-text-secondary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Cash Reconciliation Worksheet</h1>
-            <p className="text-text-secondary text-sm mt-0.5">Internal Agent Yesterday reconciliation</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Cash Reconciliation Worksheet</h1>
+            <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Internal Agent Yesterday reconciliation</p>
           </div>
         </div>
         <button
@@ -156,106 +156,106 @@ export default function ReconciliationWorksheet() {
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-primary" />
-                <h2 className="text-lg font-bold text-text-primary">Opening Balance</h2>
+              <div className="flex items-center gap-3 min-w-0">
+                <DollarSign size={20} className="text-primary shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary truncate">Opening</h2>
               </div>
-              <span className="text-3xl font-bold text-primary">{(data.openingBalance ?? 0).toLocaleString()} USDT</span>
+              <span className="text-xl sm:text-3xl font-bold text-primary shrink-0">{(data.openingBalance ?? 0).toLocaleString()}</span>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Starting cash position</p>
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Starting cash position</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-success" />
-                <h2 className="text-lg font-bold text-text-primary">Cash In</h2>
+              <div className="flex items-center gap-3 min-w-0">
+                <DollarSign size={20} className="text-success shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary truncate">Cash In</h2>
               </div>
-              <span className="text-3xl font-bold text-success">+{(data.cashIn ?? 0).toLocaleString()} USDT</span>
+              <span className="text-xl sm:text-3xl font-bold text-success shrink-0">+{(data.cashIn ?? 0).toLocaleString()}</span>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Cash received from users</p>
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Cash received from users</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-info" />
-                <h2 className="text-lg font-bold text-text-primary">Liquid Cash Received</h2>
+              <div className="flex items-center gap-3 min-w-0">
+                <DollarSign size={20} className="text-secondary shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary truncate">Liquid Cash</h2>
               </div>
-              <span className="text-3xl font-bold text-info">+{(data.liquidCashReceived ?? 0).toLocaleString()} USDT</span>
+              <span className="text-xl sm:text-3xl font-bold text-secondary shrink-0">+{(data.liquidCashReceived ?? 0).toLocaleString()}</span>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Cash delivery from Quicksend</p>
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Cash delivery from Quicksend</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-danger" />
-                <h2 className="text-lg font-bold text-text-primary">Cash Out</h2>
+              <div className="flex items-center gap-3 min-w-0">
+                <DollarSign size={20} className="text-danger shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary truncate">Cash Out</h2>
               </div>
-              <span className="text-3xl font-bold text-danger">-{(data.cashOut ?? 0).toLocaleString()} USDT</span>
+              <span className="text-xl sm:text-3xl font-bold text-danger shrink-0">-{(data.cashOut ?? 0).toLocaleString()}</span>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Cash paid to users</p>
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Cash paid to users</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-warning" />
-                <h2 className="text-lg font-bold text-text-primary">Treasury Top-up</h2>
+              <div className="flex items-center gap-3 min-w-0">
+                <DollarSign size={20} className="text-warning shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary truncate">Treasury</h2>
               </div>
-              <span className="text-3xl font-bold text-warning">+{(data.treasuryIn ?? 0).toLocaleString()} USDT</span>
+              <span className="text-xl sm:text-3xl font-bold text-warning shrink-0">+{(data.treasuryIn ?? 0).toLocaleString()}</span>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Float replenishment from treasury</p>
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Float replenishment from treasury</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-danger" />
-                <h2 className="text-lg font-bold text-text-primary">Bank Settlements</h2>
+              <div className="flex items-center gap-3 min-w-0">
+                <DollarSign size={20} className="text-danger shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary truncate">Settlements</h2>
               </div>
-              <span className="text-3xl font-bold text-danger">-{(data.bankSettlements ?? 0).toLocaleString()} USDT</span>
+              <span className="text-xl sm:text-3xl font-bold text-danger shrink-0">-{(data.bankSettlements ?? 0).toLocaleString()}</span>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Confirmed bank deposits to Quicksend</p>
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Confirmed bank deposits</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-primary font-bold" />
-                <h2 className="text-lg font-bold text-text-primary">Closing Balance</h2>
+              <div className="flex items-center gap-3 min-w-0">
+                <DollarSign size={20} className="text-primary shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary truncate">Closing</h2>
               </div>
-              <span className="text-3xl font-bold text-primary">{(data.closingBalance ?? 0).toLocaleString()} USDT</span>
+              <span className="text-xl sm:text-3xl font-bold text-primary shrink-0">{(data.closingBalance ?? 0).toLocaleString()}</span>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Current cash position</p>
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Current cash position</p>
           </Card>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
+          <Card className="p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
-                <DollarSign size={20} className="text-warning" />
-                <h2 className="text-lg font-bold text-text-primary">Request Cash</h2>
+                <DollarSign size={20} className="text-warning shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary">Request Cash</h2>
               </div>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Request cash delivery from Quicksend</p>
-            <button className="mt-4 w-full bg-warning text-white py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Request cash delivery from Quicksend</p>
+            <button className="mt-3 w-full bg-warning text-white py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
               Request Cash
             </button>
           </Card>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
+          <Card className="p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
-                <Clock size={20} className="text-info" />
-                <h2 className="text-lg font-bold text-text-primary">Submit Settlement</h2>
+                <Clock size={20} className="text-secondary shrink-0" />
+                <h2 className="text-sm sm:text-lg font-bold text-text-primary">Submit Settlement</h2>
               </div>
             </div>
-            <p className="text-text-secondary text-sm mt-2">Submit bank settlements for verification</p>
-            <button className="mt-4 w-full bg-card-alt border border-border text-text-primary py-2 rounded-lg text-sm font-semibold hover:bg-card transition-colors">
+            <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Submit bank settlements for verification</p>
+            <button className="mt-3 w-full bg-card-alt border border-border text-text-primary py-2 rounded-lg text-sm font-semibold hover:bg-card transition-colors">
               Submit Bank Settlements
             </button>
           </Card>
@@ -271,11 +271,11 @@ export default function ReconciliationWorksheet() {
               <thead>
                 <tr className="text-text-subtle uppercase border-b border-border">
                   <th className="text-left py-3 pr-4 font-semibold">Date</th>
-                  <th className="text-right py-3 pr-4 font-semibold">Open Balance (Beginning)</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Open</th>
                   <th className="text-right py-3 pr-4 font-semibold">Cash In</th>
                   <th className="text-right py-3 pr-4 font-semibold">Cash Out</th>
-                  <th className="text-right py-3 pr-4 font-semibold">Close Balance (End)</th>
-                  <th className="text-right py-3 pr-4 font-semibold">Discrepancy</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Close</th>
+                  <th className="text-right py-3 pr-4 font-semibold">Disc.</th>
                   <th className="text-right py-3 font-semibold">Status</th>
                 </tr>
               </thead>

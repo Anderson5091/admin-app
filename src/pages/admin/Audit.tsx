@@ -59,24 +59,25 @@ export default function Audit() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">System Audit Logs</h1>
-          <p className="text-text-secondary text-sm mt-1">Track all admin actions and system changes</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">System Audit Logs</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Track all admin actions and system changes</p>
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
           <input
             type="text"
-            placeholder="Search by action, entity, or ID..."
+            placeholder="Search action, entity, or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm placeholder-text-subtle focus:outline-none focus:ring-2 focus:ring-primary/40 w-72"
+            className="w-full sm:w-72 pl-9 pr-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm placeholder-text-subtle focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
       </div>
 
-      <Card className="p-0 overflow-hidden">
+      {/* Desktop Table */}
+      <Card className="p-0 overflow-hidden hidden sm:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -127,6 +128,42 @@ export default function Audit() {
           </table>
         </div>
       </Card>
+
+      {/* Mobile Cards */}
+      <div className="sm:hidden space-y-3">
+        {filtered.map((log) => {
+          const Icon = actionIcon[log.action] || FileText;
+          const color = actionColor[log.action] || "text-text-secondary bg-card-alt";
+          return (
+            <Card key={log.id} className="p-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className={`p-1.5 rounded-lg ${color}`}>
+                    <Icon size={12} />
+                  </div>
+                  <span className="text-xs font-bold text-text-primary">{formatAction(log.action)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-text-secondary">{log.entity || "—"}</span>
+                  <span className="text-text-subtle">{new Date(log.createdAt).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-text-secondary">
+                  <span className="font-mono">{log.adminId ? `${log.adminId.slice(0, 8)}...` : "System"}</span>
+                  {log.entityId && <span className="font-mono text-text-subtle">ID: {log.entityId}</span>}
+                </div>
+                {log.metadata && (
+                  <p className="text-[10px] text-text-subtle truncate">{JSON.stringify(log.metadata).slice(0, 100)}</p>
+                )}
+              </div>
+            </Card>
+          );
+        })}
+        {filtered.length === 0 && (
+          <Card className="p-8">
+            <p className="text-center text-text-subtle text-sm">No audit logs found</p>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

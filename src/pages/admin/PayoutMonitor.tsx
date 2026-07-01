@@ -16,22 +16,22 @@ export default function PayoutMonitor() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Payout Monitor</h1>
-          <p className="text-text-secondary text-sm mt-1">{failedPayouts.length} failed payouts requiring attention</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Payout Monitor</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">{failedPayouts.length} failed payouts requiring attention</p>
         </div>
       </div>
 
       <div className="space-y-3">
         {(failedPayouts || []).map((payout) => (
           <Card key={payout.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-danger-dim text-danger">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-start gap-4">
+                <div className="p-2 rounded-lg bg-danger-dim text-danger shrink-0">
                   <AlertTriangle size={18} />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-text-primary font-semibold">${(payout.amount || 0).toLocaleString()}</p>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-text-primary font-semibold text-sm sm:text-base">${(payout.amount || 0).toLocaleString()}</p>
                     <Badge variant="info">{payout.currency || "USDT"}</Badge>
                     <Badge variant={payout.status === "FAILED" ? "danger" : "warning"}>
                       {payout.status === "FAILED" ? "Failed" : "Pending Retry"}
@@ -43,7 +43,7 @@ export default function PayoutMonitor() {
                   </p>
                 </div>
               </div>
-              <Button size="sm" variant="primary" onClick={() => retryPayout(payout.id)}>
+              <Button size="sm" variant="primary" onClick={() => retryPayout(payout.id)} className="w-full sm:w-auto">
                 <RefreshCw size={14} className="mr-1" /> Retry
               </Button>
             </div>

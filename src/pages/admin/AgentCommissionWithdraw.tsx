@@ -51,7 +51,7 @@ export default function AgentCommissionWithdraw() {
   const isAgent = profile?.role === "AGENT_PARTNER" || profile?.role === "AGENT_INTERNAL";
   if (!isAgent) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-center">
+      <div className="flex flex-col items-center justify-center h-64 text-center px-4">
         <div className="p-3 rounded-lg bg-warning-dim border border-warning/30 mb-4">
           <HandCoins size={32} className="text-warning" />
         </div>
@@ -77,14 +77,14 @@ export default function AgentCommissionWithdraw() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/")} className="p-1.5 hover:bg-card-alt rounded-lg transition-colors">
             <ArrowLeft size={18} className="text-text-secondary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Commission Withdraw</h1>
-            <p className="text-text-secondary text-sm mt-0.5">Move commission earnings to your treasury wallet</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Commission Withdraw</h1>
+            <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Move commission earnings to your treasury wallet</p>
           </div>
         </div>
         <button
@@ -103,13 +103,13 @@ export default function AgentCommissionWithdraw() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <div className="bg-warning-dim border border-warning/20 rounded-xl p-4 text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3">
+            <div className="bg-warning-dim border border-warning/20 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-warning-dim">
+                <div className="p-2 rounded-lg bg-warning-dim shrink-0">
                   <Wallet size={16} className="text-warning" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-2xl font-bold text-text-primary">{commLedger.toLocaleString()}</p>
                   <p className="text-xs text-text-secondary">Commission Ledger</p>
                   <p className="text-[9px] text-text-subtle">USDT — withdrawable</p>
@@ -119,12 +119,12 @@ export default function AgentCommissionWithdraw() {
             <div className="flex items-center justify-center">
               <ArrowRight size={20} className="text-text-subtle" />
             </div>
-            <div className="bg-primary-dim border border-primary/20 rounded-xl p-4 text-left">
+            <div className="bg-primary-dim border border-primary/20 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary-dim">
+                <div className="p-2 rounded-lg bg-primary-dim shrink-0">
                   <Wallet size={16} className="text-primary" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-2xl font-bold text-text-primary">{walletBal.toLocaleString()}</p>
                   <p className="text-xs text-text-secondary">Main Wallet</p>
                   <p className="text-[9px] text-text-subtle">{mainWallet?.network || "BASE"} — on-chain</p>
@@ -133,7 +133,7 @@ export default function AgentCommissionWithdraw() {
             </div>
           </div>
 
-          <Card className="p-6 space-y-5">
+          <Card className="p-4 sm:p-6 space-y-5">
             <div className="flex items-center gap-2 pb-4 border-b border-border">
               <HandCoins size={18} className="text-warning" />
               <h2 className="text-lg font-bold text-text-primary">Withdraw Commission</h2>
@@ -163,10 +163,10 @@ export default function AgentCommissionWithdraw() {
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4 border-t border-border">
               <button
                 onClick={() => navigate("/")}
-                className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
                 disabled={loading}
               >
                 Back
@@ -174,7 +174,7 @@ export default function AgentCommissionWithdraw() {
               <button
                 onClick={() => profile?.id && withdrawCommission(profile.id)}
                 disabled={loading || balanceTooLow}
-                className="px-6 py-2 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-2 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 size={14} className="animate-spin" />}
                 {loading ? "Processing..." : `Withdraw All (${commLedger} USDT)`}

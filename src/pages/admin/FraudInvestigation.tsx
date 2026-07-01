@@ -36,13 +36,13 @@ export default function FraudInvestigation() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-text-primary">Fraud Investigation</h1>
-        <p className="text-text-secondary text-sm mt-1">Analyze user activity for suspicious patterns</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Fraud Investigation</h1>
+        <p className="text-text-secondary text-xs sm:text-sm mt-1">Analyze user activity for suspicious patterns</p>
       </div>
 
       {/* Search */}
       <Card className="p-4">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
             <input
@@ -54,7 +54,7 @@ export default function FraudInvestigation() {
               className="w-full pl-9 pr-4 py-2.5 rounded-lg bg-card-alt border border-border text-text-primary text-sm placeholder-text-subtle focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </div>
-          <Button onClick={handleAnalyze} isLoading={loading}>
+          <Button onClick={handleAnalyze} isLoading={loading} className="w-full sm:w-auto">
             <Search size={16} className="mr-1" /> Analyze
           </Button>
         </div>
@@ -66,14 +66,14 @@ export default function FraudInvestigation() {
           {/* Risk Score */}
           <Card className={`border ${riskBg(fraudAnalysis.riskScore)}`}>
             <div className="flex items-center justify-between">
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-text-secondary">User</p>
-                <p className="text-text-primary font-bold text-lg">{fraudAnalysis.email}</p>
+                <p className="text-text-primary font-bold text-base sm:text-lg truncate">{fraudAnalysis.email}</p>
                 <p className="text-xs text-text-subtle">ID: {fraudAnalysis.userId}</p>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <p className="text-sm text-text-secondary">Risk Score</p>
-                <p className={`text-4xl font-extrabold ${riskColor(fraudAnalysis.riskScore)}`}>
+                <p className={`text-3xl sm:text-4xl font-extrabold ${riskColor(fraudAnalysis.riskScore)}`}>
                   {fraudAnalysis.riskScore}
                 </p>
                 <p className={`text-sm font-semibold ${riskColor(fraudAnalysis.riskScore)}`}>

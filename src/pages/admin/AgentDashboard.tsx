@@ -46,7 +46,6 @@ export default function AgentDashboard() {
       setPhotoData(null);
       loadDashboard();
     } catch {
-      // handled by api
     } finally {
       setBusyId(null);
     }
@@ -83,7 +82,6 @@ export default function AgentDashboard() {
       setPhotoData(null);
       loadDashboard();
     } catch {
-      // handled by api
     } finally {
       setBusyId(null);
     }
@@ -124,8 +122,8 @@ export default function AgentDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Agent Dashboard</h1>
-          <p className="text-text-secondary text-sm mt-1">Welcome back, {agentName}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Agent Dashboard</h1>
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">Welcome back, {agentName}</p>
         </div>
         <button
           onClick={() => { if (profile?.id) { loadDashboard(); fetchAgentKpi(profile.id, kpiPeriod); } }}
@@ -136,20 +134,20 @@ export default function AgentDashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="p-4">
+          <Card key={kpi.label} className="p-3 sm:p-4">
             <div className="flex items-start gap-3">
-              <div className={`p-2 rounded-lg ${kpi.color} shrink-0`}>
-                <kpi.icon size={18} />
+              <div className={`p-1.5 sm:p-2 rounded-lg ${kpi.color} shrink-0`}>
+                <kpi.icon size={16} className="sm:w-[18px] sm:h-[18px]" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-2xl font-bold text-text-primary truncate">{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
                   {kpi.isWallet && isPartner && (
                     <button
                       onClick={goToSwapWallet}
-                      className="shrink-0 text-xs font-semibold text-primary bg-primary-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
+                      className="shrink-0 text-[10px] sm:text-xs font-semibold text-primary bg-primary-dim px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg hover:opacity-80 transition-opacity"
                     >
                       Swap
                     </button>
@@ -157,16 +155,16 @@ export default function AgentDashboard() {
                   {kpi.isCommission && (
                     <button
                       onClick={goToCommission}
-                      className="shrink-0 text-xs font-semibold text-warning bg-warning-dim px-2.5 py-1 rounded-lg hover:opacity-80 transition-opacity"
+                      className="shrink-0 text-[10px] sm:text-xs font-semibold text-warning bg-warning-dim px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg hover:opacity-80 transition-opacity"
                     >
                       Withdraw
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-text-secondary">{kpi.label}</p>
+                <p className="text-[10px] sm:text-xs text-text-secondary">{kpi.label}</p>
                 {kpi.sub !== undefined && isPartner && (
                   <div className="flex items-center gap-1.5 mt-1">
-                    <span className="text-lg font-bold text-text-primary">{typeof kpi.sub === "number" ? kpi.sub.toLocaleString() : kpi.sub}</span>
+                    <span className="text-base sm:text-lg font-bold text-text-primary">{typeof kpi.sub === "number" ? kpi.sub.toLocaleString() : kpi.sub}</span>
                     <span className="text-[10px] text-text-subtle">{kpi.subLabel}</span>
                   </div>
                 )}
@@ -177,13 +175,13 @@ export default function AgentDashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp size={16} className="text-primary" />
             <h2 className="text-lg font-bold text-text-primary">KPI Performance</h2>
           </div>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="text-xs text-text-secondary">Period:</span>
             {["DAILY", "WEEKLY", "MONTHLY"].map((p) => (
               <button
@@ -265,32 +263,34 @@ export default function AgentDashboard() {
 
       {photoData && (
         <Card>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <img src={photoData.preview} alt="Proof" className="w-20 h-20 object-cover rounded-lg border border-border" />
-            <div className="flex-1">
+            <div className="flex-1 text-center sm:text-left">
               <p className="text-xs text-text-secondary">Proof photo captured</p>
               <p className="text-[10px] text-text-subtle font-mono">{photoData.transferId}</p>
             </div>
-            <button
-              onClick={submitPhoto}
-              disabled={busyId === photoData.transferId}
-              className="flex items-center gap-1.5 text-xs font-semibold text-white bg-success px-3 py-2 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-            >
-              {busyId === photoData.transferId ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Send size={14} />
-              )}
-              {busyId === photoData.transferId ? "Submitting..." : "Submit Proof"}
-            </button>
-            <button
-              onClick={() => setPhotoData(null)}
-              disabled={busyId === photoData.transferId}
-              className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary bg-card px-3 py-2 rounded-lg hover:opacity-80 transition-opacity"
-            >
-              <XCircle size={14} />
-              Discard
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={submitPhoto}
+                disabled={busyId === photoData.transferId}
+                className="flex items-center gap-1.5 text-xs font-semibold text-white bg-success px-3 py-2 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+              >
+                {busyId === photoData.transferId ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Send size={14} />
+                )}
+                {busyId === photoData.transferId ? "Submitting..." : "Submit Proof"}
+              </button>
+              <button
+                onClick={() => setPhotoData(null)}
+                disabled={busyId === photoData.transferId}
+                className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary bg-card px-3 py-2 rounded-lg hover:opacity-80 transition-opacity"
+              >
+                <XCircle size={14} />
+                Discard
+              </button>
+            </div>
           </div>
         </Card>
       )}
@@ -302,53 +302,89 @@ export default function AgentDashboard() {
             <h2 className="text-lg font-bold text-text-primary">Pending Payouts</h2>
             <Badge variant="warning">{lockedPayouts.length} locked</Badge>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-text-subtle uppercase border-b border-border">
-                  <th className="text-left py-2 pr-4">Reference</th>
-                  <th className="text-left py-2 pr-4">Amount</th>
-                  <th className="text-left py-2 pr-4">Method</th>
-                  <th className="text-left py-2 pr-4">Currency</th>
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-right py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lockedPayouts.map((t) => (
-                  <tr key={t.id} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-4 text-text-subtle font-mono text-[10px]">{t.referenceId || "—"}</td>
-                    <td className="py-2 pr-4 text-text-primary font-bold">${t.amount.toLocaleString()}</td>
-                    <td className="py-2 pr-4">
-                      <Badge variant="info">{t.payoutMethod || "—"}</Badge>
-                    </td>
-                    <td className="py-2 pr-4 text-text-secondary">{t.currency}</td>
-                    <td className="py-2 pr-4 text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</td>
-                    <td className="py-2 text-right">
-                      <div className="flex items-center gap-1.5 ml-auto justify-end">
-                        <button
-                          onClick={() => handleCameraClick(t.id)}
-                          disabled={busyId === t.id}
-                          className="flex items-center gap-1 text-xs font-semibold text-success bg-success-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                        >
-                          {busyId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
-                          Proof
-                        </button>
-                        <button
-                          onClick={() => cancelPayout(t.id)}
-                          disabled={busyId === t.id}
-                          className="flex items-center gap-1 text-xs font-semibold text-danger bg-danger-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
-                        >
-                          <XCircle size={12} />
-                          Cancel
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-text-subtle uppercase border-b border-border">
+                    <th className="text-left py-2 pr-4">Reference</th>
+                    <th className="text-left py-2 pr-4">Amount</th>
+                    <th className="text-left py-2 pr-4">Method</th>
+                    <th className="text-left py-2 pr-4">Currency</th>
+                    <th className="text-left py-2 pr-4">Date</th>
+                    <th className="text-right py-2">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {lockedPayouts.map((t) => (
+                    <tr key={t.id} className="border-b border-border last:border-0">
+                      <td className="py-2 pr-4 text-text-subtle font-mono text-[10px]">{t.referenceId || "—"}</td>
+                      <td className="py-2 pr-4 text-text-primary font-bold">${t.amount.toLocaleString()}</td>
+                      <td className="py-2 pr-4">
+                        <Badge variant="info">{t.payoutMethod || "—"}</Badge>
+                      </td>
+                      <td className="py-2 pr-4 text-text-secondary">{t.currency}</td>
+                      <td className="py-2 pr-4 text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</td>
+                      <td className="py-2 text-right">
+                        <div className="flex items-center gap-1.5 ml-auto justify-end">
+                          <button
+                            onClick={() => handleCameraClick(t.id)}
+                            disabled={busyId === t.id}
+                            className="flex items-center gap-1 text-xs font-semibold text-success bg-success-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                          >
+                            {busyId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+                            Proof
+                          </button>
+                          <button
+                            onClick={() => cancelPayout(t.id)}
+                            disabled={busyId === t.id}
+                            className="flex items-center gap-1 text-xs font-semibold text-danger bg-danger-dim px-2 py-1 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                          >
+                            <XCircle size={12} />
+                            Cancel
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="sm:hidden space-y-2">
+              {lockedPayouts.map((t) => (
+                <div key={t.id} className="bg-card-alt rounded-lg p-3 border border-border">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-mono text-text-subtle">{t.referenceId || "—"}</span>
+                    <span className="text-sm font-bold text-text-primary">${t.amount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
+                    <Badge variant="info">{t.payoutMethod || "—"}</Badge>
+                    <span className="text-text-secondary">{t.currency}</span>
+                    <span className="text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleCameraClick(t.id)}
+                      disabled={busyId === t.id}
+                      className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold text-success bg-success-dim px-2 py-1.5 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                    >
+                      {busyId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+                      Proof
+                    </button>
+                    <button
+                      onClick={() => cancelPayout(t.id)}
+                      disabled={busyId === t.id}
+                      className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold text-danger bg-danger-dim px-2 py-1.5 rounded-lg hover:opacity-80 transition-opacity disabled:opacity-50"
+                    >
+                      <XCircle size={12} />
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         </Card>
       )}
 

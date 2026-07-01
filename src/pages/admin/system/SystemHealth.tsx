@@ -36,22 +36,22 @@ export default function SystemHealth() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-text-primary">System Health</h1>
-        <p className="text-text-secondary text-sm mt-1">Production infrastructure monitoring and observability</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary">System Health</h1>
+        <p className="text-text-secondary text-xs sm:text-sm mt-1">Production infrastructure monitoring and observability</p>
       </div>
 
       {/* Service Status */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
         {systemHealth ? (
           Object.entries(systemHealth.services).map(([service, status]) => (
-            <Card key={service} className="p-4">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${status === "UP" ? "bg-primary-dim text-primary" : "bg-danger-dim text-danger"}`}>
-                  {service === "database" ? <Database size={18} /> : service === "redis" ? <HardDrive size={18} /> : <Server size={18} />}
+            <Card key={service} className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className={`p-1.5 sm:p-2 rounded-lg ${status === "UP" ? "bg-primary-dim text-primary" : "bg-danger-dim text-danger"}`}>
+                  {service === "database" ? <Database size={16} className="sm:w-[18px] sm:h-[18px]" /> : service === "redis" ? <HardDrive size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Server size={16} className="sm:w-[18px] sm:h-[18px]" />}
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-text-primary capitalize">{status === "UP" ? "Operational" : "Down"}</p>
-                  <p className="text-xs text-text-secondary capitalize">{service}</p>
+                <div className="min-w-0">
+                  <p className="text-base sm:text-lg font-bold text-text-primary truncate capitalize">{status === "UP" ? "Operational" : "Down"}</p>
+                  <p className="text-[10px] sm:text-xs text-text-secondary capitalize truncate">{service}</p>
                 </div>
               </div>
             </Card>
@@ -65,7 +65,7 @@ export default function SystemHealth() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* System Overview */}
         <Card>
           <div className="flex items-center gap-2 mb-4">
@@ -114,9 +114,13 @@ export default function SystemHealth() {
               <div className="flex items-center justify-between py-2 border-b border-border">
                 <span className="text-sm text-text-secondary">System Health</span>
                 {systemStatus.healthy ? (
-                  <span className="flex items-center gap-1 text-sm text-primary"><CheckCircle2 size={14} /> Healthy</span>
+                  <span className="flex items-center gap-1 text-sm text-primary">
+                    <CheckCircle2 size={14} /> Healthy
+                  </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-sm text-danger"><XCircle size={14} /> Degraded</span>
+                  <span className="flex items-center gap-1 text-sm text-danger">
+                    <XCircle size={14} /> Degraded
+                  </span>
                 )}
               </div>
               <div className="flex items-center justify-between py-2 border-b border-border">
@@ -152,7 +156,7 @@ export default function SystemHealth() {
               <BarChart3 size={18} className="text-violet-400" />
               <h2 className="text-lg font-bold text-text-primary">Request Counters</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {systemMetrics.counters.slice(0, 8).map((counter) => (
                 <div key={counter.name} className="bg-card rounded-lg p-3 border border-border">
                   <p className="text-lg font-bold text-text-primary">{counter.count.toLocaleString()}</p>

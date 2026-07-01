@@ -34,14 +34,14 @@ export default function AgentDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/agents")} className="p-1.5 hover:bg-card-alt rounded-lg transition-colors">
             <ArrowLeft size={18} className="text-text-secondary" />
           </button>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-text-primary">{a.fullName || a.email}</h1>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-text-primary truncate">{a.fullName || a.email}</h1>
               <Badge variant={isPartner ? "purple" : "success"}>{a.type}</Badge>
               <Badge variant={a.status === "ACTIVE" ? "success" : "danger"}>{a.status}</Badge>
             </div>
@@ -69,51 +69,51 @@ export default function AgentDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary-dim">
-              <DollarSign size={16} className="text-primary" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-primary-dim">
+              <DollarSign size={14} className="sm:w-4 sm:h-4 text-primary" />
             </div>
-            <div>
-              <p className="text-lg font-bold text-text-primary">{a.walletBalance?.toLocaleString() ?? "N/A"}</p>
-              <p className="text-xs text-text-secondary">Wallet Balance</p>
+            <div className="min-w-0">
+              <p className="text-base sm:text-lg font-bold text-text-primary truncate">{a.walletBalance?.toLocaleString() ?? "N/A"}</p>
+              <p className="text-[10px] sm:text-xs text-text-secondary">Wallet Balance</p>
               <p className="text-[9px] text-text-subtle">USDT</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-secondary-dim">
-              <HandCoins size={16} className="text-secondary" />
+        <Card className="p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-secondary-dim">
+              <HandCoins size={14} className="sm:w-4 sm:h-4 text-secondary" />
             </div>
-            <div>
-              <p className="text-lg font-bold text-text-primary">{a.commissionLedgerBalance.toLocaleString()}</p>
-              <p className="text-xs text-text-secondary">Commission</p>
+            <div className="min-w-0">
+              <p className="text-base sm:text-lg font-bold text-text-primary truncate">{a.commissionLedgerBalance.toLocaleString()}</p>
+              <p className="text-[10px] sm:text-xs text-text-secondary">Commission</p>
               <p className="text-[9px] text-text-subtle">USDT</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-violet-900/30">
-              <Activity size={16} className="text-violet-400" />
+        <Card className="p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-violet-900/30">
+              <Activity size={14} className="sm:w-4 sm:h-4 text-violet-400" />
             </div>
-            <div>
-              <p className="text-lg font-bold text-text-primary">${a.todayVolume.toLocaleString()}</p>
-              <p className="text-xs text-text-secondary">Today Volume</p>
+            <div className="min-w-0">
+              <p className="text-base sm:text-lg font-bold text-text-primary truncate">${a.todayVolume.toLocaleString()}</p>
+              <p className="text-[10px] sm:text-xs text-text-secondary">Today Volume</p>
               <p className="text-[9px] text-text-subtle">{a.todayTxCount} txs</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary-dim">
-              <BarChart3 size={16} className="text-primary" />
+        <Card className="p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-primary-dim">
+              <BarChart3 size={14} className="sm:w-4 sm:h-4 text-primary" />
             </div>
-            <div>
-              <p className="text-lg font-bold text-text-primary">{a.totalRewards.toLocaleString()}</p>
-              <p className="text-xs text-text-secondary">Total Rewards</p>
+            <div className="min-w-0">
+              <p className="text-base sm:text-lg font-bold text-text-primary truncate">{a.totalRewards.toLocaleString()}</p>
+              <p className="text-[10px] sm:text-xs text-text-secondary">Total Rewards</p>
               <p className="text-[9px] text-text-subtle">{a.kpiRating ? `KPI: ${a.kpiRating}/100` : "No rating"}</p>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function AgentDetail() {
             <BarChart3 size={16} className="text-primary" />
             <h2 className="text-lg font-bold text-text-primary">KPI Performance</h2>
           </div>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="text-xs text-text-secondary">Period:</span>
             {["DAILY", "WEEKLY", "MONTHLY"].map((p) => (
               <button
@@ -214,7 +214,7 @@ export default function AgentDetail() {
               <h2 className="text-lg font-bold text-text-primary">Recent Transactions</h2>
             </div>
             {id && (
-              <Link to={`/agents/${id}/transactions`} className="text-xs text-primary hover:underline">
+              <Link to={`/agents/${id}/transactions`} className="text-xs text-primary hover:underline shrink-0">
                 View All
               </Link>
             )}
