@@ -60,11 +60,6 @@ export const AgentApi = {
     return data;
   },
 
-  async withdrawCommission(agentId: string): Promise<{ id: string; type: string; amount: number; status: string; reference: string }> {
-    const { data } = await api.post(`/agent/${agentId}/withdraw-commission`);
-    return data;
-  },
-
   async getMyDashboard(): Promise<AgentDetail> {
     const { data } = await api.get("/agent/me/dashboard");
     return data;
@@ -112,11 +107,6 @@ export const AgentApi = {
 
   async getMyTransactions(agentId: string): Promise<any[]> {
     const { data } = await api.get(`/agent/${agentId}/transactions`);
-    return data;
-  },
-
-  async swapOffchain(agentId: string, direction: "TO_MAIN" | "TO_OFFCHAIN", amount?: number): Promise<{ id: string; type: string; amount: number; status: string; reference: string }> {
-    const { data } = await api.post(`/agent/${agentId}/swap-offchain`, { direction, amount });
     return data;
   },
 };

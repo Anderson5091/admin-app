@@ -133,7 +133,7 @@ export default function Agents() {
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 size={12} className="text-secondary" />
-                      Commission: {agent.commissionLedgerBalance.toLocaleString()} USDT
+                      Ledger: {agent.ledgerBalance.toLocaleString()} USDT
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 size={12} className="text-secondary" />

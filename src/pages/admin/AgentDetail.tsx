@@ -88,8 +88,8 @@ export default function AgentDetail() {
               <HandCoins size={14} className="sm:w-4 sm:h-4 text-secondary" />
             </div>
             <div className="min-w-0">
-              <p className="text-base sm:text-lg font-bold text-text-primary truncate">{a.commissionLedgerBalance.toLocaleString()}</p>
-              <p className="text-[10px] sm:text-xs text-text-secondary">Commission</p>
+              <p className="text-base sm:text-lg font-bold text-text-primary truncate">{a.ledgerBalance.toLocaleString()}</p>
+              <p className="text-[10px] sm:text-xs text-text-secondary">Ledger Balance</p>
               <p className="text-[9px] text-text-subtle">USDT</p>
             </div>
           </div>

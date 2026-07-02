@@ -12,7 +12,7 @@ export interface Agent {
   totalRewards: number;
   totalTransactions: number;
   walletBalance: number;
-  commissionLedgerBalance: number;
+  ledgerBalance: number;
   createdAt: string;
 }
 
@@ -36,8 +36,7 @@ export interface AgentDetail {
   status: string;
   kpiRating: number | null;
   totalRewards: number;
-  commissionLedgerBalance: number;
-  offchainLedgerBalance: number;
+  ledgerBalance: number;
   walletBalance: number | null;
   todayVolume: number;
   todayCommission: number;

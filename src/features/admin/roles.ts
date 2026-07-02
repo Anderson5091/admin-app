@@ -38,7 +38,6 @@ export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
 
 export function canAccess(path: string, role: AdminRole | undefined): boolean {
   if (!role) return false;
-  if (role === "SUPER_ADMIN") return true;
   const allowed = PAGE_PERMISSIONS[path];
   return allowed ? allowed.includes(role) : false;
 }

@@ -108,14 +108,11 @@ export default function AgentDashboard() {
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
   const kpiCards = [
-    { label: "Wallet", value: agentDetail?.walletBalance ?? "—", sub: agentDetail?.offchainLedgerBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", subLabel: "Pending OffChain", isWallet: true },
-    { label: "Commission", value: agentDetail?.commissionLedgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: "USDT", isCommission: true },
+    { label: "Ledger Balance", value: agentDetail?.ledgerBalance ?? "—", sub: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", subLabel: "Crossmint Wallet" },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
     { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
   ];
 
-  const goToCommission = () => navigate("/agent/commission");
-  const goToSwapWallet = () => navigate("/agent/swap-wallet");
   const isPartner = profile?.role === "AGENT_PARTNER";
 
   return (
@@ -144,22 +141,6 @@ export default function AgentDashboard() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
-                  {kpi.isWallet && isPartner && (
-                    <button
-                      onClick={goToSwapWallet}
-                      className="shrink-0 text-[10px] sm:text-xs font-semibold text-primary bg-primary-dim px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg hover:opacity-80 transition-opacity"
-                    >
-                      Swap
-                    </button>
-                  )}
-                  {kpi.isCommission && (
-                    <button
-                      onClick={goToCommission}
-                      className="shrink-0 text-[10px] sm:text-xs font-semibold text-warning bg-warning-dim px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg hover:opacity-80 transition-opacity"
-                    >
-                      Withdraw
-                    </button>
-                  )}
                 </div>
                 <p className="text-[10px] sm:text-xs text-text-secondary">{kpi.label}</p>
                 {kpi.sub !== undefined && isPartner && (
