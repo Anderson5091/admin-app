@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, HandCoins, Clock, FileText, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, HandCoins, Clock, FileText, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -158,7 +158,7 @@ export default function AdminLayout() {
             </div>
           </div>
         )}
-        <button onClick={() => { setCollapsed(!collapsed); if (mobileOpen) closeMobile(); }} className="p-1.5 rounded-lg hover:bg-card-alt text-text-subtle hover:text-text-primary transition-colors">
+        <button onClick={() => setCollapsed(!collapsed)} className="p-1.5 rounded-lg hover:bg-card-alt text-text-subtle hover:text-text-primary transition-colors">
           <ChevronLeft size={16} className={`transition-transform ${collapsed ? "rotate-180" : ""}`} />
         </button>
       </div>
@@ -179,7 +179,7 @@ export default function AdminLayout() {
                   end={item.end}
                   onClick={closeMobile}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    `flex ${collapsed ? "justify-center p-2 rounded-full" : "items-center gap-3 px-3 py-2.5 rounded-lg"} text-sm font-medium transition-all ${
                       isActive ? "bg-primary-dim text-primary border border-primary-border" : "text-text-secondary hover:text-text-primary hover:bg-card border border-transparent"
                     }`
                   }
@@ -237,12 +237,24 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-app-page flex">
-      {/* Mobile Hamburger */}
-      <div className="fixed top-3 left-3 z-50 lg:hidden flex items-center gap-2">
-        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg bg-card border border-border text-text-primary hover:bg-card-alt transition-colors shadow-lg">
+      {/* Mobile Top Nav Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 lg:hidden flex items-center gap-3 px-4 h-14 bg-app-bg border-b border-border shadow-sm">
+        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg hover:bg-card-alt text-text-primary transition-colors">
           <Menu size={20} />
         </button>
-        <div className="w-6 h-6 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-[10px]">A</div>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xs shrink-0">A</div>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-text-primary text-sm leading-tight truncate">
+              {profile?.role === "AGENT_PARTNER" || profile?.role === "AGENT_INTERNAL" ? "Agent Panel" : "Admin Panel"}
+            </span>
+            {profile && (
+              <span className={`text-[9px] font-semibold uppercase tracking-wider truncate ${roleColors[profile.role]?.split(" ")[0] || "text-text-secondary"}`}>
+                {profile.role}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Mobile Overlay */}
@@ -254,12 +266,7 @@ export default function AdminLayout() {
       )}
 
       {/* Mobile Drawer */}
-      <aside className={`fixed top-0 left-0 h-full bg-app-bg border-r border-border flex flex-col transition-all duration-300 z-50 lg:hidden ${mobileOpen ? "translate-x-0" : "-translate-x-full"} w-60`}>
-        <div className="flex items-center justify-end p-3">
-          <button onClick={closeMobile} className="p-1.5 rounded-lg hover:bg-card-alt text-text-subtle hover:text-text-primary transition-colors">
-            <X size={18} />
-          </button>
-        </div>
+      <aside className={`fixed top-0 left-0 h-full bg-app-bg border-r border-border flex flex-col transition-all duration-300 z-50 lg:hidden ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "w-14" : "w-60"}`}>
         {sidebarContent}
       </aside>
 
