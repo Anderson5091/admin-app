@@ -108,7 +108,7 @@ export default function AgentDashboard() {
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
   const kpiCards = [
-    { label: "Ledger Balance", value: agentDetail?.ledgerBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT" },
+    { label: "Balance", value: agentDetail?.ledgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: "USDT" },
     { label: "Wallet Balance", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", isSub: true },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
     { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
