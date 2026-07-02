@@ -5,6 +5,7 @@ interface AgentActionState {
   loading: boolean;
   result: { success: boolean; message: string; reference?: string } | null;
 
+  swapFunds: (agentId: string, amount: number, direction: "TO_LEDGER" | "TO_WALLET") => Promise<void>;
   deposit: (agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number; commissionPercent?: number }) => Promise<void>;
   withdraw: (agentId: string, payload: { userId: string; amount: number; commissionPercent?: number; destinationType?: "OFFCHAIN" | "MAIN" }) => Promise<void>;
   topupPartner: (payload: { partnerAgentId: string; usdtAmount: number }) => Promise<void>;
@@ -99,6 +100,21 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Transfer failed";
+      set({ loading: false, result: { success: false, message: msg } });
+    }
+  },
+
+  swapFunds: async (agentId, amount, direction) => {
+    set({ loading: true, result: null });
+    try {
+      const res = await AgentApi.swapFunds(agentId, amount, direction);
+      const label = direction === "TO_LEDGER" ? "wallet to ledger" : "ledger to wallet";
+      set({
+        loading: false,
+        result: { success: true, message: `Swapped ${res.swappedAmount} USDT from ${label}` },
+      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || "Swap failed";
       set({ loading: false, result: { success: false, message: msg } });
     }
   },

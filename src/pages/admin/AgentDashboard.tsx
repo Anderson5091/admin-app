@@ -5,7 +5,9 @@ import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check, ExternalLink } from "lucide-react";
+import Modal from "../../components/ui/Modal";
+import Button from "../../components/ui/Button";
 import type { AgentDetail } from "../../features/admin/admin.types";
 
 export default function AgentDashboard() {
@@ -19,6 +21,19 @@ export default function AgentDashboard() {
   const [photoData, setPhotoData] = useState<{ transferId: string; base64: string; mimeType: string; preview: string } | null>(null);
   const pendingTransferIdRef = useRef<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showSwapModal, setShowSwapModal] = useState(false);
+  const [depositAmount, setDepositAmount] = useState("");
+  const [depositFrom, setDepositFrom] = useState("bank");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawTo, setWithdrawTo] = useState("bank");
+  const [withdrawAddress, setWithdrawAddress] = useState("");
+  const [swapAmount, setSwapAmount] = useState("");
+  const [swapDirection, setSwapDirection] = useState<"TO_LEDGER" | "TO_WALLET">("TO_LEDGER");
+  const [swapping, setSwapping] = useState(false);
+  const [walletAddressCopied, setWalletAddressCopied] = useState(false);
+  const [selectedNetwork, setSelectedNetwork] = useState("BASE");
   const loadDashboard = async () => {
     if (!profile?.id) return;
     setLoading(true);
@@ -154,6 +169,241 @@ export default function AgentDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
           <div className="flex items-center gap-2 mb-4">
+            <Wallet size={16} className="text-primary" />
+            <h2 className="text-lg font-bold text-text-primary">Wallets</h2>
+          </div>
+          {agentDetail?.wallets && agentDetail.wallets.length > 0 ? (
+            <div className="space-y-3">
+              {agentDetail.wallets.map((w) => (
+                <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="purple">{w.walletType}</Badge>
+                      <span className="text-xs text-text-subtle">{w.network}</span>
+                    </div>
+                    <button
+                      onClick={() => { if (w.address) { navigator.clipboard.writeText(w.address); setWalletAddressCopied(true); setTimeout(() => setWalletAddressCopied(false), 1500); } }}
+                      className="flex items-center gap-1 text-[10px] text-text-subtle hover:text-primary transition-colors"
+                    >
+                      {walletAddressCopied ? <Check size={12} /> : <Copy size={12} />}
+                      {w.address ? (walletAddressCopied ? "Copied" : w.address.slice(0, 10) + "..." + w.address.slice(-6)) : "N/A"}
+                    </button>
+                  </div>
+                  <p className="text-lg font-bold text-text-primary mb-2">{w.balance.toLocaleString()} USDT</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button variant="success" size="sm" onClick={() => setShowDepositModal(true)}>
+                      <ArrowDownFromLine size={12} className="mr-1" /> Deposit
+                    </Button>
+                    <Button variant="danger" size="sm" onClick={() => setShowWithdrawModal(true)}>
+                      <ArrowUpFromLine size={12} className="mr-1" /> Withdraw
+                    </Button>
+                    {isPartner && (
+                      <Button variant="ghost" className="!text-warning !bg-warning-dim !border-warning/30 border" size="sm" onClick={() => setShowSwapModal(true)}>
+                        <ArrowLeftRight size={12} className="mr-1" /> Swap
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-text-subtle text-sm py-8 text-center">No wallets assigned</p>
+          )}
+        </Card>
+
+        {/* Deposit Modal */}
+        <Modal open={showDepositModal} onClose={() => setShowDepositModal(false)} title="Deposit into Wallet">
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-text-secondary mb-1 block">Amount (USDT)</label>
+              <input
+                type="number"
+                placeholder="0.00"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-text-secondary mb-1 block">Deposit from</label>
+              <select
+                value={depositFrom}
+                onChange={(e) => setDepositFrom(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
+              >
+                <optgroup label="Off Ramp">
+                  <option value="bank">Bank Account</option>
+                </optgroup>
+                <optgroup label="External Address">
+                  <option value="BASE">BASE (USDT)</option>
+                  <option value="ETHEREUM">Ethereum (USDT)</option>
+                  <option value="POLYGON">Polygon (USDT)</option>
+                  <option value="SOLANA">Solana (USDT)</option>
+                </optgroup>
+              </select>
+            </div>
+            {depositFrom !== "bank" && (
+              <div>
+                <label className="text-xs text-text-secondary mb-1 block">Deposit Address</label>
+                <div className="bg-card-alt border border-border rounded-lg p-3 text-center">
+                  <p className="text-sm font-mono text-text-primary break-all">wallet-address-placeholder</p>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText("wallet-address-placeholder"); setWalletAddressCopied(true); setTimeout(() => setWalletAddressCopied(false), 1500); }}
+                    className="flex items-center gap-1 text-xs text-primary hover:opacity-80 transition-colors mt-1"
+                  >
+                    <Copy size={12} /> Copy Address
+                  </button>
+                  <p className="text-[10px] text-text-subtle mt-1">Only send {depositFrom === "SOLANA" ? "USDT (SOL)" : "USDT"} to this address</p>
+                </div>
+              </div>
+            )}
+            {depositFrom === "bank" && (
+                <p className="text-xs text-text-subtle">To deposit from your bank account, please use the Crossmint off-ramp integration to deposit fiat into this wallet.</p>
+            )}
+          </div>
+        </Modal>
+
+        {/* Withdraw Modal */}
+        <Modal open={showWithdrawModal} onClose={() => setShowWithdrawModal(false)} title="Withdraw from Wallet">
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-text-secondary mb-1 block">Amount (USDT)</label>
+              <input
+                type="number"
+                placeholder="0.00"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-text-secondary mb-1 block">Withdraw to</label>
+              <select
+                value={withdrawTo}
+                onChange={(e) => setWithdrawTo(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
+              >
+                <optgroup label="Off Ramp">
+                  <option value="bank">Bank Account</option>
+                </optgroup>
+                <optgroup label="External Address">
+                  <option value="BASE">BASE (USDT)</option>
+                  <option value="ETHEREUM">Ethereum (USDT)</option>
+                  <option value="POLYGON">Polygon (USDT)</option>
+                  <option value="SOLANA">Solana (USDT)</option>
+                </optgroup>
+              </select>
+            </div>
+            {withdrawTo !== "bank" && (
+              <div>
+                <label className="text-xs text-text-secondary mb-1 block">Destination Address</label>
+                <input
+                  type="text"
+                  placeholder="0x... or addr..."
+                  value={withdrawAddress}
+                  onChange={(e) => setWithdrawAddress(e.target.value)}
+                  className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary"
+                />
+              </div>
+            )}
+            {withdrawTo === "bank" && (
+              <p className="text-xs text-text-subtle">To withdraw to your bank account, please use the Crossmint off-ramp integration.</p>
+            )}
+            <Button variant="primary" size="sm" className="w-full">
+              <ArrowUpFromLine size={14} className="mr-1" /> Withdraw{withdrawAmount ? ` ${withdrawAmount} USDT` : ''}
+            </Button>
+          </div>
+        </Modal>
+
+        {/* Swap Modal */}
+        <Modal open={showSwapModal} onClose={() => { setShowSwapModal(false); setSwapDirection("TO_LEDGER"); }} title="Swap Funds">
+          <div className="space-y-3">
+            <p className="text-xs text-text-secondary">
+              {swapDirection === "TO_LEDGER"
+                ? "Swap funds from your wallet to your ledger balance."
+                : "Swap funds from your ledger balance to your wallet."}
+            </p>
+            <div className="flex items-center justify-between bg-card-alt rounded-lg p-3">
+              <div>
+                <p className="text-xs text-text-secondary">{swapDirection === "TO_LEDGER" ? "Wallet Balance" : "Ledger Balance"}</p>
+                <p className="text-lg font-bold text-text-primary">
+                  {swapDirection === "TO_LEDGER"
+                    ? ((agentDetail?.wallets && agentDetail.wallets[0]?.balance) || 0)
+                    : (agentDetail?.ledgerBalance || 0)} USDT
+                </p>
+              </div>
+              <button
+                onClick={() => setSwapDirection((d) => d === "TO_LEDGER" ? "TO_WALLET" : "TO_LEDGER")}
+                className="p-2 rounded-lg hover:bg-card-border transition-colors"
+                title="Toggle swap direction"
+              >
+                <ArrowLeftRight size={20} className="text-primary" />
+              </button>
+              <div className="text-right opacity-60">
+                <p className="text-xs text-text-secondary">{swapDirection === "TO_LEDGER" ? "Ledger Balance" : "Wallet Balance"}</p>
+                <p className="text-lg font-bold text-text-primary">
+                  {swapDirection === "TO_LEDGER"
+                    ? (agentDetail?.ledgerBalance || 0)
+                    : ((agentDetail?.wallets && agentDetail.wallets[0]?.balance) || 0)} USDT
+                </p>
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-text-secondary mb-1 block">Amount (USDT)</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  placeholder="0.00"
+                  value={swapAmount}
+                  onChange={(e) => setSwapAmount(e.target.value)}
+                  className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary pr-16"
+                />
+                <button
+                  onClick={() => {
+                    const sourceBal = swapDirection === "TO_LEDGER"
+                      ? (agentDetail?.wallets && agentDetail.wallets[0]?.balance) || 0
+                      : agentDetail?.ledgerBalance || 0;
+                    setSwapAmount(String(sourceBal));
+                  }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 text-xs text-primary hover:text-primary/80 font-semibold px-2 py-1 rounded"
+                >
+                  Swap All
+                </button>
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full"
+              disabled={swapping || !swapAmount || Number(swapAmount) <= 0}
+              onClick={async () => {
+                if (!profile?.id) return;
+                const amt = Number(swapAmount);
+                if (amt <= 0) return;
+                setSwapping(true);
+                try {
+                  await AgentApi.swapFunds(profile.id, amt, swapDirection);
+                  setShowSwapModal(false);
+                  setSwapAmount("");
+                  setSwapDirection("TO_LEDGER");
+                  loadDashboard();
+                } catch {
+                } finally {
+                  setSwapping(false);
+                }
+              }}
+            >
+              {swapping
+                ? "Swapping..."
+                : swapDirection === "TO_LEDGER"
+                  ? `Swap${swapAmount ? ` ${swapAmount}` : ""} to Ledger`
+                  : `Swap${swapAmount ? ` ${swapAmount}` : ""} to Wallet`}
+            </Button>
+          </div>
+        </Modal>
+
+        <Card>
+          <div className="flex items-center gap-2 mb-4">
             <TrendingUp size={16} className="text-primary" />
             <h2 className="text-lg font-bold text-text-primary">KPI Performance</h2>
           </div>
@@ -205,27 +455,6 @@ export default function AgentDashboard() {
           )}
         </Card>
 
-        <Card>
-          <div className="flex items-center gap-2 mb-4">
-            <Wallet size={16} className="text-primary" />
-            <h2 className="text-lg font-bold text-text-primary">Wallets</h2>
-          </div>
-          {agentDetail?.wallets && agentDetail.wallets.length > 0 ? (
-            <div className="space-y-3">
-              {agentDetail.wallets.map((w) => (
-                <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="purple">{w.walletType}</Badge>
-                    <span className="text-[10px] text-text-subtle">{w.network}</span>
-                  </div>
-                  <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-text-subtle text-sm py-8 text-center">No wallets assigned</p>
-          )}
-        </Card>
       </div>
 
       <input

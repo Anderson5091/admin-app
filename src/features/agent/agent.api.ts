@@ -109,4 +109,9 @@ export const AgentApi = {
     const { data } = await api.get(`/agent/${agentId}/transactions`);
     return data;
   },
+
+  async swapFunds(agentId: string, amount: number, direction: "TO_LEDGER" | "TO_WALLET"): Promise<{ swappedAmount: number; walletBalance: number; ledgerBalance: number }> {
+    const { data } = await api.post(`/agent/${agentId}/swap`, { amount, direction });
+    return data;
+  },
 };
