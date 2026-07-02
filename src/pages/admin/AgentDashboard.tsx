@@ -108,7 +108,8 @@ export default function AgentDashboard() {
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
   const kpiCards = [
-    { label: "Ledger Balance", value: agentDetail?.ledgerBalance ?? "—", sub: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", subLabel: "Crossmint Wallet" },
+    { label: "Ledger Balance", value: agentDetail?.ledgerBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT" },
+    { label: "Wallet Balance", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: "USDT", isSub: true },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
     { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
   ];
@@ -133,23 +134,17 @@ export default function AgentDashboard() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="p-3 sm:p-4">
+          <Card key={kpi.label} className={`p-3 sm:p-4 ${kpi.isSub ? "opacity-70" : ""}`}>
             <div className="flex items-start gap-3">
               <div className={`p-1.5 sm:p-2 rounded-lg ${kpi.color} shrink-0`}>
                 <kpi.icon size={16} className="sm:w-[18px] sm:h-[18px]" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
+                  <p className={`font-bold text-text-primary truncate ${kpi.isSub ? "text-base sm:text-lg" : "text-lg sm:text-2xl"}`}>{typeof kpi.value === "number" ? kpi.value.toLocaleString() : kpi.value}</p>
                 </div>
                 <p className="text-[10px] sm:text-xs text-text-secondary">{kpi.label}</p>
-                {kpi.sub !== undefined && isPartner && (
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <span className="text-base sm:text-lg font-bold text-text-primary">{typeof kpi.sub === "number" ? kpi.sub.toLocaleString() : kpi.sub}</span>
-                    <span className="text-[10px] text-text-subtle">{kpi.subLabel}</span>
-                  </div>
-                )}
-                {kpi.suffix && !kpi.sub && <p className="text-[9px] text-text-subtle">{kpi.suffix}</p>}
+                {kpi.suffix && <p className="text-[9px] text-text-subtle">{kpi.suffix}</p>}
               </div>
             </div>
           </Card>
