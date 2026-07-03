@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem } from "./admin.types";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -35,6 +35,7 @@ interface AdminState {
   escalateCase: (caseId: string) => Promise<void>;
   fetchFailedPayouts: () => Promise<void>;
   fetchExecutedPayouts: () => Promise<void>;
+  fetchPayoutDetail: (payoutId: string) => Promise<PayoutDetailItem>;
   retryPayout: (payoutId: string) => Promise<void>;
   analyzeFraud: (userId: string) => Promise<void>;
   fetchNotifications: () => Promise<void>;
@@ -200,6 +201,11 @@ export const useAdminStore = create<AdminState>((set) => ({
     } catch (err) {
       console.error("Failed to fetch executed payouts:", err);
     }
+  },
+
+  fetchPayoutDetail: async (payoutId: string) => {
+    const detail = await AdminApi.getPayoutDetail(payoutId);
+    return detail;
   },
 
   retryPayout: async (payoutId: string) => {

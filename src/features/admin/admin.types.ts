@@ -195,6 +195,45 @@ export interface ExecutedPayoutItem {
   createdAt: string;
 }
 
+export interface PayoutDetailItem {
+  id: string;
+  transferId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  partner: string | null;
+  payoutMethod: string | null;
+  externalReference: string | null;
+  attemptCount: number;
+  createdAt: string;
+  updatedAt: string;
+  processingAgent: { id: string; email: string; name: string; type: string } | null;
+  transfer: {
+    id: string;
+    referenceId: string;
+    amount: number;
+    fee: number;
+    destinationAmount: number;
+    status: string;
+    payoutMethod: string;
+    createdAt: string;
+    userEmail: string;
+    userName: string;
+  } | null;
+  events: {
+    id: string;
+    eventType: string;
+    payload: unknown;
+    createdAt: string;
+  }[];
+  partnerLogs: {
+    id: string;
+    partner: string;
+    statusCode: number | null;
+    createdAt: string;
+  }[];
+}
+
 export interface FraudAnalysis {
   userId: string;
   email: string;
