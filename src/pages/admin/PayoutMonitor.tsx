@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
-import { RefreshCw, AlertTriangle, CheckCircle, X, ExternalLink } from "lucide-react";
+import { Search, Filter, RefreshCw, AlertTriangle, CheckCircle, X, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import type { PayoutDetailItem } from "../../features/admin/admin.types";
+
+const statusOptions = ["All Statuses", "FAILED", "COMPLETED", "PENDING", "PROCESSING", "QUEUED"];
 
 function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: () => void }) {
   const { fetchPayoutDetail } = useAdminStore();
@@ -138,14 +140,14 @@ function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: (
                     <h4 className="text-xs font-semibold text-text-subtle mb-2">Proof Image</h4>
                     {detail.transfer.proofMimeType?.startsWith("image/") ? (
                       <img
-                        src={detail.transfer.proofImage}
+                        src={`data:${detail.transfer.proofMimeType};base64,${detail.transfer.proofImage}`}
                         alt="Proof"
                         className="max-w-full max-h-64 rounded-lg border border-border object-contain cursor-pointer"
-                        onClick={() => window.open(detail.transfer.proofImage!, "_blank")}
+                        onClick={() => window.open(`data:${detail.transfer.proofMimeType};base64,${detail.transfer.proofImage}`, "_blank")}
                       />
                     ) : (
                       <a
-                        href={detail.transfer.proofImage}
+                        href={`data:${detail.transfer.proofMimeType || "image/jpeg"};base64,${detail.transfer.proofImage}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-primary hover:underline inline-flex items-center gap-1"
@@ -204,6 +206,41 @@ function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: (
 export default function PayoutMonitor() {
   const { failedPayouts, executedPayouts, fetchFailedPayouts, fetchExecutedPayouts, retryPayout } = useAdminStore();
   const [selectedPayoutId, setSelectedPayoutId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("All Statuses");
+  const [methodFilter, setMethodFilter] = useState("All Methods");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [minAmount, setMinAmount] = useState("");
+  const [maxAmount, setMaxAmount] = useState("");
+
+  const allPayouts = useMemo(() => [...failedPayouts, ...executedPayouts], [failedPayouts, executedPayouts]);
+  const methodOptions = useMemo(() => {
+    const methods = new Set(allPayouts.map(p => p.partner).filter(Boolean) as string[]);
+    return ["All Methods", ...Array.from(methods).sort()];
+  }, [allPayouts]);
+
+  const filterFn = (p: { id: string; referenceId: string; amount: number; partner: string | null; currency: string; status: string; createdAt: string }) => {
+    const q = search.toLowerCase();
+    if (search && !p.id.toLowerCase().includes(q) && !p.referenceId.toLowerCase().includes(q) &&
+        !p.amount.toString().includes(q) && !(p.partner || "").toLowerCase().includes(q) &&
+        !p.currency.toLowerCase().includes(q)) return false;
+    if (statusFilter !== "All Statuses" && p.status !== statusFilter) return false;
+    if (methodFilter !== "All Methods" && p.partner !== methodFilter) return false;
+    if (startDate && p.createdAt && new Date(p.createdAt) < new Date(startDate)) return false;
+    if (endDate && p.createdAt) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      if (new Date(p.createdAt) > end) return false;
+    }
+    if (minAmount && p.amount < Number(minAmount)) return false;
+    if (maxAmount && p.amount > Number(maxAmount)) return false;
+    return true;
+  };
+
+  const filteredFailed = failedPayouts.filter(filterFn);
+  const filteredExecuted = executedPayouts.filter(filterFn);
 
   useEffect(() => {
     fetchFailedPayouts();
@@ -217,20 +254,118 @@ export default function PayoutMonitor() {
           <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Payout Monitor</h1>
           <p className="text-text-secondary text-xs sm:text-sm mt-1">{failedPayouts.length} failed payouts requiring attention</p>
         </div>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
+            <input
+              type="text"
+              placeholder="Search payouts..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-48 bg-card-alt border border-border rounded-lg pl-9 pr-3 py-2 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-1.5 text-xs text-text-primary transition-colors px-3 py-2 rounded-lg bg-card-alt border border-border hover:bg-card-alt/80"
+          >
+            <Filter size={14} />
+            Filters
+            {showFilters ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          </button>
+        </div>
       </div>
+
+      {/* Filters Panel */}
+      {showFilters && (
+        <Card className="p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider mb-1">Status</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
+              >
+                {statusOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider mb-1">Method</label>
+              <select
+                value={methodFilter}
+                onChange={(e) => setMethodFilter(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
+              >
+                {methodOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider mb-1">Start Date</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary [color-scheme:dark]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider mb-1">End Date</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary [color-scheme:dark]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider mb-1">Min Amount ($)</label>
+              <input
+                type="number"
+                min="0"
+                value={minAmount}
+                onChange={(e) => setMinAmount(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-text-subtle uppercase tracking-wider mb-1">Max Amount ($)</label>
+              <input
+                type="number"
+                min="0"
+                value={maxAmount}
+                onChange={(e) => setMaxAmount(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
+              />
+              <div className="flex justify-end mt-2">
+                <button
+                  onClick={() => { setStatusFilter("All Statuses"); setMethodFilter("All Methods"); setStartDate(""); setEndDate(""); setMinAmount(""); setMaxAmount(""); setSearch(""); }}
+                  className="bg-card-alt border border-border rounded-lg px-3 py-1.5 text-xs text-text-subtle hover:text-text-primary transition-colors"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Failed Payouts */}
       <div>
         <h2 className="text-sm font-semibold text-danger mb-3 flex items-center gap-2">
-          <AlertTriangle size={16} /> Failed Payouts ({failedPayouts.length})
+          <AlertTriangle size={16} /> Failed Payouts ({filteredFailed.length})
         </h2>
         <div className="space-y-3">
-          {failedPayouts.length === 0 ? (
+          {filteredFailed.length === 0 ? (
             <Card>
               <p className="text-text-secondary text-center py-8">No failed payouts</p>
             </Card>
           ) : (
-            failedPayouts.map((payout) => (
+            filteredFailed.map((payout) => (
               <Card key={payout.id} className="p-4 border-l-2 border-danger cursor-pointer hover:bg-card-alt transition-colors" onClick={() => setSelectedPayoutId(payout.id)}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-start gap-4">
@@ -265,15 +400,15 @@ export default function PayoutMonitor() {
       {/* Executed Payouts */}
       <div>
         <h2 className="text-sm font-semibold text-success mb-3 flex items-center gap-2">
-          <CheckCircle size={16} /> Executed Payouts ({executedPayouts.length})
+          <CheckCircle size={16} /> Executed Payouts ({filteredExecuted.length})
         </h2>
         <div className="space-y-3">
-          {executedPayouts.length === 0 ? (
+          {filteredExecuted.length === 0 ? (
             <Card>
               <p className="text-text-secondary text-center py-8">No executed payouts yet</p>
             </Card>
           ) : (
-            executedPayouts.map((payout) => (
+            filteredExecuted.map((payout) => (
               <Card key={payout.id} className="p-4 border-l-2 border-success cursor-pointer hover:bg-card-alt transition-colors" onClick={() => setSelectedPayoutId(payout.id)}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-start gap-4">
