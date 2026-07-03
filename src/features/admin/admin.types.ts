@@ -219,6 +219,8 @@ export interface PayoutDetailItem {
     createdAt: string;
     userEmail: string;
     userName: string;
+    proofImage: string | null;
+    proofMimeType: string | null;
   } | null;
   events: {
     id: string;

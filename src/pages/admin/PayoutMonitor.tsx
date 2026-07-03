@@ -131,6 +131,30 @@ function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: (
                     <p className="text-sm text-text-primary">{new Date(detail.transfer.createdAt).toLocaleString()}</p>
                   </div>
                 </div>
+
+                {/* Proof Image */}
+                {detail.transfer.proofImage && (
+                  <div className="mt-4">
+                    <h4 className="text-xs font-semibold text-text-subtle mb-2">Proof Image</h4>
+                    {detail.transfer.proofMimeType?.startsWith("image/") ? (
+                      <img
+                        src={detail.transfer.proofImage}
+                        alt="Proof"
+                        className="max-w-full max-h-64 rounded-lg border border-border object-contain cursor-pointer"
+                        onClick={() => window.open(detail.transfer.proofImage!, "_blank")}
+                      />
+                    ) : (
+                      <a
+                        href={detail.transfer.proofImage}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        <ExternalLink size={12} /> View proof file
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
