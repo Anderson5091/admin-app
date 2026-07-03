@@ -175,10 +175,24 @@ export interface FailedPayoutItem {
   transferId: string;
   amount: number;
   currency: string;
-  reason: string;
+  partner: string | null;
+  status: string;
+  externalReference: string | null;
   attempts: number;
-  lastAttempt: string;
-  status: "FAILED" | "PENDING_RETRY";
+  referenceId: string;
+  createdAt: string;
+}
+
+export interface ExecutedPayoutItem {
+  id: string;
+  transferId: string;
+  amount: number;
+  currency: string;
+  partner: string | null;
+  status: string;
+  externalReference: string | null;
+  referenceId: string;
+  createdAt: string;
 }
 
 export interface FraudAnalysis {

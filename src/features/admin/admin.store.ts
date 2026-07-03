@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem } from "./admin.types";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -8,6 +8,7 @@ interface AdminState {
   pendingKyc: PendingKycItem[];
   complianceCases: ComplianceCaseItem[];
   failedPayouts: FailedPayoutItem[];
+  executedPayouts: ExecutedPayoutItem[];
   fraudAnalysis: FraudAnalysis | null;
   notifications: AdminNotification[];
   unreadNotifications: number;
@@ -33,6 +34,7 @@ interface AdminState {
   fetchComplianceCases: () => Promise<void>;
   escalateCase: (caseId: string) => Promise<void>;
   fetchFailedPayouts: () => Promise<void>;
+  fetchExecutedPayouts: () => Promise<void>;
   retryPayout: (payoutId: string) => Promise<void>;
   analyzeFraud: (userId: string) => Promise<void>;
   fetchNotifications: () => Promise<void>;
@@ -83,6 +85,7 @@ export const useAdminStore = create<AdminState>((set) => ({
   pendingKyc: [],
   complianceCases: [],
   failedPayouts: [],
+  executedPayouts: [],
   fraudAnalysis: null,
   notifications: [],
   unreadNotifications: 0,
@@ -187,6 +190,15 @@ export const useAdminStore = create<AdminState>((set) => ({
       set({ failedPayouts });
     } catch (err) {
       console.error("Failed to fetch failed payouts:", err);
+    }
+  },
+
+  fetchExecutedPayouts: async () => {
+    try {
+      const executedPayouts = await AdminApi.getExecutedPayouts();
+      set({ executedPayouts });
+    } catch (err) {
+      console.error("Failed to fetch executed payouts:", err);
     }
   },
 
