@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
-import { ArrowLeft, Users, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  ArrowLeft, ArrowUpFromLine, Users, DollarSign,
+  Loader2, CheckCircle, AlertCircle,
+} from "lucide-react";
 
 export default function AgentTopUp() {
   const navigate = useNavigate();
@@ -20,7 +23,7 @@ export default function AgentTopUp() {
         clearAgentActionResult();
         setPartnerAgentId("");
         setUsdtAmount("");
-      }, 3000);
+      }, 4000);
       return () => clearTimeout(t);
     }
   }, [agentActionResult, clearAgentActionResult]);
@@ -29,14 +32,10 @@ export default function AgentTopUp() {
 
   const handleSubmit = async () => {
     if (!partnerAgentId || !usdtAmount || Number(usdtAmount) <= 0) return;
-    await agentAddBalance(partnerAgentId, {
-      userId: partnerAgentId,
-      fiatAmount: usdtAmount,
-      usdtAmount: Number(usdtAmount),
-    });
+    await agentAddBalance({ partnerAgentId, usdtAmount: Number(usdtAmount) });
   };
 
-  const isSuccess = agentActionResult?.toLowerCase().includes("success");
+  const isSuccess = agentActionResult?.toLowerCase().includes("success") || agentActionResult?.toLowerCase().includes("completed");
   const isError = agentActionResult?.toLowerCase().includes("error") || agentActionResult?.toLowerCase().includes("fail");
 
   return (
@@ -47,18 +46,21 @@ export default function AgentTopUp() {
         </button>
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Top Up Partner</h1>
-          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Add funds to a partner's wallet</p>
+          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Transfer USDT from system treasury to a partner's wallet</p>
         </div>
       </div>
 
       <Card className="p-4 sm:p-6 space-y-5">
         <div className="flex items-center gap-2 pb-4 border-b border-border">
-          <Users size={18} className="text-primary" />
-          <h2 className="text-lg font-bold text-text-primary">Partner Selection</h2>
+          <ArrowUpFromLine size={18} className="text-warning" />
+          <h2 className="text-lg font-bold text-text-primary">Partner Top-Up</h2>
         </div>
 
         <div>
-          <label className="block text-sm text-text-secondary mb-1.5">Partner Agent *</label>
+          <label className="block text-sm text-text-secondary mb-1.5">
+            <Users size={14} className="inline mr-1" />
+            Partner Agent *
+          </label>
           <select
             value={partnerAgentId}
             onChange={(e) => setPartnerAgentId(e.target.value)}
@@ -78,16 +80,20 @@ export default function AgentTopUp() {
         </div>
 
         <div>
-          <label className="block text-sm text-text-secondary mb-1.5">USDT Amount *</label>
+          <label className="block text-sm text-text-secondary mb-1.5">
+            <DollarSign size={14} className="inline mr-1" />
+            USDT Amount *
+          </label>
           <input
             type="number"
             value={usdtAmount}
             onChange={(e) => setUsdtAmount(e.target.value)}
-            placeholder="e.g. 5000"
+            placeholder="e.g. 10000"
             className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary"
             disabled={agentActionLoading}
             min="0"
           />
+          <p className="text-[10px] text-text-subtle mt-1">Amount to transfer from system treasury to partner's wallet</p>
         </div>
 
         {partnerAgentId && usdtAmount && Number(usdtAmount) > 0 && (
@@ -101,11 +107,13 @@ export default function AgentTopUp() {
         )}
 
         {agentActionResult && (
-          <div className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm ${
+          <div className={`flex items-start gap-3 px-4 py-3 rounded-lg text-sm ${
             isSuccess ? "bg-primary/10 text-primary" : isError ? "bg-danger/10 text-danger" : "bg-card-alt text-text-secondary"
           }`}>
-            {isSuccess ? <CheckCircle size={16} /> : isError ? <AlertCircle size={16} /> : null}
-            {agentActionResult}
+            {isSuccess ? <CheckCircle size={18} className="shrink-0 mt-0.5" /> : isError ? <AlertCircle size={18} className="shrink-0 mt-0.5" /> : null}
+            <div>
+              <p>{agentActionResult}</p>
+            </div>
           </div>
         )}
 
@@ -120,7 +128,7 @@ export default function AgentTopUp() {
           <button
             onClick={handleSubmit}
             disabled={agentActionLoading || !partnerAgentId || !usdtAmount || Number(usdtAmount) <= 0}
-            className="w-full sm:w-auto px-6 py-2 text-sm bg-primary text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-2 text-sm bg-warning text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {agentActionLoading && <Loader2 size={14} className="animate-spin" />}
             {agentActionLoading ? "Processing..." : "Confirm Top Up"}

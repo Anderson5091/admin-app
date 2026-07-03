@@ -62,7 +62,7 @@ interface AdminState {
   fetchAgentDetail: (agentId: string) => Promise<void>;
   toggleAgentStatus: (agentId: string) => Promise<void>;
   fetchAgentKpi: (agentId: string, period?: string) => Promise<void>;
-  agentAddBalance: (agentId: string, payload: AddBalancePayload) => Promise<void>;
+  agentAddBalance: (payload: AddBalancePayload) => Promise<void>;
   clearAgentActionResult: () => void;
 
   adminUsers: AdminUserItem[];
@@ -379,11 +379,11 @@ export const useAdminStore = create<AdminState>((set) => ({
     }
   },
 
-  agentAddBalance: async (agentId: string, payload: AddBalancePayload) => {
+  agentAddBalance: async (payload: AddBalancePayload) => {
     set({ agentActionLoading: true, agentActionResult: null });
     try {
-      const result = await AdminApi.addBalance(agentId, payload);
-      set({ agentActionLoading: false, agentActionResult: result.message || "Top up successful" });
+      const result = await AdminApi.addBalance(payload);
+      set({ agentActionLoading: false, agentActionResult: `Top-up completed — ${payload.usdtAmount} USDT sent to partner` });
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || "Top up failed";
       set({ agentActionLoading: false, agentActionResult: message });

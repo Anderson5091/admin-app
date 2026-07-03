@@ -78,8 +78,7 @@ export interface AgentKpiItem {
 }
 
 export interface AddBalancePayload {
-  userId: string;
-  fiatAmount: string;
+  partnerAgentId: string;
   usdtAmount: number;
 }
 

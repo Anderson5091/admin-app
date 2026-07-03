@@ -153,7 +153,7 @@ export const AdminApi = {
     return data;
   },
 
-  async addBalance(_agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number }): Promise<{ message: string }> {
+  async addBalance(payload: { partnerAgentId: string; usdtAmount: number }): Promise<{ success: boolean; amount: number; partnerAgentId: string }> {
     const { data } = await api.post(`/agent/topup-partner`, payload);
     return data;
   },
