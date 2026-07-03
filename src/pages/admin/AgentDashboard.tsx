@@ -197,7 +197,7 @@ export default function AgentDashboard() {
                     <Button variant="danger" size="sm" onClick={() => setShowWithdrawModal(true)}>
                       <ArrowUpFromLine size={12} className="mr-1" /> Withdraw
                     </Button>
-                    {isPartner && (
+                    {(isPartner || profile?.role === "AGENT_INTERNAL") && (
                       <Button variant="ghost" className="!text-warning !bg-warning-dim !border-warning/30 border" size="sm" onClick={() => setShowSwapModal(true)}>
                         <ArrowLeftRight size={12} className="mr-1" /> Swap
                       </Button>
