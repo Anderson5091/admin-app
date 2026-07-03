@@ -3,7 +3,7 @@ import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
-  Search, Filter, Calendar, DollarSign, Download, RefreshCw, ChevronDown, ChevronUp
+  Search, Filter, Calendar, DollarSign, Download, RefreshCw, ChevronDown, ChevronUp, ArrowLeftRight
 } from "lucide-react";
 
 const statusColor: Record<string, string> = {
@@ -238,9 +238,7 @@ export default function Transfers() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
         <Card className="p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-primary-dim">
-              <DollarSign size={14} className="sm:w-4 sm:h-4 text-primary" />
-            </div>
+            <ArrowLeftRight size={18} className="text-text-primary shrink-0" />
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">{stats.total.toLocaleString()}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Total Transfers</p>
@@ -249,9 +247,7 @@ export default function Transfers() {
         </Card>
         <Card className="p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-success-dim">
-              <DollarSign size={14} className="sm:w-4 sm:h-4 text-success" />
-            </div>
+            <DollarSign size={18} className="text-success shrink-0" />
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">${stats.totalAmount.toLocaleString()}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Total Amount</p>
@@ -260,9 +256,7 @@ export default function Transfers() {
         </Card>
         <Card className="p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-warning-dim">
-              <DollarSign size={14} className="sm:w-4 sm:h-4 text-warning" />
-            </div>
+            <DollarSign size={18} className="text-warning shrink-0" />
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">${stats.totalFees.toLocaleString()}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Total Fees</p>
@@ -271,9 +265,7 @@ export default function Transfers() {
         </Card>
         <Card className="p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-success-dim">
-              <DollarSign size={14} className="sm:w-4 sm:h-4 text-success" />
-            </div>
+            <ArrowLeftRight size={18} className="text-success shrink-0" />
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">{stats.completed.toLocaleString()}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Completed</p>
@@ -282,9 +274,7 @@ export default function Transfers() {
         </Card>
         <Card className="p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-warning-dim">
-              <DollarSign size={14} className="sm:w-4 sm:h-4 text-warning" />
-            </div>
+            <ArrowLeftRight size={18} className="text-warning shrink-0" />
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">{stats.pending.toLocaleString()}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Pending</p>
@@ -293,9 +283,7 @@ export default function Transfers() {
         </Card>
         <Card className="p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-danger-dim">
-              <DollarSign size={14} className="sm:w-4 sm:h-4 text-danger" />
-            </div>
+            <ArrowLeftRight size={18} className="text-danger shrink-0" />
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">{stats.failed.toLocaleString()}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Failed</p>
