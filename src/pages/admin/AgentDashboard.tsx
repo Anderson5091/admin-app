@@ -50,7 +50,7 @@ export default function AgentDashboard() {
   };
 
   const lockedPayouts = (agentDetail?.pendingTransfers || []).filter(
-    (t) => t.status === "PROCESSING" && t.processingAgentId === profile?.id
+    (t) => t.status === "SENT_TO_PARTNER" && t.processingAgentId === profile?.id
   );
 
   const cancelPayout = async (transferId: string) => {

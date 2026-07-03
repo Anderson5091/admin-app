@@ -72,7 +72,7 @@ export const AgentApi = {
 
   async getMyProcessingTransfers(agentId: string): Promise<any[]> {
     const { data } = await api.get(`/agent/${agentId}/transactions`);
-    return data.filter((t: any) => t.type === "PAYOUT" && t.status === "PROCESSING");
+    return data.filter((t: any) => t.type === "PAYOUT" && t.status === "SENT_TO_PARTNER");
   },
 
   async cancelPayout(agentId: string, transferId: string): Promise<{ success: boolean; message: string; transferId: string }> {

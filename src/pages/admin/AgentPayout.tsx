@@ -56,7 +56,7 @@ export default function AgentPayout() {
     try {
       const detail = await AgentApi.getMyDashboard();
       const locked = (detail.pendingTransfers || []).filter(
-        (t: any) => t.status === "PROCESSING" && t.processingAgentId === profile?.id
+        (t: any) => t.status === "SENT_TO_PARTNER" && t.processingAgentId === profile?.id
       );
       setLockedPayouts(locked);
     } catch {
@@ -219,7 +219,7 @@ export default function AgentPayout() {
                     </td>
                     <td className="py-2 pr-4 text-text-secondary">{searchResult.currency}</td>
                     <td className="py-2 pr-4">
-                      <Badge variant={searchResult.status === "PENDING_PAYOUT" ? "warning" : searchResult.status === "PROCESSING" ? "info" : "success"}>
+                      <Badge variant={searchResult.status === "PENDING_PAYOUT" ? "warning" : searchResult.status === "SENT_TO_PARTNER" ? "info" : "success"}>
                         {searchResult.status.replace(/_/g, " ")}
                       </Badge>
                     </td>
@@ -238,7 +238,7 @@ export default function AgentPayout() {
                           )}
                           {busyId === searchResult.id ? "Processing..." : "Execute"}
                         </button>
-                      ) : searchResult.status === "PROCESSING" ? (
+                      ) : searchResult.status === "SENT_TO_PARTNER" ? (
                         <span className="flex items-center gap-1 ml-auto text-xs text-text-subtle">
                           <Lock size={12} />
                           In Progress
@@ -264,7 +264,7 @@ export default function AgentPayout() {
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <Badge variant="info">{searchResult.payoutMethod?.replace(/_/g, " ") || "—"}</Badge>
                 <span className="text-text-secondary">{searchResult.currency}</span>
-                <Badge variant={searchResult.status === "PENDING_PAYOUT" ? "warning" : searchResult.status === "PROCESSING" ? "info" : "success"}>
+                <Badge variant={searchResult.status === "PENDING_PAYOUT" ? "warning" : searchResult.status === "SENT_TO_PARTNER" ? "info" : "success"}>
                   {searchResult.status.replace(/_/g, " ")}
                 </Badge>
               </div>

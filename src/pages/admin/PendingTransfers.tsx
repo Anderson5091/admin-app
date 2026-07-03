@@ -29,7 +29,7 @@ export default function PendingTransfers() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isMine = (t: PendingTransfer) => t.processingAgentId === profile?.id;
-  const isLocked = (t: PendingTransfer) => t.status === "PROCESSING" && !isMine(t);
+  const isLocked = (t: PendingTransfer) => t.status === "SENT_TO_PARTNER" && !isMine(t);
 
   const load = async () => {
     setLoading(true);
@@ -71,7 +71,7 @@ export default function PendingTransfers() {
     reader.onload = () => {
       const dataUrl = reader.result as string;
       const base64 = dataUrl.split(",")[1];
-      const transferId = photoData?.transferId || transfers.find(t => t.status === "PROCESSING" && isMine(t))?.id;
+      const transferId = photoData?.transferId || transfers.find(t => t.status === "SENT_TO_PARTNER" && isMine(t))?.id;
       if (transferId) {
         setPhotoData({ transferId, base64, mimeType: file.type || "image/jpeg", preview: dataUrl });
       }
@@ -182,7 +182,7 @@ export default function PendingTransfers() {
                       </td>
                       <td className="py-2 pr-4 text-text-secondary">{t.currency}</td>
                       <td className="py-2 pr-4">
-                        <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : t.status === "PROCESSING" ? "info" : "success"}>
+                        <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : t.status === "SENT_TO_PARTNER" ? "info" : "success"}>
                           {t.status.replace(/_/g, " ")}
                         </Badge>
                       </td>
@@ -201,7 +201,7 @@ export default function PendingTransfers() {
                             <Lock size={12} />
                             Locked
                           </span>
-                        ) : t.status === "PROCESSING" && isMine(t) ? (
+                        ) : t.status === "SENT_TO_PARTNER" && isMine(t) ? (
                           <div className="flex items-center gap-1.5 ml-auto">
                             <button
                               onClick={() => handleCameraClick(t.id)}
@@ -243,7 +243,7 @@ export default function PendingTransfers() {
                   <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
                     <Badge variant="info">{t.payoutMethod?.replace(/_/g, " ") || "—"}</Badge>
                     <span className="text-text-secondary">{t.currency}</span>
-                    <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : t.status === "PROCESSING" ? "info" : "success"}>
+                    <Badge variant={t.status === "PENDING_PAYOUT" ? "warning" : t.status === "SENT_TO_PARTNER" ? "info" : "success"}>
                       {t.status.replace(/_/g, " ")}
                     </Badge>
                     <span className="text-text-subtle">{new Date(t.createdAt).toLocaleDateString()}</span>
@@ -258,7 +258,7 @@ export default function PendingTransfers() {
                         Execute
                       </button>
                     )}
-                    {t.status === "PROCESSING" && isMine(t) && (
+                    {t.status === "SENT_TO_PARTNER" && isMine(t) && (
                       <>
                         <button
                           onClick={() => handleCameraClick(t.id)}
@@ -284,7 +284,7 @@ export default function PendingTransfers() {
                         Locked
                       </span>
                     )}
-                    {t.status !== "PENDING_PAYOUT" && t.status !== "PROCESSING" && (
+                    {t.status !== "PENDING_PAYOUT" && t.status !== "SENT_TO_PARTNER" && (
                       <span className="flex items-center gap-1 text-xs text-text-subtle">
                         <CheckCircle size={12} className="text-success" />
                         Done
