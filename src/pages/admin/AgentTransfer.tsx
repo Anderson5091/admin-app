@@ -73,7 +73,7 @@ export default function AgentTransfer() {
       ? undefined
       : { fullName, country, bankName: bankName || undefined, accountNumber: accountNumber || undefined, mobileWalletNumber: mobileWalletNumber || undefined, mobileProvider: mobileProvider || undefined, cashPickupLocation: cashPickupLocation || undefined };
 
-    const targetUserId = foundUser ? foundUser.id : agentId;
+    const targetUserId = foundUser ? foundUser.id : undefined;
 
     await transfer(agentId, {
       userId: targetUserId,

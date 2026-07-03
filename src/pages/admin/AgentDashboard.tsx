@@ -615,7 +615,7 @@ export default function AgentDashboard() {
                 {agentDetail.transactions.slice(0, 10).map((tx) => (
                   <tr key={tx.id} className="border-b border-border last:border-0">
                     <td className="py-2 pr-4">
-                      <Badge variant={tx.type === "COMMISSION" ? "warning" : tx.type === "ADD_BALANCE" ? "success" : tx.type === "WITHDRAW" ? "danger" : "info"}>
+                      <Badge variant={tx.type === "COMMISSION" ? "warning" : tx.type === "ADD_BALANCE" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : "info"}>
                         {tx.type}
                       </Badge>
                     </td>

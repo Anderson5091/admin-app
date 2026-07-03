@@ -76,7 +76,6 @@ export default function AgentActivity() {
           </div>
         ) : filtered.length > 0 ? (
           <>
-            {/* Desktop Table */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -114,7 +113,6 @@ export default function AgentActivity() {
               </table>
             </div>
 
-            {/* Mobile Cards */}
             <div className="sm:hidden space-y-2">
               {filtered.map((tx) => (
                 <div key={tx.id} className="bg-card-alt rounded-lg p-3 border border-border">
