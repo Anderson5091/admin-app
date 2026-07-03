@@ -78,64 +78,64 @@ export default function AgentActivity() {
           <>
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-text-subtle uppercase border-b border-border">
-                    <th className="text-left py-3 pr-4">Type</th>
-                    <th className="text-right py-3 pr-4">Amount</th>
-                    <th className="text-right py-3 pr-4">Commission</th>
-                    <th className="text-right py-3 pr-4">Net</th>
-                    <th className="text-right py-3 pr-4">User Ref</th>
-                    <th className="text-right py-3 pr-4">Status</th>
-                    <th className="text-right py-3">Date</th>
-                  </tr>
-                </thead>
+<thead>
+<tr className="text-text-subtle uppercase border-b border-border">
+                     <th className="text-left py-3 pr-4">Type</th>
+                     <th className="text-right py-3 pr-4">Amount</th>
+                     <th className="text-right py-3 pr-4">Commission</th>
+                     <th className="text-right py-3 pr-4">Net</th>
+                     <th className="text-right py-3 pr-4">User Ref</th>
+                     <th className="text-right py-3 pr-4">Status</th>
+                     <th className="text-right py-3">Date</th>
+                   </tr>
+</thead>
                 <tbody>
-                  {filtered.map((tx) => (
-                    <tr key={tx.id} className="border-b border-border last:border-0 hover:bg-card-alt transition-colors">
-                      <td className="py-3 pr-4">
-                        <Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : "info"}>
-                          {tx.type.replace(/_/g, " ")}
-                        </Badge>
-                      </td>
-                      <td className="py-3 pr-4 text-right text-text-primary">${tx.amount.toLocaleString()}</td>
-                      <td className="py-3 pr-4 text-right text-warning">${tx.commission.toLocaleString()}</td>
-                      <td className="py-3 pr-4 text-right text-text-primary">${tx.netAmount.toLocaleString()}</td>
-                      <td className="py-3 pr-4 text-right text-text-secondary font-mono text-[10px]">{tx.userRef?.slice(0, 12) || "—"}</td>
-                      <td className="py-3 pr-4 text-right">
-                        <Badge variant={tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
-                          {tx.status}
-                        </Badge>
-                      </td>
-                      <td className="py-3 text-right text-text-subtle whitespace-nowrap">{new Date(tx.createdAt).toLocaleString()}</td>
-                    </tr>
-                  ))}
+{filtered.map((tx) => (
+                     <tr key={tx.id} className="border-b border-border last:border-0 hover:bg-card-alt transition-colors">
+                       <td className="py-3 pr-4">
+                         <Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : "info"}>
+                           {tx.type.replace(/_/g, " ")}
+                         </Badge>
+                       </td>
+                       <td className="py-3 pr-4 text-right text-text-primary">${tx.amount.toLocaleString()}</td>
+                       <td className="py-3 pr-4 text-right text-warning">${tx.commission.toLocaleString()}</td>
+                       <td className="py-3 pr-4 text-right text-text-primary">${tx.netAmount.toLocaleString()}</td>
+                       <td className="py-3 pr-4 text-right text-text-secondary font-mono text-[10px]">{tx.userRef?.slice(0, 12) || "—"}</td>
+<td className="py-3 pr-4 text-right">
+                          <Badge variant={tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
+                            {tx.status}
+                          </Badge>
+                        </td>
+                        <td className="py-3 text-right text-text-subtle whitespace-nowrap">{new Date(tx.createdAt).toLocaleString()}</td>
+                     </tr>
+                   ))}
                 </tbody>
               </table>
             </div>
 
-            <div className="sm:hidden space-y-2">
-              {filtered.map((tx) => (
-                <div key={tx.id} className="bg-card-alt rounded-lg p-3 border border-border">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : "info"}>
-                      {tx.type.replace(/_/g, " ")}
-                    </Badge>
-                    <Badge variant={tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
-                      {tx.status}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-primary font-bold">${tx.amount.toLocaleString()}</span>
-                    <span className="text-text-subtle">{new Date(tx.createdAt).toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-text-secondary">
-                    <span>Commission: <span className="text-warning">${tx.commission.toLocaleString()}</span></span>
-                    <span>Net: ${tx.netAmount.toLocaleString()}</span>
-                  </div>
-                  {tx.userRef && <p className="text-[10px] text-text-subtle mt-1">Ref: {tx.userRef.slice(0, 12)}</p>}
-                </div>
-              ))}
-            </div>
+<div className="sm:hidden space-y-2">
+               {filtered.map((tx) => (
+                 <div key={tx.id} className="bg-card-alt rounded-lg p-3 border border-border">
+                   <div className="flex items-center justify-between mb-2">
+                     <Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : "info"}>
+                       {tx.type.replace(/_/g, " ")}
+                     </Badge>
+                     <Badge variant={tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
+                       {tx.status}
+                     </Badge>
+                   </div>
+                   <div className="flex items-center justify-between text-sm">
+                     <span className="text-text-primary font-bold">${tx.amount.toLocaleString()}</span>
+                     <span className="text-text-subtle">{new Date(tx.createdAt).toLocaleString()}</span>
+                   </div>
+<div className="flex items-center gap-3 mt-1 text-xs text-text-secondary">
+                      <span>Commission: <span className="text-warning">${tx.commission.toLocaleString()}</span></span>
+                      <span>Net: ${tx.netAmount.toLocaleString()}</span>
+                    </div>
+                   {tx.userRef && <p className="text-[10px] text-text-subtle mt-1">Ref: {tx.userRef.slice(0, 12)}</p>}
+                 </div>
+               ))}
+             </div>
           </>
         ) : (
           <p className="text-text-subtle text-sm py-12 text-center">
