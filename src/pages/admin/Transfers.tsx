@@ -44,10 +44,21 @@ export default function Transfers() {
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [fetchError, setFetchError] = useState("");
 
   useEffect(() => {
-    fetchTransfers();
-  }, [fetchTransfers]);
+    loadTransfers();
+  }, []);
+
+  async function loadTransfers() {
+    setFetchError("");
+    try {
+      await fetchTransfers();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to fetch transfers";
+      setFetchError(message);
+    }
+  }
 
   const safeTransfers = transfers ?? [];
 
@@ -155,13 +166,13 @@ export default function Transfers() {
             <p className="text-text-secondary text-xs sm:text-sm mt-1">Track and monitor all platform transfers</p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={fetchTransfers}
-              className="flex items-center gap-1.5 text-xs bg-primary-dim text-primary hover:bg-primary/20 transition-colors px-3 py-1.5 rounded-lg"
-            >
-              <RefreshCw size={14} />
-              Retry
-            </button>
+              <button
+                onClick={loadTransfers}
+                className="flex items-center gap-1.5 text-xs bg-primary-dim text-primary hover:bg-primary/20 transition-colors px-3 py-1.5 rounded-lg"
+              >
+                <RefreshCw size={14} />
+                Retry
+              </button>
           </div>
         </div>
         
@@ -171,6 +182,12 @@ export default function Transfers() {
               <DollarSign size={24} className="text-text-subtle" />
             </div>
             <h3 className="text-lg font-bold text-text-primary">No Transfers Found</h3>
+            {fetchError && (
+              <div className="bg-danger-dim text-danger text-sm px-4 py-3 rounded-lg max-w-md w-full text-left">
+                <p className="font-semibold mb-1">API Error:</p>
+                <p className="font-mono text-xs">{fetchError}</p>
+              </div>
+            )}
             <p className="text-text-secondary text-sm max-w-md">
               There are no transfers matching your criteria. Try adjusting your filters or check if you have the required permissions to view transfers.
             </p>
@@ -193,7 +210,7 @@ export default function Transfers() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={fetchTransfers}
+            onClick={loadTransfers}
             className="flex items-center gap-1.5 text-xs text-text-subtle hover:text-text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-card-alt"
           >
             <RefreshCw size={14} />

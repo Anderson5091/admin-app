@@ -406,10 +406,12 @@ export const useAdminStore = create<AdminState>((set) => ({
     set({ transfersLoading: true });
     try {
       const transfers = await AdminApi.getTransfers();
-      set({ transfers, transfersLoading: false });
+      set({ transfers, transfersLoading: false, error: "" });
     } catch (err) {
-      console.error("Failed to fetch transfers:", err);
-      set({ transfersLoading: false });
+      const message = (err as any)?.response?.data?.error || (err as any)?.message || "Failed to fetch transfers";
+      console.error("Failed to fetch transfers:", message);
+      set({ transfersLoading: false, error: message });
+      throw err;
     }
   },
 
