@@ -1,0 +1,22 @@
+{
+  "short_name": "QuickSend Admin",
+  "name": "QuickSend — Admin Dashboard",
+  "description": "dashboard for managin Quicksend admin an Operation",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#4f46e5",
+  "background_color": "#f8fafc",
+  "orientation": "portrait"
+}
