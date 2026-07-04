@@ -63,6 +63,7 @@ export interface AgentWalletInfo {
   walletType: string;
   network: string;
   balance: number;
+  address?: string;
 }
 
 export interface AgentKpiItem {

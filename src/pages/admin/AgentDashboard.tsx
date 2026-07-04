@@ -1,17 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check, ExternalLink } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check } from "lucide-react";
 import Modal from "../../components/ui/Modal";
 import Button from "../../components/ui/Button";
 import type { AgentDetail } from "../../features/admin/admin.types";
 
 export default function AgentDashboard() {
-  const navigate = useNavigate();
   const profile = useAuthStore((s) => s.profile);
   const { agentKpi, fetchAgentKpi } = useAdminStore();
   const [agentDetail, setAgentDetail] = useState<AgentDetail | null>(null);
@@ -33,7 +31,6 @@ export default function AgentDashboard() {
   const [swapDirection, setSwapDirection] = useState<"TO_LEDGER" | "TO_WALLET">("TO_LEDGER");
   const [swapping, setSwapping] = useState(false);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
-  const [selectedNetwork, setSelectedNetwork] = useState("BASE");
   const loadDashboard = async () => {
     if (!profile?.id) return;
     setLoading(true);

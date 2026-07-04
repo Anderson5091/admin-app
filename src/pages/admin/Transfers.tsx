@@ -3,17 +3,17 @@ import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
-  Search, Filter, Calendar, DollarSign, Download, RefreshCw, ChevronDown, ChevronUp, ArrowLeftRight
+  Search, Filter, DollarSign, Download, RefreshCw, ChevronDown, ChevronUp, ArrowLeftRight
 } from "lucide-react";
 
-const statusColor: Record<string, string> = {
-  DRAFT: "text-text-subtle bg-card-alt",
-  PENDING: "text-warning bg-warning-dim",
-  PENDING_PAYOUT: "text-primary bg-primary-dim",
-  SENT_TO_PARTNER: "text-secondary bg-secondary-dim",
-  COMPLETED: "text-success bg-success-dim",
-  FAILED: "text-danger bg-danger-dim",
-  CANCELLED: "text-text-subtle bg-card-alt",
+const statusVariant: Record<string, "default" | "success" | "warning" | "danger" | "info" | "purple"> = {
+  DRAFT: "default",
+  PENDING: "warning",
+  PENDING_PAYOUT: "info",
+  SENT_TO_PARTNER: "purple",
+  COMPLETED: "success",
+  FAILED: "danger",
+  CANCELLED: "default",
 };
 
 const statusOptions = [
@@ -420,7 +420,7 @@ export default function Transfers() {
                     <span className="text-xs text-text-secondary">{t.payoutMethod?.replace(/_/g, " ") || "—"}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={statusColor[t.status]?.includes("bg-") ? statusColor[t.status].split(" ")[1].replace("bg-", "") : "info"}>
+                    <Badge variant={statusVariant[t.status] || "info"}>
                       {t.status.replace(/_/g, " ")}
                     </Badge>
                   </td>
@@ -457,7 +457,7 @@ export default function Transfers() {
                 <span className="text-text-secondary">Net: ${t.destinationAmount.toLocaleString()}</span>
                 <span className="text-text-secondary">·</span>
                 <span className="text-text-secondary">{t.payoutMethod?.replace(/_/g, " ") || "—"}</span>
-                <Badge variant={statusColor[t.status]?.includes("bg-") ? statusColor[t.status].split(" ")[1].replace("bg-", "") : "info"}>
+                <Badge variant={statusVariant[t.status] || "info"}>
                   {t.status.replace(/_/g, " ")}
                 </Badge>
               </div>

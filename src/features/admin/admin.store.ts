@@ -382,7 +382,7 @@ export const useAdminStore = create<AdminState>((set) => ({
   agentAddBalance: async (payload: AddBalancePayload) => {
     set({ agentActionLoading: true, agentActionResult: null });
     try {
-      const result = await AdminApi.addBalance(payload);
+      await AdminApi.addBalance(payload);
       set({ agentActionLoading: false, agentActionResult: `Top-up completed — ${payload.usdtAmount} USDT sent to partner` });
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || "Top up failed";

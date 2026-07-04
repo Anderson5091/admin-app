@@ -96,46 +96,40 @@ function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: (
             )}
 
             {/* Transfer Info */}
-            {detail.transfer && (
+            {detail.transfer && (() => {
+              const t = detail.transfer;
+              return (
               <div className="border-t border-border pt-4">
                 <h3 className="text-sm font-semibold text-text-primary mb-3">Transfer Details</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-text-subtle">Reference</p>
-                    <p className="text-sm text-text-primary font-mono">{detail.transfer.referenceId}</p>
+                    <p className="text-sm text-text-primary font-mono">{t.referenceId}</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-subtle">User</p>
-                    <p className="text-sm text-text-primary">{detail.transfer.userName}</p>
+                    <p className="text-sm text-text-primary">{t.userName}</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-subtle">Email</p>
-                    <p className="text-sm text-text-primary">{detail.transfer.userEmail}</p>
+                    <p className="text-sm text-text-primary">{t.userEmail}</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-subtle">Amount</p>
-                    <p className="text-sm text-text-primary">${detail.transfer.amount.toLocaleString()}</p>
+                    <p className="text-sm text-text-primary">${t.amount.toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-subtle">Fee</p>
-                    <p className="text-sm text-warning">${detail.transfer.fee.toLocaleString()}</p>
+                    <p className="text-sm text-warning">${t.fee.toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-xs text-text-subtle">Net</p>
-                    <p className="text-sm text-text-primary">${detail.transfer.destinationAmount.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-subtle">Transfer Status</p>
-                    <Badge variant={statusVariant(detail.transfer.status)}>{detail.transfer.status}</Badge>
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-subtle">Created</p>
-                    <p className="text-sm text-text-primary">{new Date(detail.transfer.createdAt).toLocaleString()}</p>
+                    <p className="text-sm text-text-primary">${t.destinationAmount.toLocaleString()}</p>
                   </div>
                 </div>
 
                 {/* Proof Image */}
-                {detail.transfer.proofImage && (
+                {t.proofImage && (
                   <div className="mt-4">
                     <h4 className="text-xs font-semibold text-text-subtle mb-2">Proof Image</h4>
                     {detail.transfer.proofMimeType?.startsWith("image/") ? (
@@ -143,11 +137,11 @@ function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: (
                         src={`data:${detail.transfer.proofMimeType};base64,${detail.transfer.proofImage}`}
                         alt="Proof"
                         className="max-w-full max-h-64 rounded-lg border border-border object-contain cursor-pointer"
-                        onClick={() => window.open(`data:${detail.transfer.proofMimeType};base64,${detail.transfer.proofImage}`, "_blank")}
+                        onClick={() => window.open(`data:${t.proofMimeType};base64,${t.proofImage}`, "_blank")}
                       />
                     ) : (
                       <a
-                        href={`data:${detail.transfer.proofMimeType || "image/jpeg"};base64,${detail.transfer.proofImage}`}
+                        href={`data:${t.proofMimeType || "image/jpeg"};base64,${t.proofImage}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-primary hover:underline inline-flex items-center gap-1"
@@ -158,7 +152,8 @@ function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: (
                   </div>
                 )}
               </div>
-            )}
+              );
+            })()}
 
             {/* Events */}
             {detail.events.length > 0 && (
@@ -171,7 +166,7 @@ function PayoutDetailModal({ payoutId, onClose }: { payoutId: string; onClose: (
                         <span className="text-text-primary font-medium">{e.eventType}</span>
                         <span className="text-text-subtle">{new Date(e.createdAt).toLocaleString()}</span>
                       </div>
-                      {e.payload && (
+                      {e.payload != null && (
                         <pre className="mt-1 text-text-secondary overflow-x-auto">{JSON.stringify(e.payload, null, 1)}</pre>
                       )}
                     </div>
