@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { api } from "../../api/client";
-import { getToken, setToken, clearToken } from "../../utils/token";
+import { getToken, setToken, clearToken, getRefreshToken, setRefreshToken, clearRefreshToken } from "../../utils/token";
 import type { AdminProfile, AdminRole } from "./admin.types";
 
 function mapAgentTypeToRole(type: string): AdminRole {
@@ -12,10 +12,12 @@ interface AuthState {
   loading: boolean;
   error: string;
   isAuthenticated: boolean;
+  sessionExpired: boolean;
 
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   fetchProfile: () => Promise<void>;
+  setSessionExpired: (value: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -23,18 +25,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: false,
   error: "",
   isAuthenticated: !!getToken(),
+  sessionExpired: false,
 
   login: async (email: string, password: string) => {
-    set({ loading: true, error: "" });
+    set({ loading: true, error: "", sessionExpired: false });
     try {
       const { data } = await api.post("/admin/auth/login", { email, password });
       setToken(data.token);
+      if (data.refreshToken) setRefreshToken(data.refreshToken);
       set({ profile: data.user, isAuthenticated: true, loading: false });
       return true;
     } catch {
       try {
         const { data } = await api.post("/agent/auth/login", { email, password });
         setToken(data.token);
+        clearRefreshToken();
         set({
           profile: {
             id: data.user.id,
@@ -57,7 +62,12 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     clearToken();
-    set({ profile: null, isAuthenticated: false });
+    clearRefreshToken();
+    set({ profile: null, isAuthenticated: false, sessionExpired: false });
+  },
+
+  setSessionExpired: (value: boolean) => {
+    set({ sessionExpired: value });
   },
 
   fetchProfile: async () => {
@@ -84,6 +94,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     } catch {
       clearToken();
+      clearRefreshToken();
       set({ profile: null, isAuthenticated: false });
     }
   },
