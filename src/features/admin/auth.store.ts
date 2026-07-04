@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { api } from "../../api/client";
-import { getToken, setToken, clearToken, getRefreshToken, setRefreshToken, clearRefreshToken } from "../../utils/token";
+import { getToken, setToken, clearToken, setRefreshToken, clearRefreshToken } from "../../utils/token";
 import type { AdminProfile, AdminRole } from "./admin.types";
 
 function mapAgentTypeToRole(type: string): AdminRole {
