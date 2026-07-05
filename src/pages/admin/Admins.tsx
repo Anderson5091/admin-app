@@ -5,8 +5,9 @@ import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import { Plus, ShieldCheck, Trash2, X } from "lucide-react";
 
-const roleBadge: Record<string, { variant: "purple" | "info" | "warning" | "success"; label: string }> = {
+const roleBadge: Record<string, { variant: "purple" | "info" | "warning" | "success" | "default"; label: string }> = {
   SUPER_ADMIN: { variant: "purple", label: "Super Admin" },
+  ADMIN: { variant: "info", label: "Admin" },
   COMPLIANCE: { variant: "info", label: "Compliance" },
   OPS: { variant: "warning", label: "Operations" },
   TREASURY: { variant: "success", label: "Treasury" },
@@ -107,6 +108,7 @@ export default function Admins() {
                   className="w-full bg-app-bg border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="SUPER_ADMIN">Super Admin</option>
+                  <option value="ADMIN">Admin</option>
                   <option value="COMPLIANCE">Compliance</option>
                   <option value="OPS">Operations</option>
                   <option value="TREASURY">Treasury</option>
