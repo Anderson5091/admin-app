@@ -210,30 +210,9 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Revenue — visible for SUPER_ADMIN, ADMIN, TREASURY */}
-      {canViewRevenue && (
-        <>
-          {/* Revenue Header + Period Toggle */}
-          <div className="flex items-center flex-wrap gap-3">
-            <div className="flex items-center gap-2">
-              <DollarSign size={20} className="text-primary" />
-              <h2 className="text-lg font-bold text-text-primary">Revenue Overview</h2>
-            </div>
-            <div className="flex items-center gap-1 bg-card border border-border rounded-lg p-0.5">
-              {PERIODS.map((p) => (
-                <button
-                  key={p.value}
-                  onClick={() => setRevPeriod(p.value)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                    revPeriod === p.value ? "bg-primary text-white" : "text-text-secondary hover:text-text-primary"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            {revLoading && <Loader size={14} className="animate-spin text-text-subtle" />}
-          </div>
+{/* Revenue — visible for SUPER_ADMIN, ADMIN, TREASURY */}
+       {canViewRevenue && (
+         <>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
             {/* ── System Revenue Card ── */}
@@ -271,17 +250,29 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Trend chart */}
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <TrendingUp size={14} className="text-primary" />
-                      <span className="text-text-subtle text-[10px] uppercase tracking-wider font-semibold">
-                        Trend ({revPeriod === "day" ? "Daily" : revPeriod === "month" ? "Monthly" : "Yearly"})
-                      </span>
+                  {/* Trend header with inline period picker */}
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <TrendingUp size={14} className="text-primary" />
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px]">Trend </span>
+                      <div className="relative">
+                        <button
+                          onClick={() => {
+                            const next = PERIODS.find((p) => p.value === revPeriod);
+                            const idx = PERIODS.findIndex((p) => p.value === revPeriod);
+                            const nextIdx = (idx + 1) % PERIODS.length;
+                            setRevPeriod(PERIODS[nextIdx].value);
+                          }}
+                          className="px-2 py-0.5 rounded bg-primary-dim text-primary text-xs font-medium hover:opacity-90"
+                        >
+                          {revPeriod === "day" ? "Daily" : revPeriod === "month" ? "Monthly" : "Yearly"}
+                        </span>
+                      </div>
                       <span className="text-text-subtle text-[9px] ml-auto">
                         ${sysRevenue.total.toFixed(2)} in period
                       </span>
                     </div>
+                  </div>
                     <TrendChart
                       data={sysRevenue.trend}
                       period={revPeriod}
@@ -358,17 +349,30 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Trend chart */}
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <TrendingUp size={14} className="text-purple-400" />
-                      <span className="text-text-subtle text-[10px] uppercase tracking-wider font-semibold">
-                        Trend ({revPeriod === "day" ? "Daily" : revPeriod === "month" ? "Monthly" : "Yearly"})
-                      </span>
-                      <span className="text-text-subtle text-[9px] ml-auto">
-                        ${agentRevenue.total.toFixed(2)} in period
-                      </span>
-                    </div>
+{/* Trend chart */}
+                   <div>
+                     <div className="flex items-center gap-1.5 mb-3">
+                       <TrendingUp size={14} className="text-purple-400" />
+                       <div className="flex items-center gap-1">
+                         <span className="text-[10px]">Trend </span>
+                         <div className="relative">
+                           <button
+                             onClick={() => {
+                               const next = PERIODS.find((p) => p.value === revPeriod);
+                               const idx = PERIODS.findIndex((p) => p.value === revPeriod);
+                               const nextIdx = (idx + 1) % PERIODS.length;
+                               setRevPeriod(PERIODS[nextIdx].value);
+                             }}
+                             className="px-2 py-0.5 rounded bg-purple-900/50 text-purple-400 text-xs font-medium hover:opacity-90"
+                           >
+                             {revPeriod === "day" ? "Daily" : revPeriod === "month" ? "Monthly" : "Yearly"}
+                           </span>
+                         </div>
+                         <span className="text-text-subtle text-[9px] ml-auto">
+                           ${agentRevenue.total.toFixed(2)} in period
+                         </span>
+                       </div>
+                     </div>
                     <TrendChart
                       data={agentRevenue.trend}
                       period={revPeriod}
