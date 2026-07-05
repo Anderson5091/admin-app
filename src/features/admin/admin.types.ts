@@ -372,6 +372,30 @@ export interface AuditLogItem {
   createdAt: string;
 }
 
+export interface SystemRevenueData {
+  allTimeTotal: number;
+  allTimeBreakdown: { transferFees: number; depositFees: number; withdrawalFees: number };
+  total: number;
+  breakdown: { transferFees: number; depositFees: number; withdrawalFees: number };
+  period: string;
+  start: string;
+  end: string;
+  trend: { label: string; transfer: number; deposit: number; withdrawal: number; total: number }[];
+}
+
+export interface AgentRevenueData {
+  allTimeTotal: number;
+  allTimeBreakdown: { commissions: number; kpiRewards: number };
+  total: number;
+  breakdown: { commissions: number; kpiRewards: number };
+  period: string;
+  start: string;
+  end: string;
+  agentId: string | null;
+  agents: { id: string; fullName: string | null; email: string }[];
+  trend: { label: string; commissions: number; kpiRewards: number; total: number }[];
+}
+
 export interface SystemStatus {
   healthy: boolean;
   lastBackup: string | null;

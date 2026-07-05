@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemRevenueData, AgentRevenueData, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem } from "./admin.types";
 
 export const AdminApi = {
   async getDashboard(): Promise<AdminDashboardData> {
@@ -198,6 +198,18 @@ export const AdminApi = {
 
   async updateFeeConfig(id: string, payload: Partial<FeeConfig>): Promise<FeeConfig> {
     const { data } = await api.put(`/admin/fees/${id}`, payload);
+    return data;
+  },
+
+  async getSystemRevenue(period: string = "day"): Promise<SystemRevenueData> {
+    const { data } = await api.get("/admin/revenue/system", { params: { period } });
+    return data;
+  },
+
+  async getAgentRevenue(period: string = "day", agentId?: string): Promise<AgentRevenueData> {
+    const params: Record<string, string> = { period };
+    if (agentId) params.agentId = agentId;
+    const { data } = await api.get("/admin/revenue/agents", { params });
     return data;
   },
 };
