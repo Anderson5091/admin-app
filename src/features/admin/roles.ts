@@ -34,6 +34,7 @@ export const PAGE_PERMISSIONS: Record<string, AdminRole[]> = {
   "/audit": ["SUPER_ADMIN", "ADMIN", "COMPLIANCE", "OPS"],
   "/pending-transfers": ["AGENT_PARTNER", "AGENT_INTERNAL"],
   "/agent/activity": ["AGENT_PARTNER", "AGENT_INTERNAL"],
+  "/finance/fees": ["SUPER_ADMIN", "ADMIN", "OPS"],
 };
 
 export function canAccess(path: string, role: AdminRole | undefined): boolean {

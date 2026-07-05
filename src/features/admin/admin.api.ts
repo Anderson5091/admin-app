@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem } from "./admin.types";
 
 export const AdminApi = {
   async getDashboard(): Promise<AdminDashboardData> {
@@ -189,5 +189,15 @@ export const AdminApi = {
 
   async deleteAdmin(adminId: string): Promise<void> {
     await api.delete(`/admin/admins/${adminId}`);
+  },
+
+  async getFeeConfigs(): Promise<FeeConfig[]> {
+    const { data } = await api.get("/admin/fees");
+    return data;
+  },
+
+  async updateFeeConfig(id: string, payload: Partial<FeeConfig>): Promise<FeeConfig> {
+    const { data } = await api.put(`/admin/fees/${id}`, payload);
+    return data;
   },
 };

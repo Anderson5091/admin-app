@@ -379,3 +379,23 @@ export interface SystemStatus {
   disk: string;
   timestamp: string;
 }
+
+export interface FeeConfig {
+  id: string;
+  transactionType: string;
+  label: string | null;
+  description: string | null;
+  systemFeeEnabled: boolean;
+  systemFeeMode: "FIXED" | "PERCENTAGE" | "BOTH";
+  systemFixedFee: number;
+  systemPercentFee: number;
+  processingFeeEnabled: boolean;
+  processingFeeMode: "FIXED" | "PERCENTAGE" | "BOTH";
+  processingFixedFee: number;
+  processingPercentFee: number;
+  superAdminOnly: boolean;
+  enabled: boolean;
+  updatedBy: string | null;
+  updatedAt: string;
+  createdAt: string;
+}

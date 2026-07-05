@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, Clock, FileText, Menu } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, Clock, FileText, Menu, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -31,6 +31,7 @@ const navIconMap: Record<string, any> = {
   "/transfers": ArrowLeftRight,
   "/audit": ScrollText,
   "/pending-transfers": Clock,
+  "/finance/fees": DollarSign,
 };
 
 const navLabelMap: Record<string, string> = {
@@ -57,12 +58,13 @@ const navLabelMap: Record<string, string> = {
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
   "/pending-transfers": "Pending Transfers",
+  "/finance/fees": "Fee Management",
 };
 
 const NAV_SECTIONS = [
   { label: "Monitor", paths: ["/", "/notifications", "/live", "/system", "/agent/activity", "/pending-transfers"] },
   { label: "Administration", paths: ["/admins"] },
-  { label: "Finance", paths: ["/treasury", "/payouts", "/transfers"] },
+  { label: "Finance", paths: ["/treasury", "/payouts", "/transfers", "/finance/fees"] },
   { label: "Compliance", paths: ["/cases", "/fraud", "/audit"] },
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },
