@@ -86,6 +86,7 @@ export interface AddBalancePayload {
 export interface AdminProfile {
   id: string;
   email: string;
+  name?: string;
   role: AdminRole;
   status: string;
   createdAt: string;
@@ -94,6 +95,7 @@ export interface AdminProfile {
 export interface AdminUserItem {
   id: string;
   email: string;
+  name?: string;
   role: AdminRole;
   status: string;
   createdAt: string;

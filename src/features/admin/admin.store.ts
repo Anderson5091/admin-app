@@ -67,7 +67,7 @@ interface AdminState {
 
   adminUsers: AdminUserItem[];
   fetchAdminUsers: () => Promise<void>;
-  createAdmin: (data: { email: string; password: string; role: string }) => Promise<void>;
+  createAdmin: (data: { email: string; name?: string; password: string; role: string }) => Promise<void>;
   toggleAdminStatus: (adminId: string) => Promise<void>;
   deleteAdmin: (adminId: string) => Promise<void>;
 

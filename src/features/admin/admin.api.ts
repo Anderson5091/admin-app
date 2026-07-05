@@ -178,7 +178,7 @@ export const AdminApi = {
     return data;
   },
 
-  async createAdmin(data: { email: string; password: string; role: string }): Promise<AdminUserItem> {
+  async createAdmin(data: { email: string; name?: string; password: string; role: string }): Promise<AdminUserItem> {
     const { data: res } = await api.post("/admin/admins", data);
     return res;
   },

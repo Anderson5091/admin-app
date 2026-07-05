@@ -18,6 +18,7 @@ export default function Admins() {
   const profile = useAuthStore((s) => s.profile);
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("OPS");
   const [error, setError] = useState("");
@@ -31,8 +32,9 @@ export default function Admins() {
     setError("");
     if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
     try {
-      await createAdmin({ email, password, role });
+      await createAdmin({ email, name: name.trim() || undefined, password, role });
       setEmail("");
+      setName("");
       setPassword("");
       setRole("OPS");
       setShowForm(false);
@@ -78,7 +80,17 @@ export default function Admins() {
         <Card>
           <form onSubmit={handleCreate} className="space-y-4">
             <h2 className="text-lg font-semibold text-text-primary">New Admin Account</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1">Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full name"
+                  className="w-full bg-app-bg border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-1">Email</label>
                 <input
@@ -138,7 +150,7 @@ export default function Admins() {
                   </div>
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium text-text-primary truncate">{admin.email}</span>
+                      <span className="font-medium text-text-primary truncate">{admin.name || admin.email}</span>
                       <Badge variant={roleInfo.variant}>{roleInfo.label}</Badge>
                       <Badge variant={admin.status === "ACTIVE" ? "success" : "danger"}>
                         {admin.status}
