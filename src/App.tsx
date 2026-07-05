@@ -3,7 +3,6 @@ import { RouterProvider } from "react-router-dom";
 import { router } from "./routes";
 import { useAuthStore } from "./features/admin/auth.store";
 import { setupInterceptors } from "./api/interceptors";
-import SessionExpiredModal from "./components/SessionExpiredModal";
 
 export default function App() {
   const fetchProfile = useAuthStore((s) => s.fetchProfile);
@@ -13,10 +12,5 @@ export default function App() {
     fetchProfile();
   }, [fetchProfile]);
 
-  return (
-    <>
-      <RouterProvider router={router} />
-      <SessionExpiredModal />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
