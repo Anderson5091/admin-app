@@ -23,6 +23,7 @@ const TX_TYPE_LABELS: Record<string, string> = {
   AGENT_CASH_WITHDRAW: "Agent Cash Withdraw",
   PAYOUT: "Payout",
   P2P: "P2P Transfer",
+  AGENT_TOPUP: "Agent Topup",
 };
 
 export default function FeeManagement() {
