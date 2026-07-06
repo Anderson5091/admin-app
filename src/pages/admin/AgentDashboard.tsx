@@ -4,7 +4,7 @@ import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check, IdCard } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check, IdCard, AlertCircle } from "lucide-react";
 import Modal from "../../components/ui/Modal";
 import Button from "../../components/ui/Button";
 import type { AgentDetail } from "../../features/admin/admin.types";
@@ -25,8 +25,6 @@ export default function AgentDashboard() {
   const [depositAmount, setDepositAmount] = useState("");
   const [depositFrom, setDepositFrom] = useState("bank");
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawTo, setWithdrawTo] = useState("bank");
-  const [withdrawAddress, setWithdrawAddress] = useState("");
   const [swapAmount, setSwapAmount] = useState("");
   const [swapDirection, setSwapDirection] = useState<"TO_LEDGER" | "TO_WALLET">("TO_LEDGER");
   const [swapping, setSwapping] = useState(false);
