@@ -253,6 +253,7 @@ export default function AdminLayout() {
             )}
           </div>
         </div>
+        <span className="ml-auto text-[9px] text-text-subtle font-mono truncate max-w-[50%]">UUID: {profile?.id || ""}</span>
       </div>
 
       {/* Mobile Overlay */}

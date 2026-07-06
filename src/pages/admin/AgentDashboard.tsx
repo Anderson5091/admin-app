@@ -4,7 +4,7 @@ import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check, IdCard } from "lucide-react";
 import Modal from "../../components/ui/Modal";
 import Button from "../../components/ui/Button";
 import type { AgentDetail } from "../../features/admin/admin.types";
@@ -135,13 +135,19 @@ export default function AgentDashboard() {
           <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Agent Dashboard</h1>
           <p className="text-text-secondary text-xs sm:text-sm mt-1">Welcome back, {agentName}</p>
         </div>
-        <button
-          onClick={() => { if (profile?.id) { loadDashboard(); fetchAgentKpi(profile.id, kpiPeriod); } }}
-          className="flex items-center gap-1.5 text-xs text-text-subtle hover:text-text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-card-alt"
-        >
-          <RefreshCw size={14} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          <span className="hidden sm:flex items-center gap-1.5 text-xs text-text-subtle bg-card-alt px-2.5 py-1.5 rounded-lg">
+            <IdCard size={12} />
+            UUID: {profile?.id || "—"}
+          </span>
+          <button
+            onClick={() => { if (profile?.id) { loadDashboard(); fetchAgentKpi(profile.id, kpiPeriod); } }}
+            className="flex items-center gap-1.5 text-xs text-text-subtle hover:text-text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-card-alt"
+          >
+            <RefreshCw size={14} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
