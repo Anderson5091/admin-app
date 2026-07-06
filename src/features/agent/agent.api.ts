@@ -109,4 +109,9 @@ export const AgentApi = {
     const { data } = await api.post(`/agent/${agentId}/swap`, { amount, direction });
     return data;
   },
+
+  async walletWithdraw(agentId: string, amount: number): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post(`/agent/${agentId}/withdraw-wallet`, { amount });
+    return data;
+  },
 };

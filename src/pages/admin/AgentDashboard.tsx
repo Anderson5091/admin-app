@@ -30,6 +30,8 @@ export default function AgentDashboard() {
   const [swapAmount, setSwapAmount] = useState("");
   const [swapDirection, setSwapDirection] = useState<"TO_LEDGER" | "TO_WALLET">("TO_LEDGER");
   const [swapping, setSwapping] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const loadDashboard = async () => {
     if (!profile?.id) return;
@@ -266,54 +268,63 @@ export default function AgentDashboard() {
           </div>
         </Modal>
 
-        {/* Withdraw Modal */}
-        <Modal open={showWithdrawModal} onClose={() => setShowWithdrawModal(false)} title="Withdraw from Wallet">
+        {/* Withdraw Modal — sends from agent's Crossmint wallet to hot treasury */}
+        <Modal open={showWithdrawModal} onClose={() => { setShowWithdrawModal(false); setWithdrawError(null); }} title="Withdraw from Wallet">
           <div className="space-y-3">
+            <p className="text-xs text-text-secondary">
+              Send USDT from your Crossmint wallet to the platform hot treasury.
+            </p>
             <div>
               <label className="text-xs text-text-secondary mb-1 block">Amount (USDT)</label>
-              <input
-                type="number"
-                placeholder="0.00"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-text-secondary mb-1 block">Withdraw to</label>
-              <select
-                value={withdrawTo}
-                onChange={(e) => setWithdrawTo(e.target.value)}
-                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
-              >
-                <optgroup label="Off Ramp">
-                  <option value="bank">Bank Account</option>
-                </optgroup>
-                <optgroup label="External Address">
-                  <option value="BASE">BASE (USDT)</option>
-                  <option value="ETHEREUM">Ethereum (USDT)</option>
-                  <option value="POLYGON">Polygon (USDT)</option>
-                  <option value="SOLANA">Solana (USDT)</option>
-                </optgroup>
-              </select>
-            </div>
-            {withdrawTo !== "bank" && (
-              <div>
-                <label className="text-xs text-text-secondary mb-1 block">Destination Address</label>
+              <div className="relative">
                 <input
-                  type="text"
-                  placeholder="0x... or addr..."
-                  value={withdrawAddress}
-                  onChange={(e) => setWithdrawAddress(e.target.value)}
-                  className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary"
+                  type="number"
+                  placeholder="0.00"
+                  value={withdrawAmount}
+                  onChange={(e) => { setWithdrawAmount(e.target.value); setWithdrawError(null); }}
+                  className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary pr-16"
                 />
+                {agentDetail?.wallets?.[0]?.balance ? (
+                  <button
+                    onClick={() => setWithdrawAmount(String(agentDetail.wallets[0].balance))}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 text-xs text-primary hover:text-primary/80 font-semibold px-2 py-1 rounded"
+                  >
+                    Max
+                  </button>
+                ) : null}
+              </div>
+            </div>
+            {withdrawError && (
+              <div className="flex items-start gap-2 px-4 py-3 rounded-lg text-sm bg-danger/10 text-danger">
+                <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                <p>{withdrawError}</p>
               </div>
             )}
-            {withdrawTo === "bank" && (
-              <p className="text-xs text-text-subtle">To withdraw to your bank account, please use the Crossmint off-ramp integration.</p>
-            )}
-            <Button variant="primary" size="sm" className="w-full">
-              <ArrowUpFromLine size={14} className="mr-1" /> Withdraw{withdrawAmount ? ` ${withdrawAmount} USDT` : ''}
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full"
+              disabled={withdrawing || !withdrawAmount || Number(withdrawAmount) <= 0}
+              onClick={async () => {
+                if (!profile?.id) return;
+                const amt = Number(withdrawAmount);
+                if (amt <= 0) return;
+                setWithdrawing(true);
+                setWithdrawError(null);
+                try {
+                  await AgentApi.walletWithdraw(profile.id, amt);
+                  setShowWithdrawModal(false);
+                  setWithdrawAmount("");
+                  loadDashboard();
+                } catch (err: any) {
+                  setWithdrawError(err?.response?.data?.error || err?.message || "Withdrawal failed");
+                } finally {
+                  setWithdrawing(false);
+                }
+              }}
+            >
+              {withdrawing ? <Loader2 size={14} className="animate-spin mr-1" /> : <ArrowUpFromLine size={14} className="mr-1" />}
+              {withdrawing ? "Processing..." : `Withdraw${withdrawAmount ? ` ${withdrawAmount}` : ""} USDT to Treasury`}
             </Button>
           </div>
         </Modal>
