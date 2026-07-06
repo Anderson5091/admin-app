@@ -7,7 +7,7 @@ import Card from "../../components/ui/Card";
 import type { SystemRevenueData, AgentRevenueData } from "../../features/admin/admin.types";
 import {
   Users, ArrowUpDown, Shield, AlertTriangle, Scale, Ban, AlertCircle, Clock, Radio, UserCog, Handshake,
-  DollarSign, TrendingUp, BarChart3, Loader, Search, X
+  TrendingUp, BarChart3, Search, X
 } from "lucide-react";
 
 const statusColors: Record<string, string> = {
@@ -29,9 +29,8 @@ function TrendChart({ data, period, colorStart, colorEnd }: {
   const barCount = data.length;
 
   const formatLabel = (label: string) => {
-    if (period === "year") return label; // already "2024-01"
-    if (period === "month") return label.slice(5); // "01" from "2024-01-01"
-    return label.slice(5); // "01-15" from "2024-01-15"
+    if (period === "day") return label.slice(5); // "MM-DD" from "YYYY-MM-DD"
+    return label; // "YYYY-MM" for month/year
   };
 
   const formatVerticalLabel = (val: number) => {
@@ -110,7 +109,7 @@ export default function Dashboard() {
   const [revPeriod, setRevPeriod] = useState<"day" | "month" | "year">("day");
   const [revAgentId, setRevAgentId] = useState<string>("");
   const [revAgentInput, setRevAgentInput] = useState("");
-  const [revLoading, setRevLoading] = useState(false);
+  const [, setRevLoading] = useState(false);
 
   const fetchRevenue = useCallback(async () => {
     if (!canViewRevenue) return;
@@ -258,7 +257,6 @@ export default function Dashboard() {
                       <div className="relative">
                         <button
                           onClick={() => {
-                            const next = PERIODS.find((p) => p.value === revPeriod);
                             const idx = PERIODS.findIndex((p) => p.value === revPeriod);
                             const nextIdx = (idx + 1) % PERIODS.length;
                             setRevPeriod(PERIODS[nextIdx].value);
@@ -266,7 +264,7 @@ export default function Dashboard() {
                           className="px-2 py-0.5 rounded bg-primary-dim text-primary text-xs font-medium hover:opacity-90"
                         >
                           {revPeriod === "day" ? "Daily" : revPeriod === "month" ? "Monthly" : "Yearly"}
-                        </span>
+                        </button>
                       </div>
                       <span className="text-text-subtle text-[9px] ml-auto">
                         ${sysRevenue.total.toFixed(2)} in period
@@ -279,7 +277,6 @@ export default function Dashboard() {
                       colorStart="#00D6A3"
                       colorEnd="#0084FF"
                     />
-                  </div>
                 </>
               )}
             </Card>
@@ -356,17 +353,16 @@ export default function Dashboard() {
                        <div className="flex items-center gap-1">
                          <span className="text-[10px]">Trend </span>
                          <div className="relative">
-                           <button
-                             onClick={() => {
-                               const next = PERIODS.find((p) => p.value === revPeriod);
-                               const idx = PERIODS.findIndex((p) => p.value === revPeriod);
-                               const nextIdx = (idx + 1) % PERIODS.length;
-                               setRevPeriod(PERIODS[nextIdx].value);
-                             }}
-                             className="px-2 py-0.5 rounded bg-purple-900/50 text-purple-400 text-xs font-medium hover:opacity-90"
-                           >
-                             {revPeriod === "day" ? "Daily" : revPeriod === "month" ? "Monthly" : "Yearly"}
-                           </span>
+                        <button
+                            onClick={() => {
+                              const idx = PERIODS.findIndex((p) => p.value === revPeriod);
+                              const nextIdx = (idx + 1) % PERIODS.length;
+                              setRevPeriod(PERIODS[nextIdx].value);
+                            }}
+                            className="px-2 py-0.5 rounded bg-purple-900/50 text-purple-400 text-xs font-medium hover:opacity-90"
+                          >
+                            {revPeriod === "day" ? "Daily" : revPeriod === "month" ? "Monthly" : "Yearly"}
+                          </button>
                          </div>
                          <span className="text-text-subtle text-[9px] ml-auto">
                            ${agentRevenue.total.toFixed(2)} in period

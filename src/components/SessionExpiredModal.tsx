@@ -5,7 +5,13 @@ import Modal from "./ui/Modal";
 export default function SessionExpiredModal() {
   const navigate = useNavigate();
   const sessionExpired = useAuthStore((s) => s.sessionExpired);
+  const setSessionExpired = useAuthStore((s) => s.setSessionExpired);
   const logout = useAuthStore((s) => s.logout);
+
+  const handleClose = () => {
+    setSessionExpired(false);
+    navigate("/login");
+  };
 
   const handleSignInAgain = () => {
     logout();
@@ -13,7 +19,7 @@ export default function SessionExpiredModal() {
   };
 
   return (
-    <Modal open={sessionExpired} onClose={() => {}} title="Session Expired">
+    <Modal open={sessionExpired} onClose={handleClose} title="Session Expired">
       <p className="text-text-secondary text-sm mb-5">
         Your session has expired due to inactivity. Please sign in again to continue.
       </p>
