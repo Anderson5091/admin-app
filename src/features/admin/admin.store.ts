@@ -6,6 +6,7 @@ interface AdminState {
   dashboard: AdminDashboardData | null;
   users: AdminUser[];
   pendingKyc: PendingKycItem[];
+  kycDetail: any | null;
   complianceCases: ComplianceCaseItem[];
   failedPayouts: FailedPayoutItem[];
   executedPayouts: ExecutedPayoutItem[];
@@ -165,6 +166,15 @@ export const useAdminStore = create<AdminState>((set) => ({
   rejectKyc: async (kycId: string) => {
     await AdminApi.rejectKyc(kycId);
     set((state) => ({ pendingKyc: state.pendingKyc.filter((k) => k.id !== kycId) }));
+  },
+
+  fetchKycDetail: async (kycId: string) => {
+    try {
+      const kycDetail = await AdminApi.getKycDetail(kycId);
+      set({ kycDetail });
+    } catch (err) {
+      console.error("Failed to fetch KYC detail:", err);
+    }
   },
 
   fetchComplianceCases: async () => {

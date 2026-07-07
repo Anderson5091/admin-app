@@ -151,8 +151,16 @@ export interface PendingKycItem {
   email: string;
   name: string;
   tier: number;
+  status: string;
   documents: KycDocument[];
   submittedAt: string;
+  userKycTier: number;
+  userKycStatus: string;
+  lastEvent: {
+    type: string;
+    status: string;
+    payload: Record<string, any> | null;
+  } | null;
 }
 
 export interface KycDocument {

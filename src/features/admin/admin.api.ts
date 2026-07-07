@@ -29,6 +29,11 @@ export const AdminApi = {
     await api.post(`/admin/kyc/${kycId}/reject`);
   },
 
+  async getKycDetail(kycId: string): Promise<any> {
+    const { data } = await api.get(`/admin/kyc/${kycId}`);
+    return data;
+  },
+
   async getComplianceCases(): Promise<ComplianceCaseItem[]> {
     const { data } = await api.get("/admin/compliance-cases");
     return data;
