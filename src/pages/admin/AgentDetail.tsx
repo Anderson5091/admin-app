@@ -5,7 +5,7 @@ import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
   ArrowLeft, DollarSign, Activity,
-  Wallet, Clock, BarChart3, HandCoins, RefreshCw,
+  Wallet, Clock, BarChart3, HandCoins, RefreshCw, Copy, Check,
 } from "lucide-react";
 
 export default function AgentDetail() {
@@ -13,6 +13,7 @@ export default function AgentDetail() {
   const navigate = useNavigate();
   const { agentDetail, agentKpi, fetchAgentDetail, fetchAgentKpi, toggleAgentStatus } = useAdminStore();
   const [kpiPeriod, setKpiPeriod] = useState("DAILY");
+  const [copiedWalletId, setCopiedWalletId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -145,13 +146,17 @@ export default function AgentDetail() {
                     <td className="py-2 pr-4 text-text-subtle">{w.network}</td>
                     <td className="py-2 pr-4">
                       {w.address ? (
-                        <span
-                          className="text-text-primary font-mono text-[11px] truncate block max-w-[200px] cursor-pointer hover:text-primary transition-colors"
-                          onClick={() => navigator.clipboard.writeText(w.address!)}
-                          title="Click to copy"
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(w.address!);
+                            setCopiedWalletId(w.id);
+                            setTimeout(() => setCopiedWalletId(null), 1500);
+                          }}
+                          className="flex items-center gap-1 text-[11px] font-mono text-text-subtle hover:text-primary transition-colors"
                         >
-                          {w.address}
-                        </span>
+                          {copiedWalletId === w.id ? <Check size={12} /> : <Copy size={12} />}
+                          {copiedWalletId === w.id ? "Copied" : w.address.slice(0, 8) + "..." + w.address.slice(-6)}
+                        </button>
                       ) : (
                         <span className="text-text-subtle">—</span>
                       )}
