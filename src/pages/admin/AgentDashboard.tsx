@@ -28,6 +28,8 @@ export default function AgentDashboard() {
   const [swapAmount, setSwapAmount] = useState("");
   const [swapDirection, setSwapDirection] = useState<"TO_LEDGER" | "TO_WALLET">("TO_LEDGER");
   const [swapping, setSwapping] = useState(false);
+  const [swapError, setSwapError] = useState<string | null>(null);
+  const [swapSuccess, setSwapSuccess] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
@@ -249,9 +251,14 @@ export default function AgentDashboard() {
               <div>
                 <label className="text-xs text-text-secondary mb-1 block">Deposit Address</label>
                 <div className="bg-card-alt border border-border rounded-lg p-3 text-center">
-                  <p className="text-sm font-mono text-text-primary break-all">wallet-address-placeholder</p>
+                  <p className="text-sm font-mono text-text-primary break-all">
+                    {agentDetail?.wallets.find(w => w.network === depositFrom)?.address || "No address available"}
+                  </p>
                   <button
-                    onClick={() => { navigator.clipboard.writeText("wallet-address-placeholder"); setWalletAddressCopied(true); setTimeout(() => setWalletAddressCopied(false), 1500); }}
+                    onClick={() => {
+                      const addr = agentDetail?.wallets.find(w => w.network === depositFrom)?.address;
+                      if (addr) { navigator.clipboard.writeText(addr); setWalletAddressCopied(true); setTimeout(() => setWalletAddressCopied(false), 1500); }
+                    }}
                     className="flex items-center gap-1 text-xs text-primary hover:opacity-80 transition-colors mt-1"
                   >
                     <Copy size={12} /> Copy Address
@@ -328,7 +335,7 @@ export default function AgentDashboard() {
         </Modal>
 
         {/* Swap Modal */}
-        <Modal open={showSwapModal} onClose={() => { setShowSwapModal(false); setSwapDirection("TO_LEDGER"); }} title="Swap Funds">
+        <Modal open={showSwapModal} onClose={() => { setShowSwapModal(false); setSwapDirection("TO_LEDGER"); setSwapError(null); setSwapSuccess(false); }} title="Swap Funds">
           <div className="space-y-3">
             <p className="text-xs text-text-secondary">
               {swapDirection === "TO_LEDGER"
@@ -383,6 +390,16 @@ export default function AgentDashboard() {
                 </button>
               </div>
             </div>
+            {swapError && (
+              <div className="bg-danger-dim border border-danger/30 text-danger text-sm rounded-lg px-4 py-2.5 font-medium text-center">
+                {swapError}
+              </div>
+            )}
+            {swapSuccess && (
+              <div className="bg-primary-dim border border-primary/30 text-primary text-sm rounded-lg px-4 py-2.5 font-medium text-center">
+                Swap completed successfully!
+              </div>
+            )}
             <Button
               variant="primary"
               size="sm"
@@ -393,13 +410,20 @@ export default function AgentDashboard() {
                 const amt = Number(swapAmount);
                 if (amt <= 0) return;
                 setSwapping(true);
+                setSwapError(null);
+                setSwapSuccess(false);
                 try {
                   await AgentApi.swapFunds(profile.id, amt, swapDirection);
-                  setShowSwapModal(false);
-                  setSwapAmount("");
-                  setSwapDirection("TO_LEDGER");
-                  loadDashboard();
-                } catch {
+                  setSwapSuccess(true);
+                  setTimeout(() => {
+                    setShowSwapModal(false);
+                    setSwapAmount("");
+                    setSwapDirection("TO_LEDGER");
+                    setSwapSuccess(false);
+                    loadDashboard();
+                  }, 1500);
+                } catch (err: any) {
+                  setSwapError(err?.response?.data?.error || err?.message || "Swap failed");
                 } finally {
                   setSwapping(false);
                 }
