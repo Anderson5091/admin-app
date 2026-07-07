@@ -4,11 +4,10 @@ import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
-import { FileText, CheckCircle, XCircle, Shield, AlertTriangle } from "lucide-react";
+import { FileText, CheckCircle, XCircle, Shield } from "lucide-react";
 
 export default function KycReview() {
   const { pendingKyc, fetchPendingKyc, approveKyc, rejectKyc, fetchKycDetail, kycDetail } = useAdminStore();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState(false);
 
   useEffect(() => {
@@ -16,7 +15,6 @@ export default function KycReview() {
   }, [fetchPendingKyc]);
 
   const openDetail = async (id: string) => {
-    setSelectedId(id);
     await fetchKycDetail(id);
     setShowDetail(true);
   };
@@ -101,8 +99,8 @@ export default function KycReview() {
         )}
       </div>
 
-      {showDetail && kycDetail && (
-        <Modal onClose={() => setShowDetail(false)}>
+      {kycDetail && (
+        <Modal open={showDetail} onClose={() => setShowDetail(false)} title="KYC Detail">
           <div className="p-6 space-y-4">
             <h2 className="text-lg font-bold text-text-primary">KYC Detail</h2>
             <div className="text-sm text-text-secondary space-y-2">

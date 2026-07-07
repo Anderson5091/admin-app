@@ -32,6 +32,7 @@ interface AdminState {
   fetchPendingKyc: () => Promise<void>;
   approveKyc: (kycId: string) => Promise<void>;
   rejectKyc: (kycId: string) => Promise<void>;
+  fetchKycDetail: (kycId: string) => Promise<void>;
   fetchComplianceCases: () => Promise<void>;
   escalateCase: (caseId: string) => Promise<void>;
   fetchFailedPayouts: () => Promise<void>;
