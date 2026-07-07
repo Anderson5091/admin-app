@@ -86,6 +86,7 @@ export const useAdminStore = create<AdminState>((set) => ({
   dashboard: null,
   users: [],
   pendingKyc: [],
+  kycDetail: null,
   complianceCases: [],
   failedPayouts: [],
   executedPayouts: [],
