@@ -5,6 +5,9 @@ import { useAuthStore } from "../features/admin/auth.store";
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value: any) => void; reject: (reason: any) => void }> = [];
 
+let requestInterceptorId: number | null = null;
+let responseInterceptorId: number | null = null;
+
 function processQueue(error: any, token: string | null = null) {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
@@ -13,8 +16,30 @@ function processQueue(error: any, token: string | null = null) {
   failedQueue = [];
 }
 
+function isAuthMeEndpoint(url: string): boolean {
+  return url.includes("/auth/me");
+}
+
+export function resetInterceptorState() {
+  isRefreshing = false;
+  failedQueue = [];
+}
+
+function ejectInterceptors() {
+  if (requestInterceptorId !== null) {
+    api.interceptors.request.eject(requestInterceptorId);
+    requestInterceptorId = null;
+  }
+  if (responseInterceptorId !== null) {
+    api.interceptors.response.eject(responseInterceptorId);
+    responseInterceptorId = null;
+  }
+}
+
 export const setupInterceptors = () => {
-  api.interceptors.request.use((config) => {
+  ejectInterceptors();
+
+  requestInterceptorId = api.interceptors.request.use((config) => {
     const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -22,7 +47,7 @@ export const setupInterceptors = () => {
     return config;
   });
 
-  api.interceptors.response.use(
+  responseInterceptorId = api.interceptors.response.use(
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
@@ -32,7 +57,7 @@ export const setupInterceptors = () => {
       }
 
       const url: string = originalRequest.url || "";
-      if (url.includes("/auth/refresh")) {
+      if (url.includes("/auth/refresh") || isAuthMeEndpoint(url)) {
         return Promise.reject(error);
       }
 

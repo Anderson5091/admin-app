@@ -5,11 +5,10 @@ import Modal from "./ui/Modal";
 export default function SessionExpiredModal() {
   const navigate = useNavigate();
   const sessionExpired = useAuthStore((s) => s.sessionExpired);
-  const setSessionExpired = useAuthStore((s) => s.setSessionExpired);
   const logout = useAuthStore((s) => s.logout);
 
   const handleClose = () => {
-    setSessionExpired(false);
+    logout();
     navigate("/login");
   };
 

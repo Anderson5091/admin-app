@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { api } from "../../api/client";
 import { getToken, setToken, clearToken, setRefreshToken, clearRefreshToken } from "../../utils/token";
+import { resetInterceptorState } from "../../api/interceptors";
 import type { AdminProfile, AdminRole } from "./admin.types";
 
 function mapAgentTypeToRole(type: string): AdminRole {
@@ -33,7 +34,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { data } = await api.post("/admin/auth/login", { email, password });
       setToken(data.token);
       if (data.refreshToken) setRefreshToken(data.refreshToken);
-      set({ profile: data.user, isAuthenticated: true, loading: false });
+      set({ profile: data.user, isAuthenticated: true, loading: false, sessionExpired: false });
       return true;
     } catch {
       try {
@@ -50,6 +51,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           },
           isAuthenticated: true,
           loading: false,
+          sessionExpired: false,
         });
         return true;
       } catch (err: any) {
@@ -63,7 +65,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     clearToken();
     clearRefreshToken();
-    set({ profile: null, isAuthenticated: false, sessionExpired: false });
+    resetInterceptorState();
+    set({
+      profile: null,
+      isAuthenticated: false,
+      sessionExpired: false,
+      loading: false,
+      error: "",
+    });
   },
 
   setSessionExpired: (value: boolean) => {
@@ -78,7 +87,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ profile: data, isAuthenticated: true });
       return;
     } catch {
-      /* try agent */
+      /* admin /auth/me failed — clear any false sessionExpired trigger from interceptor */
+      set({ sessionExpired: false });
     }
     try {
       const { data } = await api.get("/agent/auth/me");
@@ -91,6 +101,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           createdAt: data.createdAt || "",
         },
         isAuthenticated: true,
+        sessionExpired: false,
       });
     } catch {
       clearToken();
