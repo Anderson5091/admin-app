@@ -105,13 +105,13 @@ export const AgentApi = {
     return data;
   },
 
-  async swapFunds(agentId: string, amount: number, direction: "TO_LEDGER" | "TO_WALLET"): Promise<{ swappedAmount: number; walletBalance: number; ledgerBalance: number }> {
-    const { data } = await api.post(`/agent/${agentId}/swap`, { amount, direction });
+  async swapFunds(agentId: string, amount: number, direction: "TO_LEDGER" | "TO_WALLET", walletType?: string): Promise<{ swappedAmount: number; walletBalance: number; ledgerBalance: number }> {
+    const { data } = await api.post(`/agent/${agentId}/swap`, { amount, direction, walletType });
     return data;
   },
 
-  async walletWithdraw(agentId: string, amount: number): Promise<{ success: boolean; message: string }> {
-    const { data } = await api.post(`/agent/${agentId}/withdraw-wallet`, { amount });
+  async walletWithdraw(agentId: string, amount: number, walletType?: string): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post(`/agent/${agentId}/withdraw-wallet`, { amount, walletType });
     return data;
   },
 };

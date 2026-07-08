@@ -38,6 +38,7 @@ export interface AgentDetail {
   totalRewards: number;
   ledgerBalance: number;
   walletBalance: number | null;
+  walletBalances?: { walletType: string; balance: number }[];
   todayVolume: number;
   todayCommission: number;
   todayTxCount: number;
