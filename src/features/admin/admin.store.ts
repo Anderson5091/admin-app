@@ -63,6 +63,7 @@ interface AdminState {
   createAgent: (data: { email: string; password: string; fullName?: string; phone?: string; type: string }) => Promise<void>;
   fetchAgentDetail: (agentId: string) => Promise<void>;
   toggleAgentStatus: (agentId: string) => Promise<void>;
+  deleteAgent: (agentId: string) => Promise<void>;
   fetchAgentKpi: (agentId: string, period?: string) => Promise<void>;
   agentAddBalance: (payload: AddBalancePayload) => Promise<void>;
   clearAgentActionResult: () => void;
@@ -379,6 +380,14 @@ export const useAdminStore = create<AdminState>((set) => ({
       agents: state.agents.map((a) =>
         a.id === agentId ? { ...a, status: a.status === "ACTIVE" ? "SUSPENDED" as const : "ACTIVE" as const } : a
       ),
+    }));
+  },
+
+  deleteAgent: async (agentId: string) => {
+    await AdminApi.deleteAgent(agentId);
+    set((state) => ({
+      agents: state.agents.filter((a) => a.id !== agentId),
+      agentDetail: state.agentDetail?.id === agentId ? null : state.agentDetail,
     }));
   },
 

@@ -4,7 +4,7 @@ import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, Check, IdCard, AlertCircle } from "lucide-react";
+import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle, Camera, Lock, ArrowDownFromLine, ArrowUpFromLine, ArrowLeftRight, Copy, IdCard, AlertCircle } from "lucide-react";
 import Modal from "../../components/ui/Modal";
 import Button from "../../components/ui/Button";
 import type { AgentDetail } from "../../features/admin/admin.types";
@@ -34,7 +34,6 @@ export default function AgentDashboard() {
   const [swapSuccess, setSwapSuccess] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
-  const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const loadDashboard = async () => {
     if (!profile?.id) return;
     setLoading(true);
@@ -181,31 +180,36 @@ export default function AgentDashboard() {
           </div>
           {agentDetail?.wallets && agentDetail.wallets.length > 0 ? (
             <div className="space-y-3">
-              {agentDetail.wallets.map((w) => (
-                <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="purple">{w.walletType}</Badge>
-                    <span className="text-xs text-text-subtle">{w.network}</span>
+              {agentDetail.wallets.map((w) => {
+                const networks = w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network;
+                return (
+                  <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="purple">{w.walletType}</Badge>
+                      <span className="text-xs text-text-subtle">{networks}</span>
+                    </div>
+                    <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
                   </div>
-                  <p className="text-lg font-bold text-text-primary mb-2">{w.balance.toLocaleString()} USDT</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button variant="success" size="sm" onClick={() => setShowDepositModal(true)}>
-                      <ArrowDownFromLine size={12} className="mr-1" /> Deposit
-                    </Button>
-                    <Button variant="danger" size="sm" onClick={() => setShowWithdrawModal(true)}>
-                      <ArrowUpFromLine size={12} className="mr-1" /> Withdraw
-                    </Button>
-                    {(isPartner || profile?.role === "AGENT_INTERNAL") && (
-                      <Button variant="ghost" className="!text-warning !bg-warning-dim !border-warning/30 border" size="sm" onClick={() => setShowSwapModal(true)}>
-                        <ArrowLeftRight size={12} className="mr-1" /> Swap
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="text-text-subtle text-sm py-8 text-center">No wallets assigned</p>
+          )}
+          {agentDetail?.wallets && agentDetail.wallets.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              <Button variant="success" size="sm" onClick={() => setShowDepositModal(true)}>
+                <ArrowDownFromLine size={12} className="mr-1" /> Deposit
+              </Button>
+              <Button variant="danger" size="sm" onClick={() => setShowWithdrawModal(true)}>
+                <ArrowUpFromLine size={12} className="mr-1" /> Withdraw
+              </Button>
+              {(isPartner || profile?.role === "AGENT_INTERNAL") && (
+                <Button variant="ghost" className="!text-warning !bg-warning-dim !border-warning/30 border" size="sm" onClick={() => setShowSwapModal(true)}>
+                  <ArrowLeftRight size={12} className="mr-1" /> Swap
+                </Button>
+              )}
+            </div>
           )}
         </Card>
 
@@ -257,7 +261,7 @@ export default function AgentDashboard() {
                       <>
                         <p className="text-sm font-mono text-text-primary break-all">{addr}</p>
                         <button
-                          onClick={() => { navigator.clipboard.writeText(addr); setWalletAddressCopied(true); setTimeout(() => setWalletAddressCopied(false), 1500); }}
+                          onClick={() => navigator.clipboard.writeText(addr)}
                           className="flex items-center gap-1 text-xs text-primary hover:opacity-80 transition-colors mt-1"
                         >
                           <Copy size={12} /> Copy Address
@@ -294,7 +298,7 @@ export default function AgentDashboard() {
               >
                 {(agentDetail?.wallets || []).map((w) => (
                   <option key={w.walletType} value={w.walletType}>
-                    {w.walletType} ({w.network}) — {w.balance} USDT
+                    {w.walletType} ({w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network}) — {w.balance} USDT
                   </option>
                 ))}
               </select>
@@ -380,7 +384,7 @@ export default function AgentDashboard() {
               >
                 {(agentDetail?.wallets || []).map((w) => (
                   <option key={w.walletType} value={w.walletType}>
-                    {w.walletType} ({w.network}) — {w.balance} USDT
+                    {w.walletType} ({w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network}) — {w.balance} USDT
                   </option>
                 ))}
               </select>

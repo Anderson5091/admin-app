@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAdminStore } from "../../features/admin/admin.store";
+import { useAuthStore } from "../../features/admin/auth.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import {
   ArrowLeft, DollarSign, Activity,
-  Wallet, Clock, BarChart3, HandCoins, RefreshCw, Copy, Check,
+  Wallet, Clock, BarChart3, HandCoins, RefreshCw, Copy, Check, Trash2,
 } from "lucide-react";
 
 export default function AgentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { agentDetail, agentKpi, fetchAgentDetail, fetchAgentKpi, toggleAgentStatus } = useAdminStore();
+  const profile = useAuthStore((s) => s.profile);
+  const { agentDetail, agentKpi, fetchAgentDetail, fetchAgentKpi, toggleAgentStatus, deleteAgent } = useAdminStore();
   const [kpiPeriod, setKpiPeriod] = useState("DAILY");
   const [copiedWalletId, setCopiedWalletId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -32,6 +35,7 @@ export default function AgentDetail() {
 
   const a = agentDetail;
   const isPartner = a.type === "PARTNER";
+  const canDelete = (profile?.role === "SUPER_ADMIN" || profile?.role === "ADMIN") && a.status === "SUSPENDED";
 
   return (
     <div className="space-y-6">
@@ -67,6 +71,25 @@ export default function AgentDetail() {
           >
             {a.status === "ACTIVE" ? "Suspend" : "Activate"}
           </button>
+          {canDelete && (
+            <button
+              onClick={async () => {
+                if (!confirm(`Permanently delete ${isPartner ? "partner" : "agent"} "${a.fullName || a.email}"? This cannot be undone.`)) return;
+                setDeleting(true);
+                try {
+                  await deleteAgent(id!);
+                  navigate("/agents");
+                } catch {
+                  setDeleting(false);
+                }
+              }}
+              disabled={deleting}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-danger-dim text-danger hover:bg-danger/20 disabled:opacity-50 flex items-center gap-1"
+            >
+              <Trash2 size={14} />
+              {deleting ? "Deleting..." : `Delete ${isPartner ? "Partner" : "Agent"}`}
+            </button>
+          )}
         </div>
       </div>
 
@@ -143,7 +166,7 @@ export default function AgentDetail() {
                     <td className="py-2 pr-4">
                       <Badge variant="purple">{w.walletType}</Badge>
                     </td>
-                    <td className="py-2 pr-4 text-text-subtle">{w.network}</td>
+                    <td className="py-2 pr-4 text-text-subtle">{w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network}</td>
                     <td className="py-2 pr-4">
                       {w.address ? (
                         <button

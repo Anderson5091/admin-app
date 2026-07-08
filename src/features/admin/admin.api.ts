@@ -152,6 +152,11 @@ export const AdminApi = {
     await api.post(`/agent/${agentId}/toggle-status`);
   },
 
+  async deleteAgent(agentId: string): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post(`/agent/${agentId}/delete`);
+    return data;
+  },
+
   async getAgentKpi(agentId: string, period?: string): Promise<AgentKpiItem[]> {
     const params = period ? `?period=${period}` : "";
     const { data } = await api.get(`/agent/kpi/${agentId}/${params}`);
