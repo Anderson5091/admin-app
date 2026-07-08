@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAdminStore } from "../../features/admin/admin.store";
+import { useAuthStore } from "../../features/admin/auth.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Plus, UserCog, DollarSign, BarChart3, X, ExternalLink, HandCoins } from "lucide-react";
+import { Plus, UserCog, DollarSign, BarChart3, X, ExternalLink, HandCoins, Trash2 } from "lucide-react";
 
 const typeColors: Record<string, string> = {
   PARTNER: "text-purple-400 bg-purple-900/30 border-purple-700/30",
@@ -11,7 +12,8 @@ const typeColors: Record<string, string> = {
 };
 
 export default function Agents() {
-  const { agents, fetchAgents, createAgent, toggleAgentStatus } = useAdminStore();
+  const { agents, fetchAgents, createAgent, toggleAgentStatus, deleteAgent } = useAdminStore();
+  const profile = useAuthStore((s) => s.profile);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "", fullName: "", phone: "", type: "PARTNER" });
 
@@ -165,6 +167,18 @@ export default function Agents() {
                 >
                   {agent.status === "ACTIVE" ? "Suspend" : "Activate"}
                 </button>
+                {(profile?.role === "SUPER_ADMIN" || profile?.role === "ADMIN") && agent.status === "SUSPENDED" && (
+                  <button
+                    onClick={async () => {
+                      if (!confirm(`Permanently delete ${agent.type === "PARTNER" ? "partner" : "agent"} "${agent.fullName || agent.email}"? This cannot be undone.`)) return;
+                      await deleteAgent(agent.id);
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-danger-dim text-danger hover:bg-danger/20 flex items-center gap-1"
+                  >
+                    <Trash2 size={14} />
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           </Card>

@@ -380,6 +380,9 @@ export const useAdminStore = create<AdminState>((set) => ({
       agents: state.agents.map((a) =>
         a.id === agentId ? { ...a, status: a.status === "ACTIVE" ? "SUSPENDED" as const : "ACTIVE" as const } : a
       ),
+      agentDetail: state.agentDetail?.id === agentId
+        ? { ...state.agentDetail, status: state.agentDetail.status === "ACTIVE" ? "SUSPENDED" as const : "ACTIVE" as const }
+        : state.agentDetail,
     }));
   },
 
