@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, Clock, FileText, Menu, DollarSign } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, Clock, FileText, Menu, DollarSign, HandCoins } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -27,6 +27,7 @@ const navIconMap: Record<string, any> = {
   "/agent/transfer": ArrowRight,
   "/agent/topup": ArrowUpFromLine,
   "/agent/reconciliation": FileText,
+  "/agent/cash-settlement": HandCoins,
   "/agent/activity": Activity,
   "/transfers": ArrowLeftRight,
   "/audit": ScrollText,
@@ -54,6 +55,7 @@ const navLabelMap: Record<string, string> = {
   "/agent/transfer": "Cash Transfer",
   "/agent/topup": "Top Up Agent",
   "/agent/reconciliation": "Reconciliation",
+  "/agent/cash-settlement": "Cash & Settlement",
   "/agent/activity": "Activity",
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
@@ -68,7 +70,7 @@ const NAV_SECTIONS = [
   { label: "Compliance", paths: ["/cases", "/fraud", "/audit"] },
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },
-  { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payout", "/agent/transfer", "/agent/topup", "/agent/reconciliation"] },
+  { label: "Agent Operations", paths: ["/agent/deposit", "/agent/withdraw", "/agent/payout", "/agent/transfer", "/agent/topup", "/agent/reconciliation", "/agent/cash-settlement"] },
 
 ];
 

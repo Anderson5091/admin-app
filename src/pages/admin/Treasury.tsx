@@ -15,6 +15,12 @@ const walletTypeBg: Record<string, string> = {
   COLD: "bg-secondary-dim border-l-secondary",
 };
 
+const walletTypeBtn: Record<string, { active: string; inactive: string }> = {
+  HOT: { active: "bg-danger text-white border-danger", inactive: "bg-card-alt text-text-secondary border-border hover:border-danger/50 hover:text-danger" },
+  WARM: { active: "bg-warning text-white border-warning", inactive: "bg-card-alt text-text-secondary border-border hover:border-warning/50 hover:text-warning" },
+  COLD: { active: "bg-secondary text-white border-secondary", inactive: "bg-card-alt text-text-secondary border-border hover:border-secondary/50 hover:text-secondary" },
+};
+
 const statusBadge: Record<string, string> = {
   PENDING: "bg-warning-dim text-warning border-warning/30",
   AWAITING_PAYMENT: "bg-warning-dim text-warning border-warning/30",
@@ -458,14 +464,12 @@ export default function Treasury() {
               <div className="mb-2">
                 <p className="text-[10px] text-text-subtle mb-1">Destination Wallet</p>
                 <div className="flex gap-1">
-                  {["HOT", "WARM", "COLD"].map((t) => (
+                  {(["HOT", "WARM", "COLD"] as const).map((t) => (
                     <button
                       key={t}
                       onClick={() => setOnrampDestType(t)}
                       className={`flex-1 px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-all ${
-                        onrampDestType === t
-                          ? "bg-primary text-white border-primary"
-                          : "bg-card-alt text-text-secondary border-border hover:border-primary/50"
+                        onrampDestType === t ? walletTypeBtn[t].active : walletTypeBtn[t].inactive
                       }`}
                     >
                       {t}
@@ -539,14 +543,12 @@ export default function Treasury() {
               <div>
                 <p className="text-[10px] text-text-subtle mb-1">Destination Wallet</p>
                 <div className="flex gap-1">
-                  {["HOT", "WARM", "COLD"].map((t) => (
+                  {(["HOT", "WARM", "COLD"] as const).map((t) => (
                     <button
                       key={t}
                       onClick={() => setCardDestType(t)}
                       className={`flex-1 px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-all ${
-                        cardDestType === t
-                          ? "bg-primary text-white border-primary"
-                          : "bg-card-alt text-text-secondary border-border hover:border-primary/50"
+                        cardDestType === t ? walletTypeBtn[t].active : walletTypeBtn[t].inactive
                       }`}
                     >
                       {t}
@@ -610,14 +612,12 @@ export default function Treasury() {
               <div>
                 <p className="text-[10px] text-text-subtle mb-1">Source Wallet</p>
                 <div className="flex gap-1">
-                  {["HOT", "WARM", "COLD"].map((t) => (
+                  {(["HOT", "WARM", "COLD"] as const).map((t) => (
                     <button
                       key={t}
                       onClick={() => setOfframpSourceType(t)}
                       className={`flex-1 px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-all ${
-                        offrampSourceType === t
-                          ? "bg-danger text-white border-danger"
-                          : "bg-card-alt text-text-secondary border-border hover:border-danger/50"
+                        offrampSourceType === t ? walletTypeBtn[t].active : walletTypeBtn[t].inactive
                       }`}
                     >
                       {t}

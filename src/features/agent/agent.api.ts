@@ -114,4 +114,24 @@ export const AgentApi = {
     const { data } = await api.post(`/agent/${agentId}/withdraw-wallet`, { amount, walletType });
     return data;
   },
+
+  async requestCash(agentId: string, payload: { amount: number; notes?: string }): Promise<any> {
+    const { data } = await api.post(`/agent/${agentId}/request-cash`, payload);
+    return data;
+  },
+
+  async getCashRequests(agentId: string): Promise<any[]> {
+    const { data } = await api.get(`/agent/${agentId}/cash-requests`);
+    return data;
+  },
+
+  async submitSettlement(agentId: string, payload: { amount: number; bankName: string; referenceNumber: string; cashRequestId?: string; notes?: string }): Promise<any> {
+    const { data } = await api.post(`/agent/${agentId}/submit-settlement`, payload);
+    return data;
+  },
+
+  async getSettlements(agentId: string): Promise<any[]> {
+    const { data } = await api.get(`/agent/${agentId}/settlements`);
+    return data;
+  },
 };
