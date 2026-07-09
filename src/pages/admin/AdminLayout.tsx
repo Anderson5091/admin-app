@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, Clock, FileText, Menu, DollarSign, HandCoins } from "lucide-react";
+import { LayoutDashboard, Users, Shield, Scale, AlertTriangle, Bell, ChevronLeft, LogOut, Activity, Radio, UserCog, ShieldCheck, Handshake, Warehouse, Gavel, Wallet, Send, ArrowUpFromLine, ArrowLeftRight, ScrollText, ExternalLink, ArrowRight, Clock, FileText, Menu, DollarSign, HandCoins, Banknote } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
@@ -28,6 +28,7 @@ const navIconMap: Record<string, any> = {
   "/agent/topup": ArrowUpFromLine,
   "/agent/reconciliation": FileText,
   "/agent/cash-settlement": HandCoins,
+  "/cash-requests": Banknote,
   "/agent/activity": Activity,
   "/transfers": ArrowLeftRight,
   "/audit": ScrollText,
@@ -56,6 +57,7 @@ const navLabelMap: Record<string, string> = {
   "/agent/topup": "Top Up Agent",
   "/agent/reconciliation": "Reconciliation",
   "/agent/cash-settlement": "Cash & Settlement",
+  "/cash-requests": "Cash & Settlements",
   "/agent/activity": "Activity",
   "/transfers": "Transfers",
   "/audit": "Audit Logs",
@@ -66,7 +68,7 @@ const navLabelMap: Record<string, string> = {
 const NAV_SECTIONS = [
   { label: "Monitor", paths: ["/", "/notifications", "/live", "/system", "/agent/activity", "/pending-transfers"] },
   { label: "Administration", paths: ["/admins"] },
-  { label: "Finance", paths: ["/treasury", "/payouts", "/transfers", "/finance/fees"] },
+  { label: "Finance", paths: ["/treasury", "/payouts", "/transfers", "/finance/fees", "/cash-requests"] },
   { label: "Compliance", paths: ["/cases", "/fraud", "/audit"] },
   { label: "Users", paths: ["/users", "/kyc"] },
   { label: "Agents & Partners", paths: ["/agents", "/partners"] },

@@ -7,7 +7,7 @@ import Card from "../../components/ui/Card";
 import type { SystemRevenueData, AgentRevenueData } from "../../features/admin/admin.types";
 import {
   Users, ArrowUpDown, Shield, AlertTriangle, Scale, Ban, AlertCircle, Clock, Radio, UserCog, Handshake,
-  TrendingUp, BarChart3, Search, X
+  TrendingUp, BarChart3, Search, X, Banknote, Landmark
 } from "lucide-react";
 
 const statusColors: Record<string, string> = {
@@ -194,6 +194,11 @@ export default function Dashboard() {
           { label: "Fraud Alerts", value: d.fraudAlerts ?? 0, icon: Ban, color: "text-danger bg-danger-dim" },
           { label: "Local Agents", value: (d.internalAgents ?? 0).toLocaleString(), icon: UserCog, color: "text-primary bg-primary-dim" },
           { label: "External Agents", value: (d.partnerAgents ?? 0).toLocaleString(), icon: Handshake, color: "text-purple-400 bg-purple-900/30" },
+          { label: "Pending Cash Requests", value: d.pendingCashRequests ?? 0, icon: Banknote, color: "text-warning bg-warning-dim" },
+          { label: "Pending Settlements", value: d.pendingSettlements ?? 0, icon: Landmark, color: "text-secondary bg-secondary-dim" },
+          { label: "Pending Transfers", value: d.pendingTransfers ?? 0, icon: Clock, color: "text-warning bg-warning-dim" },
+          { label: "Pending Reconciliation", value: d.pendingReconciliation ?? 0, icon: Scale, color: "text-warning bg-warning-dim" },
+          { label: "Discrepancy Reconciliation", value: d.discrepancyReconciliation ?? 0, icon: AlertTriangle, color: "text-danger bg-danger-dim" },
         ].map((kpi) => (
           <Card key={kpi.label} className="p-3 sm:p-4">
             <div className="flex items-center gap-2 sm:gap-3">

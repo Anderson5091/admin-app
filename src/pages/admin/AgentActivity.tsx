@@ -30,7 +30,7 @@ export default function AgentActivity() {
 
   const filtered = typeFilter === "ALL" ? transactions : transactions.filter((tx) => tx.type === typeFilter);
 
-  const typeOptions = ["ALL", "ADD_BALANCE", "WITHDRAW", "TRANSFER", "PAYOUT", "TOPUP", "COMMISSION_WITHDRAW"];
+  const typeOptions = ["ALL", "ADD_BALANCE", "WITHDRAW", "TRANSFER", "PAYOUT", "TOPUP", "COMMISSION_WITHDRAW", "CASH_REQUEST", "SETTLEMENT"];
 
   return (
     <div className="space-y-6">
@@ -93,17 +93,17 @@ export default function AgentActivity() {
 {filtered.map((tx) => (
                      <tr key={tx.id} className="border-b border-border last:border-0 hover:bg-card-alt transition-colors">
                        <td className="py-3 pr-4">
-                         <Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : "info"}>
-                           {tx.type.replace(/_/g, " ")}
-                         </Badge>
+<Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : tx.type === "CASH_REQUEST" ? "warning" : tx.type === "SETTLEMENT" ? "info" : "info"}>
+                            {tx.type === "CASH_REQUEST" ? "Cash Request" : tx.type === "SETTLEMENT" ? "Settlement" : tx.type.replace(/_/g, " ")}
+                          </Badge>
                        </td>
                        <td className="py-3 pr-4 text-right text-text-primary">${tx.amount.toLocaleString()}</td>
                        <td className="py-3 pr-4 text-right text-warning">${tx.commission.toLocaleString()}</td>
                        <td className="py-3 pr-4 text-right text-text-primary">${tx.netAmount.toLocaleString()}</td>
                        <td className="py-3 pr-4 text-right text-text-secondary font-mono text-[10px]">{tx.userRef?.slice(0, 12) || "—"}</td>
 <td className="py-3 pr-4 text-right">
-                          <Badge variant={tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
-                            {tx.status}
+                          <Badge variant={tx.type === "CASH_REQUEST" ? (tx.status === "PENDING" ? "warning" : tx.status === "PROCESSING" ? "warning" : tx.status === "DELIVERED" ? "success" : tx.status === "REJECTED" ? "danger" : "info") : tx.type === "SETTLEMENT" ? (tx.status === "PENDING" ? "warning" : tx.status === "APPROVED" ? "success" : tx.status === "REJECTED" ? "danger" : "info") : tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
+                            {tx.type === "CASH_REQUEST" ? (tx.status === "PENDING" ? "Submitted" : tx.status === "PROCESSING" ? "Processing" : tx.status === "DELIVERED" ? "Delivered" : tx.status === "REJECTED" ? "Rejected" : tx.status) : tx.type === "SETTLEMENT" ? (tx.status === "PENDING" ? "Pending" : tx.status === "APPROVED" ? "Approved" : tx.status === "REJECTED" ? "Rejected" : tx.status) : tx.status}
                           </Badge>
                         </td>
                         <td className="py-3 text-right text-text-subtle whitespace-nowrap">{new Date(tx.createdAt).toLocaleString()}</td>
@@ -116,13 +116,13 @@ export default function AgentActivity() {
 <div className="sm:hidden space-y-2">
                {filtered.map((tx) => (
                  <div key={tx.id} className="bg-card-alt rounded-lg p-3 border border-border">
-                   <div className="flex items-center justify-between mb-2">
-                     <Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : "info"}>
-                       {tx.type.replace(/_/g, " ")}
-                     </Badge>
-                     <Badge variant={tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
-                       {tx.status}
-                     </Badge>
+<div className="flex items-center justify-between mb-2">
+                      <Badge variant={tx.type === "COMMISSION" || tx.type === "COMMISSION_WITHDRAW" ? "warning" : tx.type === "ADD_BALANCE" || tx.type === "TOPUP" ? "success" : tx.type === "WITHDRAW" || tx.type === "PAYOUT" ? "danger" : tx.type === "CASH_REQUEST" ? "warning" : tx.type === "SETTLEMENT" ? "info" : "info"}>
+                        {tx.type === "CASH_REQUEST" ? "Cash Request" : tx.type === "SETTLEMENT" ? "Settlement" : tx.type.replace(/_/g, " ")}
+                      </Badge>
+                      <Badge variant={tx.type === "CASH_REQUEST" ? (tx.status === "PENDING" ? "warning" : tx.status === "PROCESSING" ? "warning" : tx.status === "DELIVERED" ? "success" : tx.status === "REJECTED" ? "danger" : "info") : tx.type === "SETTLEMENT" ? (tx.status === "PENDING" ? "warning" : tx.status === "APPROVED" ? "success" : tx.status === "REJECTED" ? "danger" : "info") : tx.status === "COMPLETED" ? "success" : tx.status === "PENDING" ? "warning" : "danger"}>
+                        {tx.type === "CASH_REQUEST" ? (tx.status === "PENDING" ? "Submitted" : tx.status === "PROCESSING" ? "Processing" : tx.status === "DELIVERED" ? "Delivered" : tx.status === "REJECTED" ? "Rejected" : tx.status) : tx.type === "SETTLEMENT" ? (tx.status === "PENDING" ? "Pending" : tx.status === "APPROVED" ? "Approved" : tx.status === "REJECTED" ? "Rejected" : tx.status) : tx.status}
+                      </Badge>
                    </div>
                    <div className="flex items-center justify-between text-sm">
                      <span className="text-text-primary font-bold">${tx.amount.toLocaleString()}</span>

@@ -281,4 +281,26 @@ export const AdminApi = {
     const { data } = await api.get("/admin/revenue/agents", { params });
     return data;
   },
+
+  // --- Cash Request & Settlement Admin ---
+
+  async getAllCashRequests(): Promise<any[]> {
+    const { data } = await api.get("/admin/cash-requests");
+    return data;
+  },
+
+  async processCashRequest(id: string, status: string): Promise<any> {
+    const { data } = await api.post(`/admin/cash-requests/${id}/process`, { status });
+    return data;
+  },
+
+  async getAllSettlements(): Promise<any[]> {
+    const { data } = await api.get("/admin/settlements");
+    return data;
+  },
+
+  async processSettlement(id: string, status: string): Promise<any> {
+    const { data } = await api.post(`/admin/settlements/${id}/process`, { status });
+    return data;
+  },
 };

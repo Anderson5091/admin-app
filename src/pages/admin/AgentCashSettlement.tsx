@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
-import { HandCoins, Landmark, Loader2, RefreshCw, CheckCircle2, XCircle, Clock, Plus, Banknote } from "lucide-react";
+import RequestCashModal from "../../components/modals/RequestCashModal";
+import SubmitSettlementModal from "../../components/modals/SubmitSettlementModal";
+import { HandCoins, Landmark, Loader2, RefreshCw, XCircle, Clock, Plus, Banknote } from "lucide-react";
 
 const statusBadge: Record<string, string> = {
   PENDING: "bg-warning-dim text-warning border-warning/30",
@@ -17,18 +19,12 @@ export default function AgentCashSettlement() {
   const agentId = profile?.agent?.id || "";
 
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [cashRequests, setCashRequests] = useState<any[]>([]);
   const [settlements, setSettlements] = useState<any[]>([]);
   const [message, setMessage] = useState("");
 
-  const [crAmount, setCrAmount] = useState("");
-  const [crNotes, setCrNotes] = useState("");
-
-  const [stAmount, setStAmount] = useState("");
-  const [stBankName, setStBankName] = useState("");
-  const [stRefNum, setStRefNum] = useState("");
-  const [stCashRequestId, setStCashRequestId] = useState("");
+  const [showRequestCash, setShowRequestCash] = useState(false);
+  const [showSubmitSettlement, setShowSubmitSettlement] = useState(false);
 
   const fetchData = async () => {
     if (!agentId) return;
@@ -48,43 +44,8 @@ export default function AgentCashSettlement() {
 
   useEffect(() => { fetchData(); }, [agentId]);
 
-  const handleRequestCash = async () => {
-    if (!crAmount || !agentId) return;
-    setSubmitting(true);
-    setMessage("");
-    try {
-      await AgentApi.requestCash(agentId, { amount: parseFloat(crAmount), notes: crNotes || undefined });
-      setMessage(`Cash request for $${parseFloat(crAmount).toLocaleString()} submitted`);
-      setCrAmount("");
-      setCrNotes("");
-      fetchData();
-    } catch (err: any) {
-      setMessage(err?.response?.data?.error || err?.message || "Request failed");
-    }
-    setSubmitting(false);
-  };
-
-  const handleSubmitSettlement = async () => {
-    if (!stAmount || !stBankName || !stRefNum || !agentId) return;
-    setSubmitting(true);
-    setMessage("");
-    try {
-      await AgentApi.submitSettlement(agentId, {
-        amount: parseFloat(stAmount),
-        bankName: stBankName,
-        referenceNumber: stRefNum,
-        cashRequestId: stCashRequestId || undefined,
-      });
-      setMessage(`Settlement of $${parseFloat(stAmount).toLocaleString()} submitted for verification`);
-      setStAmount("");
-      setStBankName("");
-      setStRefNum("");
-      setStCashRequestId("");
-      fetchData();
-    } catch (err: any) {
-      setMessage(err?.response?.data?.error || err?.message || "Submission failed");
-    }
-    setSubmitting(false);
+  const handleModalSuccess = () => {
+    fetchData();
   };
 
   if (!agentId) {
@@ -129,30 +90,13 @@ export default function AgentCashSettlement() {
             <h2 className="text-lg font-bold text-text-primary">Request Cash</h2>
           </div>
           <p className="text-xs text-text-secondary mb-4">Request cash delivery from QuickSend to fulfill payouts and agent operations.</p>
-          <div className="space-y-3">
-            <input
-              type="number"
-              placeholder="Amount (USD)"
-              value={crAmount}
-              onChange={(e) => setCrAmount(e.target.value)}
-              className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-            />
-            <textarea
-              placeholder="Notes / reason (optional)"
-              value={crNotes}
-              onChange={(e) => setCrNotes(e.target.value)}
-              rows={2}
-              className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary resize-none"
-            />
-            <button
-              onClick={handleRequestCash}
-              disabled={!crAmount || submitting}
-              className="w-full px-3 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
-            >
-              {submitting ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-              {submitting ? "Submitting..." : "Request Cash"}
-            </button>
-          </div>
+          <button
+            onClick={() => setShowRequestCash(true)}
+            className="w-full px-3 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all flex items-center justify-center gap-1.5"
+          >
+            <Plus size={14} />
+            Request Cash
+          </button>
 
           {cashRequests.length > 0 && (
             <div className="border-t border-border mt-4 pt-4">
@@ -179,51 +123,13 @@ export default function AgentCashSettlement() {
             <h2 className="text-lg font-bold text-text-primary">Submit Bank Settlement</h2>
           </div>
           <p className="text-xs text-text-secondary mb-4">Submit bank deposit proof for verification. This reconciles your cash position with QuickSend.</p>
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                placeholder="Amount (USD)"
-                value={stAmount}
-                onChange={(e) => setStAmount(e.target.value)}
-                className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-              />
-              <input
-                type="text"
-                placeholder="Bank name"
-                value={stBankName}
-                onChange={(e) => setStBankName(e.target.value)}
-                className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="Reference / transaction number"
-              value={stRefNum}
-              onChange={(e) => setStRefNum(e.target.value)}
-              className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-            />
-            {cashRequests.filter((cr: any) => cr.status === "PENDING").length > 0 && (
-              <select
-                value={stCashRequestId}
-                onChange={(e) => setStCashRequestId(e.target.value)}
-                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-              >
-                <option value="">Link to cash request (optional)</option>
-                {cashRequests.filter((cr: any) => cr.status === "PENDING").map((cr: any) => (
-                  <option key={cr.id} value={cr.id}>${Number(cr.amount).toLocaleString()} — {cr.id.slice(-8)}</option>
-                ))}
-              </select>
-            )}
-            <button
-              onClick={handleSubmitSettlement}
-              disabled={!stAmount || !stBankName || !stRefNum || submitting}
-              className="w-full px-3 py-2 rounded-lg bg-success text-white text-xs font-semibold hover:bg-success/90 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
-            >
-              {submitting ? <Loader2 size={14} className="animate-spin" /> : <HandCoins size={14} />}
-              {submitting ? "Submitting..." : "Submit Bank Settlement"}
-            </button>
-          </div>
+          <button
+            onClick={() => setShowSubmitSettlement(true)}
+            className="w-full px-3 py-2 rounded-lg bg-success text-white text-xs font-semibold hover:bg-success/90 transition-all flex items-center justify-center gap-1.5"
+          >
+            <HandCoins size={14} />
+            Submit Bank Settlement
+          </button>
 
           {settlements.length > 0 && (
             <div className="border-t border-border mt-4 pt-4">
@@ -281,6 +187,20 @@ export default function AgentCashSettlement() {
           </div>
         )}
       </Card>
+    <RequestCashModal
+        open={showRequestCash}
+        onClose={() => setShowRequestCash(false)}
+        agentId={agentId}
+        onSuccess={handleModalSuccess}
+      />
+
+      <SubmitSettlementModal
+        open={showSubmitSettlement}
+        onClose={() => setShowSubmitSettlement(false)}
+        agentId={agentId}
+        cashRequests={cashRequests}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 }

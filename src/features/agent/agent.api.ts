@@ -115,7 +115,7 @@ export const AgentApi = {
     return data;
   },
 
-  async requestCash(agentId: string, payload: { amount: number; notes?: string }): Promise<any> {
+  async requestCash(agentId: string, payload: { amount: number; destination?: string; bankName?: string; accountNumber?: string; country?: string; notes?: string }): Promise<any> {
     const { data } = await api.post(`/agent/${agentId}/request-cash`, payload);
     return data;
   },
@@ -125,7 +125,7 @@ export const AgentApi = {
     return data;
   },
 
-  async submitSettlement(agentId: string, payload: { amount: number; bankName: string; referenceNumber: string; cashRequestId?: string; notes?: string }): Promise<any> {
+  async submitSettlement(agentId: string, payload: { amount: number; bankName: string; referenceNumber: string; cashRequestId?: string; proofImage?: string; depositBankName?: string; depositAccountNumber?: string; depositAccountName?: string; depositCountry?: string; notes?: string }): Promise<any> {
     const { data } = await api.post(`/agent/${agentId}/submit-settlement`, payload);
     return data;
   },

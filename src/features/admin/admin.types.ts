@@ -116,6 +116,11 @@ export interface AdminDashboardData {
   totalAgents: number;
   partnerAgents: number;
   internalAgents: number;
+  pendingCashRequests: number;
+  pendingSettlements: number;
+  pendingTransfers: number;
+  pendingReconciliation: number;
+  discrepancyReconciliation: number;
   alerts: Alert[];
   recentActivity: ActivityItem[];
 }

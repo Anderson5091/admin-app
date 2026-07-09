@@ -27,6 +27,8 @@ interface AgentActionState {
     commissionPercent?: number;
     debitUserWallet?: boolean;
   }) => Promise<void>;
+  requestCash: (agentId: string, payload: { amount: number; notes?: string }) => Promise<void>;
+  submitSettlement: (agentId: string, payload: { amount: number; bankName: string; referenceNumber: string; cashRequestId?: string; notes?: string }) => Promise<void>;
   clearResult: () => void;
 }
 
@@ -115,6 +117,34 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Swap failed";
+      set({ loading: false, result: { success: false, message: msg } });
+    }
+  },
+
+  requestCash: async (agentId, payload) => {
+    set({ loading: true, result: null });
+    try {
+      const res = await AgentApi.requestCash(agentId, payload);
+      set({
+        loading: false,
+        result: { success: true, message: `Cash request submitted for $${payload.amount}`, reference: res.id },
+      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || "Cash request failed";
+      set({ loading: false, result: { success: false, message: msg } });
+    }
+  },
+
+  submitSettlement: async (agentId, payload) => {
+    set({ loading: true, result: null });
+    try {
+      const res = await AgentApi.submitSettlement(agentId, payload);
+      set({
+        loading: false,
+        result: { success: true, message: `Settlement submitted — $${payload.amount} to ${payload.bankName}`, reference: res.id },
+      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || "Settlement submission failed";
       set({ loading: false, result: { success: false, message: msg } });
     }
   },

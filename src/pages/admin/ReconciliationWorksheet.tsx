@@ -4,6 +4,8 @@ import { useAuthStore } from "../../features/admin/auth.store";
 import { useAgentStore } from "../../features/agent/agent.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
+import RequestCashModal from "../../components/modals/RequestCashModal";
+import SubmitSettlementModal from "../../components/modals/SubmitSettlementModal";
 import {
   ArrowLeft, DollarSign, Clock,
   RefreshCw,
@@ -45,6 +47,8 @@ export default function ReconciliationWorksheet() {
     loading: true,
     error: null
   });
+  const [showRequestCash, setShowRequestCash] = useState(false);
+  const [showSubmitSettlement, setShowSubmitSettlement] = useState(false);
 
   const loadWorksheetData = async () => {
     if (!profile?.id) return;
@@ -242,7 +246,10 @@ export default function ReconciliationWorksheet() {
               </div>
             </div>
             <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Request cash delivery from Quicksend</p>
-            <button className="mt-3 w-full bg-warning text-white py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+            <button
+              onClick={() => setShowRequestCash(true)}
+              className="mt-3 w-full bg-warning text-white py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
               Request Cash
             </button>
           </Card>
@@ -255,7 +262,10 @@ export default function ReconciliationWorksheet() {
               </div>
             </div>
             <p className="text-text-secondary text-[10px] sm:text-xs mt-1">Submit bank settlements for verification</p>
-            <button className="mt-3 w-full bg-card-alt border border-border text-text-primary py-2 rounded-lg text-sm font-semibold hover:bg-card transition-colors">
+            <button
+              onClick={() => setShowSubmitSettlement(true)}
+              className="mt-3 w-full bg-card-alt border border-border text-text-primary py-2 rounded-lg text-sm font-semibold hover:bg-card transition-colors"
+            >
               Submit Bank Settlements
             </button>
           </Card>
@@ -307,6 +317,18 @@ export default function ReconciliationWorksheet() {
           </div>
         </Card>
       </div>
+
+      <RequestCashModal
+        open={showRequestCash}
+        onClose={() => setShowRequestCash(false)}
+        agentId={profile!.id}
+      />
+
+      <SubmitSettlementModal
+        open={showSubmitSettlement}
+        onClose={() => setShowSubmitSettlement(false)}
+        agentId={profile!.id}
+      />
     </div>
   );
 }
