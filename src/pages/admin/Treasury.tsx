@@ -48,6 +48,9 @@ export default function Treasury() {
   const [cardChain, setCardChain] = useState("");
   const [cardAmount, setCardAmount] = useState("");
   const [cardEmail, setCardEmail] = useState("");
+  const [cardDestType, setCardDestType] = useState("HOT");
+  const [onrampDestType, setOnrampDestType] = useState("HOT");
+  const [offrampSourceType, setOfframpSourceType] = useState("HOT");
   const [bankName, setBankName] = useState("");
   const [pmId, setPmId] = useState("");
   const [acctSuffix, setAcctSuffix] = useState("");
@@ -94,7 +97,7 @@ export default function Treasury() {
 
   const handleCreateOfframp = async () => {
     if (!offrampChain || !offrampAmount) return;
-    await createTreasuryOfframpOrder({ chain: offrampChain, amount: parseFloat(offrampAmount) });
+    await createTreasuryOfframpOrder({ chain: offrampChain, amount: parseFloat(offrampAmount), sourceWalletType: offrampSourceType });
     setOfframpAmount("");
     fetchTreasuryOfframpOrders();
   };
@@ -105,6 +108,7 @@ export default function Treasury() {
       chain: onrampChain,
       fiatAmount: parseFloat(onrampAmount),
       memoCode: onrampMemo || undefined,
+      destinationWalletType: onrampDestType,
     });
     setOnrampAmount("");
     setOnrampMemo("");
@@ -113,7 +117,7 @@ export default function Treasury() {
 
   const handleCreateCardDeposit = async () => {
     if (!cardChain || !cardAmount) return;
-    await createTreasuryCardDeposit({ chain: cardChain, amount: parseFloat(cardAmount), receiptEmail: cardEmail || undefined });
+    await createTreasuryCardDeposit({ chain: cardChain, amount: parseFloat(cardAmount), receiptEmail: cardEmail || undefined, destinationWalletType: cardDestType });
   };
 
   const handleAddBankAccount = async () => {
@@ -445,6 +449,24 @@ export default function Treasury() {
                 onChange={(e) => setOnrampMemo(e.target.value)}
                 className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary mb-2"
               />
+              <div className="mb-2">
+                <p className="text-[10px] text-text-subtle mb-1">Destination Wallet</p>
+                <div className="flex gap-1">
+                  {["HOT", "WARM", "COLD"].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setOnrampDestType(t)}
+                      className={`flex-1 px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-all ${
+                        onrampDestType === t
+                          ? "bg-primary text-white border-primary"
+                          : "bg-card-alt text-text-secondary border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <button
                 onClick={handleCreateOnrampTransfer}
                 disabled={!onrampChain || !onrampAmount || treasuryRampLoading}
@@ -452,60 +474,6 @@ export default function Treasury() {
               >
                 {treasuryRampLoading ? "Recording..." : "Record Transfer"}
               </button>
-            </div>
-
-            {/* Deposit with Card */}
-            <div className="border-t border-border pt-3 mt-3">
-              <p className="text-xs font-semibold text-text-primary mb-2">Deposit with Card</p>
-              <div className="grid grid-cols-2 gap-2 mb-2">
-                <select
-                  value={cardChain}
-                  onChange={(e) => setCardChain(e.target.value)}
-                  className="col-span-2 sm:col-span-1 bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-                >
-                  <option value="">Select network</option>
-                  {tNetworks.map((n: string) => <option key={n} value={n}>{n}</option>)}
-                </select>
-                <input
-                  type="number"
-                  placeholder="Amount (USD)"
-                  value={cardAmount}
-                  onChange={(e) => setCardAmount(e.target.value)}
-                  className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-                />
-              </div>
-              <input
-                type="email"
-                placeholder="Receipt email (optional)"
-                value={cardEmail}
-                onChange={(e) => setCardEmail(e.target.value)}
-                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary mb-2"
-              />
-              <button
-                onClick={handleCreateCardDeposit}
-                disabled={!cardChain || !cardAmount || cardDepositLoading}
-                className="w-full px-3 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-all"
-              >
-                {cardDepositLoading ? "Creating Order..." : "Pay with Card"}
-              </button>
-              {treasuryCardDepositResult && (
-                <div className="mt-3 border border-primary-border bg-primary-dim rounded-lg p-3 space-y-2">
-                  <p className="text-xs font-semibold text-text-primary">Card Deposit Created</p>
-                  <p className="text-[11px] text-text-secondary font-mono break-all">Order ID: {treasuryCardDepositResult.orderId}</p>
-                  <p className="text-[11px] text-text-secondary font-mono break-all">Client Secret: {treasuryCardDepositResult.clientSecret}</p>
-                  <p className="text-[11px] text-text-secondary">Amount: ${treasuryCardDepositResult.amount} → {treasuryCardDepositResult.walletAddress?.slice(0, 6)}...{treasuryCardDepositResult.walletAddress?.slice(-4)}</p>
-                  <p className="text-[11px] text-text-secondary">Status: <span className="text-primary font-semibold">{treasuryCardDepositResult.status}</span></p>
-                  <a
-                    href={`https://staging.crossmint.com/checkout?clientSecret=${treasuryCardDepositResult.clientSecret}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline mt-1"
-                  >
-                    <ExternalLink size={12} />
-                    Open Checkout Page (Staging)
-                  </a>
-                </div>
-              )}
             </div>
 
             {treasuryOnrampTransfers.length > 0 && (
@@ -528,76 +496,175 @@ export default function Treasury() {
           </div>
         </Card>
 
-        {/* Withdraw to Bank (Offramp) */}
-        <Card>
-          <div className="flex items-center gap-2 mb-4">
-            <ArrowRightFromLine size={16} className="text-danger" />
-            <h2 className="text-lg font-bold text-text-primary">Withdraw to Bank</h2>
-          </div>
-
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-2">
-              <select
-                value={offrampChain}
-                onChange={(e) => setOfframpChain(e.target.value)}
-                className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-              >
-                <option value="">Select network</option>
-                {tNetworks.map((n: string) => <option key={n} value={n}>{n}</option>)}
-              </select>
-              <input
-                type="number"
-                placeholder="Amount (USDC)"
-                value={offrampAmount}
-                onChange={(e) => setOfframpAmount(e.target.value)}
-                className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-              />
+        {/* Right column: Card Deposit + Withdraw to Bank */}
+        <div className="space-y-6">
+          {/* Deposit with Card */}
+          <Card>
+            <div className="flex items-center gap-2 mb-4">
+              <ArrowLeftToLine size={16} className="text-success" />
+              <h2 className="text-lg font-bold text-text-primary">Deposit with Card</h2>
             </div>
-            <button
-              onClick={handleCreateOfframp}
-              disabled={!offrampChain || !offrampAmount || treasuryRampLoading}
-              className="w-full px-3 py-2 rounded-lg bg-danger text-white text-xs font-semibold hover:bg-danger/90 disabled:opacity-50 transition-all"
-            >
-              {treasuryRampLoading ? "Creating Order..." : "Create Offramp Order"}
-            </button>
 
-            {treasuryOfframpOrders.length > 0 && (
-              <div className="border-t border-border pt-3">
-                <p className="text-xs font-semibold text-text-primary mb-2">Offramp Orders</p>
-                <div className="space-y-1.5 max-h-60 overflow-y-auto">
-                  {treasuryOfframpOrders.map((o: { id: string; amount: number; chain: string; status: string; crossmintOrderId: string | null; txHash: string | null; failureReason: string | null; createdAt: string }) => (
-                    <div key={o.id} className="bg-card-alt border border-border rounded-lg p-2.5">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs text-text-primary font-medium">${o.amount.toLocaleString()}</span>
-                        <span className="text-[9px] text-text-subtle">{o.chain}</span>
-                        <span className={`ml-auto text-[9px] px-1.5 py-0.5 rounded-full border ${statusBadge[o.status] || ""}`}>
-                          {o.status}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[9px] text-text-subtle">
-                        {o.crossmintOrderId && <span>ID: {o.crossmintOrderId.slice(0, 12)}...</span>}
-                        {o.txHash && <span>Tx: {o.txHash.slice(0, 10)}...</span>}
-                        <span className="ml-auto">{new Date(o.createdAt).toLocaleDateString()}</span>
-                      </div>
-                      {o.failureReason && (
-                        <p className="text-[9px] text-danger mt-1">{o.failureReason}</p>
-                      )}
-                      {o.status === "AWAITING_PAYMENT" && (
-                        <button
-                          onClick={() => executeTreasuryOfframpOrder(o.id)}
-                          disabled={treasuryRampLoading}
-                          className="mt-1.5 text-[9px] px-2 py-1 rounded bg-primary-dim text-primary border border-primary-border hover:bg-primary/20 transition-all"
-                        >
-                          Execute
-                        </button>
-                      )}
-                    </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={cardChain}
+                  onChange={(e) => setCardChain(e.target.value)}
+                  className="col-span-2 sm:col-span-1 bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
+                >
+                  <option value="">Select network</option>
+                  {tNetworks.map((n: string) => <option key={n} value={n}>{n}</option>)}
+                </select>
+                <input
+                  type="number"
+                  placeholder="Amount (USD)"
+                  value={cardAmount}
+                  onChange={(e) => setCardAmount(e.target.value)}
+                  className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
+                />
+              </div>
+              <input
+                type="email"
+                placeholder="Receipt email (optional)"
+                value={cardEmail}
+                onChange={(e) => setCardEmail(e.target.value)}
+                className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
+              />
+              <div>
+                <p className="text-[10px] text-text-subtle mb-1">Destination Wallet</p>
+                <div className="flex gap-1">
+                  {["HOT", "WARM", "COLD"].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setCardDestType(t)}
+                      className={`flex-1 px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-all ${
+                        cardDestType === t
+                          ? "bg-primary text-white border-primary"
+                          : "bg-card-alt text-text-secondary border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {t}
+                    </button>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
-        </Card>
+              <button
+                onClick={handleCreateCardDeposit}
+                disabled={!cardChain || !cardAmount || cardDepositLoading}
+                className="w-full px-3 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-all"
+              >
+                {cardDepositLoading ? "Creating Order..." : "Pay with Card"}
+              </button>
+              {treasuryCardDepositResult && (
+                <div className="border border-primary-border bg-primary-dim rounded-lg p-3 space-y-2">
+                  <p className="text-xs font-semibold text-text-primary">Card Deposit Created</p>
+                  <p className="text-[11px] text-text-secondary font-mono break-all">Order ID: {treasuryCardDepositResult.orderId}</p>
+                  <p className="text-[11px] text-text-secondary font-mono break-all">Client Secret: {treasuryCardDepositResult.clientSecret}</p>
+                  <p className="text-[11px] text-text-secondary">Amount: ${treasuryCardDepositResult.amount} → {treasuryCardDepositResult.walletAddress?.slice(0, 6)}...{treasuryCardDepositResult.walletAddress?.slice(-4)}</p>
+                  <p className="text-[11px] text-text-secondary">Status: <span className="text-primary font-semibold">{treasuryCardDepositResult.status}</span></p>
+                  <a
+                    href={`https://staging.crossmint.com/checkout?clientSecret=${treasuryCardDepositResult.clientSecret}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline mt-1"
+                  >
+                    <ExternalLink size={12} />
+                    Open Checkout Page (Staging)
+                  </a>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Withdraw to Bank (Offramp) */}
+          <Card>
+            <div className="flex items-center gap-2 mb-4">
+              <ArrowRightFromLine size={16} className="text-danger" />
+              <h2 className="text-lg font-bold text-text-primary">Withdraw to Bank</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={offrampChain}
+                  onChange={(e) => setOfframpChain(e.target.value)}
+                  className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
+                >
+                  <option value="">Select network</option>
+                  {tNetworks.map((n: string) => <option key={n} value={n}>{n}</option>)}
+                </select>
+                <input
+                  type="number"
+                  placeholder="Amount (USDC)"
+                  value={offrampAmount}
+                  onChange={(e) => setOfframpAmount(e.target.value)}
+                  className="bg-card-alt border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
+                />
+              </div>
+              <div>
+                <p className="text-[10px] text-text-subtle mb-1">Source Wallet</p>
+                <div className="flex gap-1">
+                  {["HOT", "WARM", "COLD"].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setOfframpSourceType(t)}
+                      className={`flex-1 px-2 py-1.5 text-[10px] font-semibold rounded-lg border transition-all ${
+                        offrampSourceType === t
+                          ? "bg-danger text-white border-danger"
+                          : "bg-card-alt text-text-secondary border-border hover:border-danger/50"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={handleCreateOfframp}
+                disabled={!offrampChain || !offrampAmount || treasuryRampLoading}
+                className="w-full px-3 py-2 rounded-lg bg-danger text-white text-xs font-semibold hover:bg-danger/90 disabled:opacity-50 transition-all"
+              >
+                {treasuryRampLoading ? "Creating Order..." : "Create Offramp Order"}
+              </button>
+
+              {treasuryOfframpOrders.length > 0 && (
+                <div className="border-t border-border pt-3">
+                  <p className="text-xs font-semibold text-text-primary mb-2">Offramp Orders</p>
+                  <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                    {treasuryOfframpOrders.map((o: { id: string; amount: number; chain: string; status: string; crossmintOrderId: string | null; txHash: string | null; failureReason: string | null; createdAt: string }) => (
+                      <div key={o.id} className="bg-card-alt border border-border rounded-lg p-2.5">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs text-text-primary font-medium">${o.amount.toLocaleString()}</span>
+                          <span className="text-[9px] text-text-subtle">{o.chain}</span>
+                          <span className={`ml-auto text-[9px] px-1.5 py-0.5 rounded-full border ${statusBadge[o.status] || ""}`}>
+                            {o.status}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[9px] text-text-subtle">
+                          {o.crossmintOrderId && <span>ID: {o.crossmintOrderId.slice(0, 12)}...</span>}
+                          {o.txHash && <span>Tx: {o.txHash.slice(0, 10)}...</span>}
+                          <span className="ml-auto">{new Date(o.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        {o.failureReason && (
+                          <p className="text-[9px] text-danger mt-1">{o.failureReason}</p>
+                        )}
+                        {o.status === "AWAITING_PAYMENT" && (
+                          <button
+                            onClick={() => executeTreasuryOfframpOrder(o.id)}
+                            disabled={treasuryRampLoading}
+                            className="mt-1.5 text-[9px] px-2 py-1 rounded bg-primary-dim text-primary border border-primary-border hover:bg-primary/20 transition-all"
+                          >
+                            Execute
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
 
       {/* Bank Accounts Management */}

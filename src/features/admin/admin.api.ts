@@ -139,7 +139,7 @@ export const AdminApi = {
     return data;
   },
 
-  async createTreasuryCardDeposit(payload: { chain: string; amount: number; receiptEmail?: string }): Promise<{ id: string; orderId: string; clientSecret: string; status: string; walletAddress: string; chain: string; amount: number }> {
+  async createTreasuryCardDeposit(payload: { chain: string; amount: number; receiptEmail?: string; destinationWalletType?: string }): Promise<{ id: string; orderId: string; clientSecret: string; status: string; walletAddress: string; walletType: string; chain: string; amount: number }> {
     const { data } = await api.post("/treasury/ramp/onramp/card", payload);
     return data;
   },
@@ -149,7 +149,7 @@ export const AdminApi = {
     return data;
   },
 
-  async createTreasuryOnrampTransfer(payload: { chain: string; fiatAmount: number; memoCode?: string; notes?: string }): Promise<{ id: string; status: string }> {
+  async createTreasuryOnrampTransfer(payload: { chain: string; fiatAmount: number; memoCode?: string; notes?: string; destinationWalletType?: string }): Promise<{ id: string; status: string; destinationWalletType?: string }> {
     const { data } = await api.post("/treasury/ramp/onramp/transfers", payload);
     return data;
   },
@@ -159,7 +159,7 @@ export const AdminApi = {
     return data;
   },
 
-  async createTreasuryOfframpOrder(payload: { chain: string; amount: number; paymentMethodId?: string }): Promise<TreasuryOfframpResult> {
+  async createTreasuryOfframpOrder(payload: { chain: string; amount: number; paymentMethodId?: string; sourceWalletType?: string }): Promise<TreasuryOfframpResult> {
     const { data } = await api.post("/treasury/ramp/offramp/orders", payload);
     return data;
   },

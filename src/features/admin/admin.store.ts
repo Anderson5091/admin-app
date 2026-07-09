@@ -35,12 +35,12 @@ interface AdminState {
   createTreasuryBankAccount: (data: { bankName: string; accountSuffix?: string; routingNumber?: string; paymentMethodId: string; currency?: string; isDefault?: boolean }) => Promise<void>;
   removeTreasuryBankAccount: (id: string) => Promise<void>;
   fetchTreasuryOfframpOrders: () => Promise<void>;
-  createTreasuryOfframpOrder: (data: { chain: string; amount: number; paymentMethodId?: string }) => Promise<any>;
+  createTreasuryOfframpOrder: (data: { chain: string; amount: number; paymentMethodId?: string; sourceWalletType?: string }) => Promise<any>;
   executeTreasuryOfframpOrder: (orderId: string) => Promise<void>;
   confirmTreasuryOfframpOrder: (orderId: string, txHash: string) => Promise<void>;
   fetchTreasuryOnrampTransfers: () => Promise<void>;
-  createTreasuryOnrampTransfer: (data: { chain: string; fiatAmount: number; memoCode?: string; notes?: string }) => Promise<void>;
-  createTreasuryCardDeposit: (data: { chain: string; amount: number; receiptEmail?: string }) => Promise<any>;
+  createTreasuryOnrampTransfer: (data: { chain: string; fiatAmount: number; memoCode?: string; notes?: string; destinationWalletType?: string }) => Promise<void>;
+  createTreasuryCardDeposit: (data: { chain: string; amount: number; receiptEmail?: string; destinationWalletType?: string }) => Promise<any>;
   getTreasuryOrderStatus: (orderId: string) => Promise<any>;
   treasuryCardDepositResult: any;
   cardDepositLoading: boolean;
