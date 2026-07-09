@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemRevenueData, AgentRevenueData, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemRevenueData, AgentRevenueData, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer, TreasuryOfframpResult } from "./admin.types";
 
 export const AdminApi = {
   async getDashboard(): Promise<AdminDashboardData> {
@@ -126,6 +126,65 @@ export const AdminApi = {
   async getTreasuryOverview(): Promise<TreasuryOverview> {
     const { data } = await api.get("/treasury/overview");
     return data;
+  },
+
+  // Treasury Onramp / Offramp
+  async getTreasuryOnrampInfo(): Promise<TreasuryOnrampInfo> {
+    const { data } = await api.get("/treasury/ramp/onramp/info");
+    return data;
+  },
+
+  async getTreasuryOnrampTransfers(): Promise<TreasuryOnrampTransfer[]> {
+    const { data } = await api.get("/treasury/ramp/onramp/transfers");
+    return data;
+  },
+
+  async createTreasuryCardDeposit(payload: { chain: string; amount: number; receiptEmail?: string }): Promise<{ id: string; orderId: string; clientSecret: string; status: string; walletAddress: string; chain: string; amount: number }> {
+    const { data } = await api.post("/treasury/ramp/onramp/card", payload);
+    return data;
+  },
+
+  async getTreasuryOrderStatus(orderId: string): Promise<any> {
+    const { data } = await api.get(`/treasury/ramp/onramp/orders/${orderId}`);
+    return data;
+  },
+
+  async createTreasuryOnrampTransfer(payload: { chain: string; fiatAmount: number; memoCode?: string; notes?: string }): Promise<{ id: string; status: string }> {
+    const { data } = await api.post("/treasury/ramp/onramp/transfers", payload);
+    return data;
+  },
+
+  async getTreasuryOfframpOrders(): Promise<TreasuryOfframpOrder[]> {
+    const { data } = await api.get("/treasury/ramp/offramp/orders");
+    return data;
+  },
+
+  async createTreasuryOfframpOrder(payload: { chain: string; amount: number; paymentMethodId?: string }): Promise<TreasuryOfframpResult> {
+    const { data } = await api.post("/treasury/ramp/offramp/orders", payload);
+    return data;
+  },
+
+  async executeTreasuryOfframpOrder(orderId: string): Promise<{ status: string; serializedTransaction?: string; txHash?: string }> {
+    const { data } = await api.post(`/treasury/ramp/offramp/orders/${orderId}/execute`);
+    return data;
+  },
+
+  async confirmTreasuryOfframpOrder(orderId: string, txHash: string): Promise<void> {
+    await api.post(`/treasury/ramp/offramp/orders/${orderId}/confirm`, { txHash });
+  },
+
+  async getTreasuryBankAccounts(): Promise<TreasuryBankAccount[]> {
+    const { data } = await api.get("/treasury/ramp/bank-accounts");
+    return data;
+  },
+
+  async createTreasuryBankAccount(payload: { bankName: string; accountSuffix?: string; routingNumber?: string; paymentMethodId: string; currency?: string; isDefault?: boolean }): Promise<TreasuryBankAccount> {
+    const { data } = await api.post("/treasury/ramp/bank-accounts", payload);
+    return data;
+  },
+
+  async removeTreasuryBankAccount(id: string): Promise<void> {
+    await api.delete(`/treasury/ramp/bank-accounts/${id}`);
   },
 
   async triggerRebalance(network: string): Promise<{ status: string; message: string }> {

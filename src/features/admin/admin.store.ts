@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer } from "./admin.types";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -22,6 +22,29 @@ interface AdminState {
   treasuryOverview: TreasuryOverview | null;
   treasuryLoading: boolean;
   rebalanceMessage: string;
+
+  // Treasury Ramp
+  treasuryOnrampInfo: TreasuryOnrampInfo | null;
+  treasuryBankAccounts: TreasuryBankAccount[];
+  treasuryOfframpOrders: TreasuryOfframpOrder[];
+  treasuryOnrampTransfers: TreasuryOnrampTransfer[];
+  treasuryRampLoading: boolean;
+  treasuryRampMessage: string;
+  fetchTreasuryOnrampInfo: () => Promise<void>;
+  fetchTreasuryBankAccounts: () => Promise<void>;
+  createTreasuryBankAccount: (data: { bankName: string; accountSuffix?: string; routingNumber?: string; paymentMethodId: string; currency?: string; isDefault?: boolean }) => Promise<void>;
+  removeTreasuryBankAccount: (id: string) => Promise<void>;
+  fetchTreasuryOfframpOrders: () => Promise<void>;
+  createTreasuryOfframpOrder: (data: { chain: string; amount: number; paymentMethodId?: string }) => Promise<any>;
+  executeTreasuryOfframpOrder: (orderId: string) => Promise<void>;
+  confirmTreasuryOfframpOrder: (orderId: string, txHash: string) => Promise<void>;
+  fetchTreasuryOnrampTransfers: () => Promise<void>;
+  createTreasuryOnrampTransfer: (data: { chain: string; fiatAmount: number; memoCode?: string; notes?: string }) => Promise<void>;
+  createTreasuryCardDeposit: (data: { chain: string; amount: number; receiptEmail?: string }) => Promise<any>;
+  getTreasuryOrderStatus: (orderId: string) => Promise<any>;
+  treasuryCardDepositResult: any;
+  cardDepositLoading: boolean;
+  clearTreasuryRampMessage: () => void;
   loading: boolean;
   usersLoading: boolean;
   error: string;
@@ -103,6 +126,14 @@ export const useAdminStore = create<AdminState>((set) => ({
   treasuryOverview: null,
   treasuryLoading: false,
   rebalanceMessage: "",
+  treasuryOnrampInfo: null,
+  treasuryBankAccounts: [],
+  treasuryOfframpOrders: [],
+  treasuryOnrampTransfers: [],
+  treasuryRampLoading: false,
+  treasuryRampMessage: "",
+  treasuryCardDepositResult: null,
+  cardDepositLoading: false,
   agents: [],
   agentDetail: null,
   agentKpi: [],
@@ -350,6 +381,142 @@ export const useAdminStore = create<AdminState>((set) => ({
     const result = await AdminApi.triggerRebalance(network);
     set({ rebalanceMessage: result.message });
   },
+
+  // Treasury Ramp actions
+  fetchTreasuryOnrampInfo: async () => {
+    try {
+      const info = await AdminApi.getTreasuryOnrampInfo();
+      set({ treasuryOnrampInfo: info });
+    } catch (err) {
+      console.error("Failed to fetch onramp info:", err);
+    }
+  },
+
+  fetchTreasuryBankAccounts: async () => {
+    try {
+      const accounts = await AdminApi.getTreasuryBankAccounts();
+      set({ treasuryBankAccounts: accounts });
+    } catch (err) {
+      console.error("Failed to fetch bank accounts:", err);
+    }
+  },
+
+  createTreasuryBankAccount: async (data) => {
+    set({ treasuryRampLoading: true, treasuryRampMessage: "" });
+    try {
+      await AdminApi.createTreasuryBankAccount(data);
+      set({ treasuryRampLoading: false, treasuryRampMessage: "Bank account added successfully" });
+      useAdminStore.getState().fetchTreasuryBankAccounts();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to add bank account";
+      set({ treasuryRampLoading: false, treasuryRampMessage: message });
+    }
+  },
+
+  removeTreasuryBankAccount: async (id) => {
+    set({ treasuryRampLoading: true });
+    try {
+      await AdminApi.removeTreasuryBankAccount(id);
+      set({ treasuryRampLoading: false, treasuryRampMessage: "Bank account removed" });
+      useAdminStore.getState().fetchTreasuryBankAccounts();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to remove bank account";
+      set({ treasuryRampLoading: false, treasuryRampMessage: message });
+    }
+  },
+
+  fetchTreasuryOfframpOrders: async () => {
+    try {
+      const orders = await AdminApi.getTreasuryOfframpOrders();
+      set({ treasuryOfframpOrders: orders });
+    } catch (err) {
+      console.error("Failed to fetch offramp orders:", err);
+    }
+  },
+
+  createTreasuryOfframpOrder: async (data) => {
+    set({ treasuryRampLoading: true, treasuryRampMessage: "" });
+    try {
+      const result = await AdminApi.createTreasuryOfframpOrder(data);
+      set({
+        treasuryRampLoading: false,
+        treasuryRampMessage: `Offramp order created (${result.status}). Crossmint ID: ${result.crossmintOrderId}`,
+      });
+      useAdminStore.getState().fetchTreasuryOfframpOrders();
+      return result;
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to create offramp order";
+      set({ treasuryRampLoading: false, treasuryRampMessage: message });
+    }
+  },
+
+  executeTreasuryOfframpOrder: async (orderId) => {
+    set({ treasuryRampLoading: true, treasuryRampMessage: "" });
+    try {
+      const result = await AdminApi.executeTreasuryOfframpOrder(orderId);
+      set({ treasuryRampLoading: false, treasuryRampMessage: `Order execution: ${result.status}` });
+      useAdminStore.getState().fetchTreasuryOfframpOrders();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to execute order";
+      set({ treasuryRampLoading: false, treasuryRampMessage: message });
+    }
+  },
+
+  confirmTreasuryOfframpOrder: async (orderId, txHash) => {
+    set({ treasuryRampLoading: true, treasuryRampMessage: "" });
+    try {
+      await AdminApi.confirmTreasuryOfframpOrder(orderId, txHash);
+      set({ treasuryRampLoading: false, treasuryRampMessage: "Order confirmed" });
+      useAdminStore.getState().fetchTreasuryOfframpOrders();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to confirm order";
+      set({ treasuryRampLoading: false, treasuryRampMessage: message });
+    }
+  },
+
+  fetchTreasuryOnrampTransfers: async () => {
+    try {
+      const transfers = await AdminApi.getTreasuryOnrampTransfers();
+      set({ treasuryOnrampTransfers: transfers });
+    } catch (err) {
+      console.error("Failed to fetch onramp transfers:", err);
+    }
+  },
+
+  createTreasuryOnrampTransfer: async (data) => {
+    set({ treasuryRampLoading: true, treasuryRampMessage: "" });
+    try {
+      const result = await AdminApi.createTreasuryOnrampTransfer(data);
+      set({ treasuryRampLoading: false, treasuryRampMessage: `Onramp transfer recorded (ID: ${result.id})` });
+      useAdminStore.getState().fetchTreasuryOnrampTransfers();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to record onramp transfer";
+      set({ treasuryRampLoading: false, treasuryRampMessage: message });
+    }
+  },
+
+  createTreasuryCardDeposit: async (data) => {
+    set({ cardDepositLoading: true, treasuryRampMessage: "", treasuryCardDepositResult: null });
+    try {
+      const result = await AdminApi.createTreasuryCardDeposit(data);
+      set({ cardDepositLoading: false, treasuryCardDepositResult: result, treasuryRampMessage: "Card deposit order created. Complete payment to fund the treasury." });
+      useAdminStore.getState().fetchTreasuryOnrampTransfers();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to create card deposit";
+      set({ cardDepositLoading: false, treasuryRampMessage: message });
+    }
+  },
+
+  getTreasuryOrderStatus: async (orderId) => {
+    try {
+      return await AdminApi.getTreasuryOrderStatus(orderId);
+    } catch (err) {
+      console.error("Failed to get order status:", err);
+      return null;
+    }
+  },
+
+  clearTreasuryRampMessage: () => set({ treasuryRampMessage: "", treasuryCardDepositResult: null }),
 
   fetchAgents: async () => {
     try {

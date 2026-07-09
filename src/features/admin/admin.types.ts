@@ -413,6 +413,79 @@ export interface SystemStatus {
   timestamp: string;
 }
 
+export interface TreasuryBankAccount {
+  id: string;
+  bankName: string | null;
+  accountSuffix: string | null;
+  routingNumber: string | null;
+  currency: string;
+  paymentMethodId: string;
+  isDefault: boolean;
+  status: string;
+  createdAt: string;
+}
+
+export interface TreasuryOfframpOrder {
+  id: string;
+  paymentMethodId: string;
+  chain: string;
+  token: string;
+  amount: number;
+  fee: number | null;
+  netAmount: number;
+  fiatAmount: number;
+  fiatCurrency: string;
+  status: string;
+  crossmintOrderId: string | null;
+  treasuryWalletId: string | null;
+  fromWalletType: string | null;
+  txHash: string | null;
+  explorerLink: string | null;
+  failureReason: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  treasuryWallet?: { walletType: string; network: string; address: string } | null;
+}
+
+export interface TreasuryOnrampTransfer {
+  id: string;
+  fiatAmount: number;
+  fiatCurrency: string;
+  token: string;
+  chain: string;
+  amount: number | null;
+  status: string;
+  crossmintOrderId: string | null;
+  txHash: string | null;
+  memoCode: string | null;
+  notes: string | null;
+  createdAt: string;
+  treasuryWallet?: { walletType: string; network: string; address: string } | null;
+}
+
+export interface TreasuryOnrampInfo {
+  instructions: string;
+  bankAccounts: Array<{
+    id?: string;
+    bankName: string | null;
+    accountSuffix: string | null;
+    currency: string;
+    isDefault?: boolean;
+    paymentMethodId?: string;
+  }>;
+}
+
+export interface TreasuryOfframpResult {
+  id: string;
+  crossmintOrderId: string;
+  status: string;
+  serializedTransaction?: string;
+  memo?: string;
+  chain: string;
+  payerAddress: string;
+  amount: number;
+}
+
 export interface FeeConfig {
   id: string;
   transactionType: string;
