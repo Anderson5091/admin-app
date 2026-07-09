@@ -25,12 +25,13 @@ const statusBadge: Record<string, string> = {
 
 export default function Treasury() {
   const {
-    treasuryOverview, treasuryLoading, rebalanceMessage,
+    treasuryOverview, treasuryLoading, treasuryError, rebalanceMessage,
     fetchTreasuryOverview, triggerRebalance,
     treasuryOnrampInfo, treasuryBankAccounts,
     treasuryOfframpOrders, treasuryOnrampTransfers,
     treasuryRampLoading, treasuryRampMessage,
     treasuryCardDepositResult, cardDepositLoading,
+    clearTreasuryError,
     fetchTreasuryOnrampInfo, fetchTreasuryBankAccounts,
     fetchTreasuryOfframpOrders, fetchTreasuryOnrampTransfers,
     createTreasuryOfframpOrder, executeTreasuryOfframpOrder,
@@ -71,12 +72,17 @@ export default function Treasury() {
     );
   }
 
-  if (!treasuryOverview) {
+  if (!treasuryOverview && !treasuryLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-text-secondary">
         <AlertTriangle size={32} className="mb-2" />
         <p className="text-sm">Failed to load treasury data</p>
-        <button onClick={() => fetchTreasuryOverview()} className="mt-3 text-xs text-primary hover:underline">Retry</button>
+        {treasuryError && (
+          <p className="text-xs text-danger mt-1 max-w-md text-center break-all">{treasuryError}</p>
+        )}
+        <div className="flex gap-2 mt-3">
+          <button onClick={() => { clearTreasuryError(); fetchTreasuryOverview(); }} className="text-xs text-primary hover:underline">Retry</button>
+        </div>
       </div>
     );
   }

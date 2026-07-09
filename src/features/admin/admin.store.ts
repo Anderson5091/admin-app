@@ -21,6 +21,7 @@ interface AdminState {
   systemStatus: SystemStatus | null;
   treasuryOverview: TreasuryOverview | null;
   treasuryLoading: boolean;
+  treasuryError: string;
   rebalanceMessage: string;
 
   // Treasury Ramp
@@ -76,6 +77,7 @@ interface AdminState {
   fetchSystemStatus: () => Promise<void>;
   triggerBackup: () => Promise<void>;
   fetchTreasuryOverview: () => Promise<void>;
+  clearTreasuryError: () => void;
   triggerRebalance: (network: string) => Promise<void>;
   agents: Agent[];
   agentDetail: AgentDetail | null;
@@ -125,6 +127,7 @@ export const useAdminStore = create<AdminState>((set) => ({
   systemStatus: null,
   treasuryOverview: null,
   treasuryLoading: false,
+  treasuryError: "",
   rebalanceMessage: "",
   treasuryOnrampInfo: null,
   treasuryBankAccounts: [],
@@ -366,15 +369,18 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   fetchTreasuryOverview: async () => {
-    set({ treasuryLoading: true });
+    set({ treasuryLoading: true, treasuryError: "" });
     try {
       const treasuryOverview = await AdminApi.getTreasuryOverview();
       set({ treasuryOverview, treasuryLoading: false });
-    } catch (err) {
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to load treasury data";
       console.error("Failed to fetch treasury overview:", err);
-      set({ treasuryLoading: false });
+      set({ treasuryLoading: false, treasuryError: message });
     }
   },
+
+  clearTreasuryError: () => set({ treasuryError: "" }),
 
   triggerRebalance: async (network: string) => {
     set({ rebalanceMessage: "" });
