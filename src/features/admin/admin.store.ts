@@ -83,6 +83,7 @@ interface AdminState {
   fetchTreasuryOverview: () => Promise<void>;
   clearTreasuryError: () => void;
   triggerRebalance: (network: string) => Promise<void>;
+  initTreasuryWallets: () => Promise<void>;
   agents: Agent[];
   agentDetail: AgentDetail | null;
   agentKpi: AgentKpiItem[];

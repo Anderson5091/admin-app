@@ -90,6 +90,7 @@ export interface AdminProfile {
   role: AdminRole;
   status: string;
   createdAt: string;
+  agent?: { id: string };
 }
 
 export interface AdminUserItem {

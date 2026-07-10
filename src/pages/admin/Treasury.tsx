@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
+import type { TreasuryOverview } from "../../features/admin/admin.types";
 import Card from "../../components/ui/Card";
-import { Wallet, ArrowUpDown, AlertTriangle, RefreshCw, Thermometer, Database, Shield, Copy, Landmark, ArrowRightFromLine, ArrowLeftToLine, Plus, Trash2, CheckCircle2, XCircle, Clock, ExternalLink } from "lucide-react";
+import { Wallet, ArrowUpDown, AlertTriangle, RefreshCw, Thermometer, Database, Shield, Copy, Landmark, ArrowRightFromLine, ArrowLeftToLine, Plus, Trash2, XCircle, ExternalLink } from "lucide-react";
 
 const walletTypeColors: Record<string, string> = {
   HOT: "text-danger bg-danger-dim border-danger/30",
@@ -96,15 +97,18 @@ export default function Treasury() {
 
   const fmt = (n: number) => n < 1_000_000 ? `$${n.toLocaleString()}` : `$${(n / 1_000_000).toFixed(2)}M`;
 
-  const to = treasuryOverview ?? {};
-  const tWallets = to.wallets ?? [];
-  const tNetworks = to.networks ?? [];
-  const tMovements = to.recentMovements ?? [];
-  const tSnapshots = to.snapshots ?? [];
-  const tLiquidity = to.totalLiquidity ?? 0;
-  const tHot = to.hotTotal ?? 0;
-  const tWarm = to.warmTotal ?? 0;
-  const tCold = to.coldTotal ?? 0;
+  const to: TreasuryOverview = treasuryOverview ?? {
+    totalLiquidity: 0, hotTotal: 0, warmTotal: 0, coldTotal: 0,
+    networks: [], wallets: [], recentMovements: [], snapshots: [],
+  };
+  const tWallets = to.wallets;
+  const tNetworks = to.networks;
+  const tMovements = to.recentMovements;
+  const tSnapshots = to.snapshots;
+  const tLiquidity = to.totalLiquidity;
+  const tHot = to.hotTotal;
+  const tWarm = to.warmTotal;
+  const tCold = to.coldTotal;
 
   const byType = (type: string) => tWallets.filter((w: { walletType: string }) => w.walletType === type);
 
