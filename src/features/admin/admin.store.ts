@@ -114,7 +114,7 @@ interface AdminState {
   fetchAuditLogs: () => Promise<void>;
 }
 
-export const useAdminStore = create<AdminState>((set) => ({
+export const useAdminStore = create<AdminState>((set, get) => ({
   dashboard: null,
   users: [],
   pendingKyc: [],
