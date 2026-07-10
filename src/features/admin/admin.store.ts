@@ -71,6 +71,8 @@ interface AdminState {
   fetchPartnerMetrics: (partnerId: string) => Promise<void>;
   createPartner: (data: { name: string; type: string; country?: string; baseUrl?: string; apiKey?: string; priority?: number }) => Promise<void>;
   deactivatePartner: (partnerId: string) => Promise<void>;
+  deletePartner: (partnerId: string) => Promise<void>;
+  activatePartner: (partnerId: string) => Promise<void>;
   runReconciliation: () => Promise<void>;
   fetchSystemHealth: () => Promise<void>;
   fetchSystemMetrics: () => Promise<void>;
@@ -319,6 +321,27 @@ export const useAdminStore = create<AdminState>((set) => ({
     set((state) => ({
       partners: state.partners.map((p) =>
         p.id === partnerId ? { ...p, status: "INACTIVE" } : p
+      ),
+    }));
+  },
+
+  deletePartner: async (partnerId: string) => {
+    try {
+      await AdminApi.deletePartner(partnerId);
+      set((state) => ({
+        partners: state.partners.filter((p) => p.id !== partnerId),
+      }));
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to delete partner";
+      throw new Error(message);
+    }
+  },
+
+  activatePartner: async (partnerId: string) => {
+    await AdminApi.activatePartner(partnerId);
+    set((state) => ({
+      partners: state.partners.map((p) =>
+        p.id === partnerId ? { ...p, status: "ACTIVE" } : p
       ),
     }));
   },

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
+import { useAuthStore } from "../../features/admin/auth.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Building2, Smartphone, MapPin, Activity, Plus, RotateCcw, Loader2 } from "lucide-react";
+import ConfirmModal from "../../components/ui/ConfirmModal";
+import { Building2, Smartphone, MapPin, Activity, Plus, RotateCcw, Loader2, Trash2 } from "lucide-react";
 
 const typeIcon: Record<string, React.ElementType> = {
   BANK: Building2,
@@ -17,10 +19,14 @@ const typeColor: Record<string, string> = {
 };
 
 export default function Partners() {
-  const { partners, partnerMetrics, reconcileResult, fetchPartners, fetchPartnerMetrics, createPartner, deactivatePartner, runReconciliation } = useAdminStore();
+  const { partners, partnerMetrics, reconcileResult, fetchPartners, fetchPartnerMetrics, createPartner, deactivatePartner, deletePartner, activatePartner, runReconciliation } = useAdminStore();
+  const profile = useAuthStore((s) => s.profile);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: "", type: "BANK" as string, country: "", baseUrl: "", priority: 1 });
   const [reconciling, setReconciling] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPartners();
@@ -211,12 +217,57 @@ export default function Partners() {
                       Deactivate
                     </button>
                   )}
+                  {partner.status === "INACTIVE" && (
+                    <>
+                      <button
+                        onClick={() => activatePartner(partner.id)}
+                        className="text-[10px] text-primary hover:opacity-80 hover:bg-primary-dim px-2 py-1 rounded-lg transition-colors"
+                      >
+                        Activate
+                      </button>
+                      {(profile?.role === "SUPER_ADMIN" || profile?.role === "ADMIN") && (
+                        <button
+                          onClick={() => setDeleteTarget({ id: partner.id, name: partner.name })}
+                          className="text-[10px] text-danger hover:opacity-80 hover:bg-danger-dim px-2 py-1 rounded-lg transition-colors flex items-center gap-1"
+                        >
+                          <Trash2 size={12} />
+                          Delete
+                        </button>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </Card>
           );
         })}
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete Partner"
+        message={`Permanently delete partner "${deleteTarget?.name}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        variant="danger"
+        loading={deleting}
+        error={deleteError}
+        onConfirm={async () => {
+          if (!deleteTarget) return;
+          setDeleteError(null);
+          setDeleting(true);
+          try {
+            await deletePartner(deleteTarget.id);
+            setDeleteTarget(null);
+          } catch (err: any) {
+            setDeleteError(err?.message || "Failed to delete partner");
+          }
+          setDeleting(false);
+        }}
+        onCancel={() => {
+          setDeleteTarget(null);
+          setDeleteError(null);
+        }}
+      />
     </div>
   );
 }

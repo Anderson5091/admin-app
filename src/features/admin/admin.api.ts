@@ -98,6 +98,16 @@ export const AdminApi = {
     await api.delete(`/partners/${id}`);
   },
 
+  async deletePartner(partnerId: string): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post(`/partners/${partnerId}/delete`);
+    return data;
+  },
+
+  async activatePartner(partnerId: string): Promise<{ success: boolean; status: string }> {
+    const { data } = await api.post(`/partners/${partnerId}/activate`);
+    return data;
+  },
+
   async reconcilePartners(): Promise<{ total: number; matched: number; unmatched: number; errors: number }> {
     const { data } = await api.post("/partners/reconcile");
     return data;
