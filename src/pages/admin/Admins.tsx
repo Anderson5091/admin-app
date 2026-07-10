@@ -36,6 +36,7 @@ export default function Admins() {
   const [editRole, setEditRole] = useState("");
 
   const [sendingReset, setSendingReset] = useState<string | null>(null);
+  const [resetConfirm, setResetConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAdminUsers();
@@ -96,9 +97,9 @@ export default function Admins() {
     setSendingReset(adminId);
     try {
       await sendResetEmail(adminId);
-      alert("Reset email sent successfully");
+      setResetConfirm("success");
     } catch {
-      alert("Failed to send reset email");
+      setResetConfirm("error");
     }
     setSendingReset(null);
   };
@@ -327,7 +328,18 @@ export default function Admins() {
         }}
       />
 
-      {}
+      <ConfirmModal
+        open={resetConfirm !== null}
+        title={resetConfirm === "success" ? "Email Sent" : "Failed"}
+        message={resetConfirm === "success" ? "Password reset email has been sent successfully." : "Failed to send reset email. Please try again."}
+        confirmLabel="OK"
+        variant={resetConfirm === "success" ? "primary" : "danger"}
+        hideCancel
+        center
+        onConfirm={() => setResetConfirm(null)}
+        onCancel={() => setResetConfirm(null)}
+      />
+
     </div>
   );
 }

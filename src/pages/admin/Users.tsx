@@ -3,11 +3,20 @@ import { useAdminStore } from "../../features/admin/admin.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
-import { Search } from "lucide-react";
+import ConfirmModal from "../../components/ui/ConfirmModal";
+import { Search, Pencil, Trash2, X, Check } from "lucide-react";
 
 export default function Users() {
-  const { users, fetchUsers, toggleUserStatus, usersLoading } = useAdminStore();
+  const { users, fetchUsers, toggleUserStatus, updateUserEmail, deleteUser, usersLoading } = useAdminStore();
   const [search, setSearch] = useState("");
+
+  const [editingEmail, setEditingEmail] = useState<{ id: string; email: string } | null>(null);
+  const [editEmailValue, setEditEmailValue] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -33,6 +42,42 @@ export default function Users() {
       case "SUSPENDED": return <Badge variant="warning">Suspended</Badge>;
       default: return <Badge>{status}</Badge>;
     }
+  };
+
+  const startEditEmail = (id: string, email: string) => {
+    setEditingEmail({ id, email });
+    setEditEmailValue(email);
+    setEmailError("");
+  };
+
+  const cancelEditEmail = () => {
+    setEditingEmail(null);
+    setEditEmailValue("");
+    setEmailError("");
+  };
+
+  const saveEditEmail = async () => {
+    if (!editingEmail) return;
+    if (!editEmailValue.trim()) { setEmailError("Email is required"); return; }
+    try {
+      await updateUserEmail(editingEmail.id, editEmailValue.trim());
+      cancelEditEmail();
+    } catch (err: any) {
+      setEmailError(err?.response?.data?.error || err?.message || "Failed to update email");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteError(null);
+    setDeleting(true);
+    try {
+      await deleteUser(deleteTarget.id);
+      setDeleteTarget(null);
+    } catch (err: any) {
+      setDeleteError(err?.response?.data?.error || err?.message || "Failed to delete user");
+    }
+    setDeleting(false);
   };
 
   return (
@@ -73,17 +118,57 @@ export default function Users() {
               {filtered.map((user) => (
                 <tr key={user.id} className="hover:bg-card-alt transition-colors">
                   <td className="px-4 py-3 text-text-primary font-medium">{user.name || user.email}</td>
-                  <td className="px-4 py-3 text-text-primary">{user.email}</td>
+                  <td className="px-4 py-3 text-text-primary">
+                    {editingEmail?.id === user.id ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="email"
+                          value={editEmailValue}
+                          onChange={(e) => setEditEmailValue(e.target.value)}
+                          className="bg-app-bg border border-border rounded px-2 py-1 text-sm text-text-primary w-40"
+                        />
+                        <button onClick={saveEditEmail} className="p-1 rounded text-primary hover:bg-primary-dim" title="Save">
+                          <Check size={14} />
+                        </button>
+                        <button onClick={cancelEditEmail} className="p-1 rounded text-text-subtle hover:text-text-primary" title="Cancel">
+                          <X size={14} />
+                        </button>
+                        {emailError && <span className="text-xs text-danger ml-1">{emailError}</span>}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <span>{user.email}</span>
+                        <button
+                          onClick={() => startEditEmail(user.id, user.email)}
+                          className="p-1 rounded text-text-subtle hover:text-primary hover:bg-primary-dim transition-colors"
+                          title="Edit email"
+                        >
+                          <Pencil size={12} />
+                        </button>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3">{statusBadge(user.status || "ACTIVE")}</td>
                   <td className="px-4 py-3"><Badge variant="info">Tier {user.kycTier ?? 0}</Badge></td>
                   <td className="px-4 py-3 text-text-primary">{user.totalTransfers ?? 0}</td>
                   <td className="px-4 py-3 text-text-primary">${(user.totalVolume ?? 0).toLocaleString()}</td>
                   <td className="px-4 py-3 text-right">
-                    {user.status === "ACTIVE" || !user.status ? (
-                      <Button size="sm" variant="danger" onClick={() => toggleUserStatus(user.id)}>Freeze</Button>
-                    ) : (
-                      <Button size="sm" variant="success" onClick={() => toggleUserStatus(user.id)}>Activate</Button>
-                    )}
+                    <div className="flex items-center gap-2 justify-end">
+                      {user.status === "ACTIVE" || !user.status ? (
+                        <Button size="sm" variant="danger" onClick={() => toggleUserStatus(user.id)}>Freeze</Button>
+                      ) : (
+                        <>
+                          <Button size="sm" variant="success" onClick={() => toggleUserStatus(user.id)}>Activate</Button>
+                          <button
+                            onClick={() => setDeleteTarget({ id: user.id, name: user.name || user.email })}
+                            className="p-1.5 rounded-lg text-danger-dim hover:text-danger hover:bg-danger-dim/30 transition-colors"
+                            title="Delete user"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -99,7 +184,29 @@ export default function Users() {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-text-primary truncate">{user.name || user.email}</p>
-                <p className="text-xs text-text-secondary truncate mt-0.5">{user.email}</p>
+                {editingEmail?.id === user.id ? (
+                  <div className="flex items-center gap-1 mt-1">
+                    <input
+                      type="email"
+                      value={editEmailValue}
+                      onChange={(e) => setEditEmailValue(e.target.value)}
+                      className="bg-app-bg border border-border rounded px-2 py-1 text-sm text-text-primary w-36"
+                    />
+                    <button onClick={saveEditEmail} className="p-1 rounded text-primary hover:bg-primary-dim"><Check size={14} /></button>
+                    <button onClick={cancelEditEmail} className="p-1 rounded text-text-subtle hover:text-text-primary"><X size={14} /></button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <p className="text-xs text-text-secondary truncate">{user.email}</p>
+                    <button
+                      onClick={() => startEditEmail(user.id, user.email)}
+                      className="p-1 rounded text-text-subtle hover:text-primary hover:bg-primary-dim transition-colors"
+                    >
+                      <Pencil size={10} />
+                    </button>
+                  </div>
+                )}
+                {emailError && editingEmail?.id === user.id && <p className="text-xs text-danger mt-1">{emailError}</p>}
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   {statusBadge(user.status || "ACTIVE")}
                   <Badge variant="info">Tier {user.kycTier ?? 0}</Badge>
@@ -109,11 +216,19 @@ export default function Users() {
                   <span>${(user.totalVolume ?? 0).toLocaleString()}</span>
                 </div>
               </div>
-              <div className="shrink-0">
+              <div className="flex items-center gap-1 shrink-0">
                 {user.status === "ACTIVE" || !user.status ? (
                   <Button size="sm" variant="danger" onClick={() => toggleUserStatus(user.id)}>Freeze</Button>
                 ) : (
-                  <Button size="sm" variant="success" onClick={() => toggleUserStatus(user.id)}>Activate</Button>
+                  <>
+                    <Button size="sm" variant="success" onClick={() => toggleUserStatus(user.id)}>Activate</Button>
+                    <button
+                      onClick={() => setDeleteTarget({ id: user.id, name: user.name || user.email })}
+                      className="p-1.5 rounded-lg text-danger-dim hover:text-danger hover:bg-danger-dim/30 transition-colors"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -125,6 +240,18 @@ export default function Users() {
           </Card>
         )}
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete User"
+        message={`Permanently delete user "${deleteTarget?.name}"? This will remove all associated data.`}
+        confirmLabel="Delete"
+        variant="danger"
+        loading={deleting}
+        error={deleteError}
+        onConfirm={handleDelete}
+        onCancel={() => { setDeleteTarget(null); setDeleteError(null); }}
+      />
     </div>
   );
 }

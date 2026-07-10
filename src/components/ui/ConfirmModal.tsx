@@ -11,11 +11,13 @@ interface ConfirmModalProps {
   error?: string | null;
   onConfirm: () => void;
   onCancel: () => void;
+  hideCancel?: boolean;
+  center?: boolean;
 }
 
 export default function ConfirmModal({
   open, title, message, confirmLabel = "Confirm", cancelLabel = "Cancel",
-  variant = "danger", loading, error, onConfirm, onCancel,
+  variant = "danger", loading, error, onConfirm, onCancel, hideCancel, center,
 }: ConfirmModalProps) {
   if (!open) return null;
 
@@ -29,22 +31,24 @@ export default function ConfirmModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
       <div className="relative bg-card border border-border rounded-xl p-5 w-full max-w-sm shadow-xl z-10">
-        <h3 className="text-base font-bold text-text-primary mb-2">{title}</h3>
-        <p className="text-sm text-text-secondary mb-5">{message}</p>
+        <h3 className={`text-base font-bold text-text-primary mb-2 ${center ? "text-center" : ""}`}>{title}</h3>
+        <p className={`text-sm text-text-secondary mb-5 ${center ? "text-center" : ""}`}>{message}</p>
         {error && (
           <div className="mb-4 flex items-center gap-2 text-sm text-danger bg-danger-dim border border-danger/30 rounded-lg p-3" role="alert">
             <AlertCircle size={16} />
             <span>{error}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 justify-end">
-          <button
-            onClick={onCancel}
-            disabled={loading}
-            className="px-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm font-semibold hover:bg-card transition-colors disabled:opacity-50"
-          >
-            {cancelLabel}
-          </button>
+        <div className={`flex items-center gap-2 ${center ? "justify-center" : "justify-end"}`}>
+          {!hideCancel && (
+            <button
+              onClick={onCancel}
+              disabled={loading}
+              className="px-4 py-2 rounded-lg bg-card-alt border border-border text-text-primary text-sm font-semibold hover:bg-card transition-colors disabled:opacity-50"
+            >
+              {cancelLabel}
+            </button>
+          )}
           <button
             onClick={onConfirm}
             disabled={loading}

@@ -16,6 +16,15 @@ export const AdminApi = {
     await api.post(`/admin/users/${userId}/toggle-status`);
   },
 
+  async updateUserEmail(userId: string, email: string): Promise<{ id: string; email: string }> {
+    const { data } = await api.put(`/admin/users/${userId}`, { email });
+    return data;
+  },
+
+  async deleteUser(userId: string): Promise<void> {
+    await api.delete(`/admin/users/${userId}`);
+  },
+
   async getPendingKyc(): Promise<PendingKycItem[]> {
     const { data } = await api.get("/admin/kyc/pending");
     return data;

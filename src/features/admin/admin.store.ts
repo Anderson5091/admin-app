@@ -53,6 +53,8 @@ interface AdminState {
   fetchDashboard: () => Promise<void>;
   fetchUsers: () => Promise<void>;
   toggleUserStatus: (userId: string) => Promise<void>;
+  updateUserEmail: (userId: string, email: string) => Promise<void>;
+  deleteUser: (userId: string) => Promise<void>;
   fetchPendingKyc: () => Promise<void>;
   approveKyc: (kycId: string) => Promise<void>;
   rejectKyc: (kycId: string) => Promise<void>;
@@ -188,6 +190,18 @@ export const useAdminStore = create<AdminState>((set) => ({
     } catch (err) {
       console.error("Failed to toggle user status:", err);
     }
+  },
+
+  updateUserEmail: async (userId: string, email: string) => {
+    const updated = await AdminApi.updateUserEmail(userId, email);
+    set((state) => ({
+      users: state.users.map((u) => (u.id === userId ? { ...u, email: updated.email } : u)),
+    }));
+  },
+
+  deleteUser: async (userId: string) => {
+    await AdminApi.deleteUser(userId);
+    set((state) => ({ users: state.users.filter((u) => u.id !== userId) }));
   },
 
   fetchPendingKyc: async () => {
