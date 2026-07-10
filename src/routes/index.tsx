@@ -25,6 +25,7 @@ import AgentTopUpAgent from "../pages/admin/AgentTopUpAgent";
 import AgentActivity from "../pages/admin/AgentActivity";
 import AgentCashSettlement from "../pages/admin/AgentCashSettlement";
 import AdminAdmins from "../pages/admin/Admins";
+import ResetPassword from "../pages/admin/ResetPassword";
 import AdminTreasury from "../pages/admin/Treasury";
 import AdminTransfers from "../pages/admin/Transfers";
 import FeeManagement from "../pages/admin/FeeManagement";
@@ -83,6 +84,10 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
       },
       {
         path: "/",

@@ -100,6 +100,8 @@ interface AdminState {
   createAdmin: (data: { email: string; name?: string; password: string; role: string }) => Promise<void>;
   toggleAdminStatus: (adminId: string) => Promise<void>;
   deleteAdmin: (adminId: string) => Promise<void>;
+  updateAdmin: (adminId: string, data: { name?: string; role?: string; email?: string; password?: string }) => Promise<void>;
+  sendResetEmail: (adminId: string) => Promise<string>;
 
   transfers: TransferItem[];
   transfersLoading: boolean;
@@ -643,6 +645,18 @@ export const useAdminStore = create<AdminState>((set) => ({
   deleteAdmin: async (adminId: string) => {
     await AdminApi.deleteAdmin(adminId);
     set((state) => ({ adminUsers: state.adminUsers.filter((a) => a.id !== adminId) }));
+  },
+
+  updateAdmin: async (adminId: string, data: { name?: string; role?: string; email?: string; password?: string }) => {
+    const updated = await AdminApi.updateAdmin(adminId, data);
+    set((state) => ({
+      adminUsers: state.adminUsers.map((a) => (a.id === adminId ? { ...a, ...updated } : a)),
+    }));
+  },
+
+  sendResetEmail: async (adminId: string): Promise<string> => {
+    const { message } = await AdminApi.sendResetEmail(adminId);
+    return message;
   },
 
   fetchTransfers: async () => {

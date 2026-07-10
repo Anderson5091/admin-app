@@ -270,6 +270,21 @@ export const AdminApi = {
     await api.delete(`/admin/admins/${adminId}`);
   },
 
+  async updateAdmin(adminId: string, data: { name?: string; role?: string; email?: string; password?: string }): Promise<AdminUserItem> {
+    const { data: res } = await api.put(`/admin/admins/${adminId}`, data);
+    return res;
+  },
+
+  async sendResetEmail(adminId: string): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post(`/admin/admins/${adminId}/send-reset`);
+    return data;
+  },
+
+  async resetPassword(token: string, password: string): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post("/admin/reset-password", { token, password });
+    return data;
+  },
+
   async getFeeConfigs(): Promise<FeeConfig[]> {
     const { data } = await api.get("/admin/fees");
     return data;
