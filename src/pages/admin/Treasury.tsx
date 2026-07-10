@@ -321,6 +321,7 @@ export default function Treasury() {
             </div>
           ))}
         </div>
+      )}
       </Card>
 
       {/* Rebalance Controls + Movements */}
