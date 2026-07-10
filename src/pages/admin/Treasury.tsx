@@ -263,6 +263,12 @@ export default function Treasury() {
             <Wallet size={40} className="mb-3 opacity-40" />
             <p className="text-sm font-medium mb-1">No treasury wallets found</p>
             <p className="text-xs mb-4">Initialize treasury wallets to start managing liquidity</p>
+            {treasuryError && (
+              <p className="text-xs text-danger mb-4 max-w-md text-center break-all">{treasuryError}</p>
+            )}
+            {rebalanceMessage && (
+              <p className="text-xs text-success mb-4 max-w-md text-center">{rebalanceMessage}</p>
+            )}
             <button
               onClick={initTreasuryWallets}
               disabled={treasuryLoading}
