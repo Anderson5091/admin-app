@@ -38,6 +38,7 @@ export default function Treasury() {
     treasuryRampLoading, treasuryRampMessage,
     treasuryCardDepositResult, cardDepositLoading,
     clearTreasuryError,
+    initTreasuryWallets,
     fetchTreasuryOnrampInfo, fetchTreasuryBankAccounts,
     fetchTreasuryOfframpOrders, fetchTreasuryOnrampTransfers,
     createTreasuryOfframpOrder, executeTreasuryOfframpOrder,
@@ -257,6 +258,25 @@ export default function Treasury() {
           <Wallet size={16} className="text-primary" />
           <h2 className="text-lg font-bold text-text-primary">Wallet Inventory</h2>
         </div>
+        {tWallets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-text-secondary">
+            <Wallet size={40} className="mb-3 opacity-40" />
+            <p className="text-sm font-medium mb-1">No treasury wallets found</p>
+            <p className="text-xs mb-4">Initialize treasury wallets to start managing liquidity</p>
+            <button
+              onClick={initTreasuryWallets}
+              disabled={treasuryLoading}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {treasuryLoading ? (
+                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+              ) : (
+                <Database size={16} />
+              )}
+              {treasuryLoading ? "Initializing..." : "Init Treasury Wallet"}
+            </button>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {(["HOT", "WARM", "COLD"] as const).map((type) => (
             <div key={type} className={`border-l-4 rounded-lg p-4 ${walletTypeBg[type]}`}>

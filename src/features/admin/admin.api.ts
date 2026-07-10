@@ -211,6 +211,11 @@ export const AdminApi = {
     return data;
   },
 
+  async bootstrapTreasury(): Promise<{ success: boolean; message: string }> {
+    const { data } = await api.post("/treasury/bootstrap");
+    return data;
+  },
+
   async getAgents(): Promise<Agent[]> {
     const { data } = await api.get("/agent/list");
     return data;

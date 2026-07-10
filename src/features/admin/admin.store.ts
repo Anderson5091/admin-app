@@ -422,6 +422,17 @@ export const useAdminStore = create<AdminState>((set) => ({
 
   clearTreasuryError: () => set({ treasuryError: "" }),
 
+  initTreasuryWallets: async () => {
+    set({ treasuryLoading: true, treasuryError: "" });
+    try {
+      await AdminApi.bootstrapTreasury();
+      await get().fetchTreasuryOverview();
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to init treasury wallets";
+      set({ treasuryLoading: false, treasuryError: message });
+    }
+  },
+
   triggerRebalance: async (network: string) => {
     set({ rebalanceMessage: "" });
     const result = await AdminApi.triggerRebalance(network);
