@@ -19,6 +19,7 @@ export default function AgentDetail() {
   const [copiedWalletId, setCopiedWalletId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -293,17 +294,22 @@ export default function AgentDetail() {
         confirmLabel="Delete"
         variant="danger"
         loading={deleting}
+        error={deleteError}
         onConfirm={async () => {
+          setDeleteError(null);
           setDeleting(true);
           try {
             await deleteAgent(id!);
             navigate("/agents");
-          } catch {
+          } catch (err: any) {
+            setDeleteError(err?.message || "Failed to delete agent");
             setDeleting(false);
-            setShowDeleteConfirm(false);
           }
         }}
-        onCancel={() => setShowDeleteConfirm(false)}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setDeleteError(null);
+        }}
       />
     </div>
   );

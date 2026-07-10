@@ -560,11 +560,16 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
 
   deleteAgent: async (agentId: string) => {
-    await AdminApi.deleteAgent(agentId);
-    set((state) => ({
-      agents: state.agents.filter((a) => a.id !== agentId),
-      agentDetail: state.agentDetail?.id === agentId ? null : state.agentDetail,
-    }));
+    try {
+      await AdminApi.deleteAgent(agentId);
+      set((state) => ({
+        agents: state.agents.filter((a) => a.id !== agentId),
+        agentDetail: state.agentDetail?.id === agentId ? null : state.agentDetail,
+      }));
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || "Failed to delete agent";
+      throw new Error(message);
+    }
   },
 
   fetchAgentKpi: async (agentId: string, period?: string) => {

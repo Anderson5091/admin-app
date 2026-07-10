@@ -19,6 +19,8 @@ export default function Agents() {
   const [formData, setFormData] = useState({ email: "", password: "", fullName: "", phone: "", type: "PARTNER" });
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAgents();
@@ -192,18 +194,23 @@ export default function Agents() {
         confirmLabel="Delete"
         variant="danger"
         loading={deleting}
+        error={deleteError}
         onConfirm={async () => {
           if (!deleteTarget) return;
           setDeleting(true);
+          setDeleteError(null);
           try {
             await deleteAgent(deleteTarget.id);
             setDeleteTarget(null);
-          } catch {
-            setDeleteTarget(null);
+          } catch (err: any) {
+            setDeleteError(err?.response?.data?.error || err?.message || "Failed to delete agent");
           }
           setDeleting(false);
         }}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={() => {
+          setDeleteTarget(null);
+          setDeleteError(null);
+        }}
       />
     </div>
   );

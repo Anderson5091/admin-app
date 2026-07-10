@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -8,13 +8,14 @@ interface ConfirmModalProps {
   cancelLabel?: string;
   variant?: "danger" | "warning" | "primary";
   loading?: boolean;
+  error?: string | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 export default function ConfirmModal({
   open, title, message, confirmLabel = "Confirm", cancelLabel = "Cancel",
-  variant = "danger", loading, onConfirm, onCancel,
+  variant = "danger", loading, error, onConfirm, onCancel,
 }: ConfirmModalProps) {
   if (!open) return null;
 
@@ -30,6 +31,12 @@ export default function ConfirmModal({
       <div className="relative bg-card border border-border rounded-xl p-5 w-full max-w-sm shadow-xl z-10">
         <h3 className="text-base font-bold text-text-primary mb-2">{title}</h3>
         <p className="text-sm text-text-secondary mb-5">{message}</p>
+        {error && (
+          <div className="mb-4 flex items-center gap-2 text-sm text-danger bg-danger-dim border border-danger/30 rounded-lg p-3" role="alert">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
         <div className="flex items-center gap-2 justify-end">
           <button
             onClick={onCancel}
