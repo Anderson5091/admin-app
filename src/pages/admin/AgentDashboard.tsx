@@ -179,13 +179,12 @@ export default function AgentDashboard() {
             <h2 className="text-lg font-bold text-text-primary">Wallets</h2>
           </div>
           {agentDetail?.wallets && agentDetail.wallets.length > 0 ? (
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               {agentDetail.wallets.map((w) => {
                 return (
                   <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
                     <div className="flex items-center gap-2 mb-2">
                       <Badge variant="purple">{w.network}</Badge>
-                      <span className="text-xs text-text-subtle">{w.network}</span>
                     </div>
                     <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
                   </div>
