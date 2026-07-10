@@ -27,8 +27,8 @@ export default function AgentDashboard() {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [swapAmount, setSwapAmount] = useState("");
   const [swapDirection, setSwapDirection] = useState<"TO_LEDGER" | "TO_WALLET">("TO_LEDGER");
-  const [swapWalletType, setSwapWalletType] = useState("MAIN");
-  const [withdrawWalletType, setWithdrawWalletType] = useState("MAIN");
+  const [swapWalletNetwork, setSwapWalletNetwork] = useState("");
+  const [withdrawWalletNetwork, setWithdrawWalletNetwork] = useState("");
   const [swapping, setSwapping] = useState(false);
   const [swapError, setSwapError] = useState<string | null>(null);
   const [swapSuccess, setSwapSuccess] = useState(false);
@@ -124,7 +124,7 @@ export default function AgentDashboard() {
 
   const kpiCards = [
     { label: "Balance", value: agentDetail?.ledgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: "USDT" },
-    { label: "Wallet Balance (Total)", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: agentDetail?.walletBalances?.map(w => `${w.walletType}: ${w.balance} USDT`).join(" | ") || "USDT", isSub: true },
+    { label: "Wallet Balance (Total)", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: agentDetail?.walletBalances?.map(w => `${w.network}: ${w.balance} USDT`).join(" | ") || "USDT", isSub: true },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
     { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
   ];
@@ -181,12 +181,11 @@ export default function AgentDashboard() {
           {agentDetail?.wallets && agentDetail.wallets.length > 0 ? (
             <div className="space-y-3">
               {agentDetail.wallets.map((w) => {
-                const networks = w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network;
                 return (
                   <div key={w.id} className="bg-card-alt rounded-lg p-4 border border-border">
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="purple">{w.walletType}</Badge>
-                      <span className="text-xs text-text-subtle">{networks}</span>
+                      <Badge variant="purple">{w.network}</Badge>
+                      <span className="text-xs text-text-subtle">{w.network}</span>
                     </div>
                     <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
                   </div>
@@ -249,14 +248,7 @@ export default function AgentDashboard() {
                 <label className="text-xs text-text-secondary mb-1 block">Deposit Address</label>
                 <div className="bg-card-alt border border-border rounded-lg p-3 text-center">
                   {(() => {
-                    const networkToType: Record<string, string> = {
-                      BASE: "MAIN",
-                      ETHEREUM: "MAIN",
-                      POLYGON: "MAIN",
-                      SOLANA: "SOLANA",
-                    };
-                    const wt = networkToType[depositFrom];
-                    const addr = wt ? agentDetail?.wallets.find(w => w.walletType === wt)?.address : null;
+                    const addr = agentDetail?.wallets.find(w => w.network === depositFrom)?.address;
                     return addr ? (
                       <>
                         <p className="text-sm font-mono text-text-primary break-all">{addr}</p>
@@ -282,7 +274,7 @@ export default function AgentDashboard() {
         </Modal>
 
         {/* Withdraw Modal — sends from agent's Crossmint wallet to hot treasury */}
-        <Modal open={showWithdrawModal} onClose={() => { setShowWithdrawModal(false); setWithdrawWalletType("MAIN"); setWithdrawError(null); }} title="Withdraw from Wallet">
+        <Modal open={showWithdrawModal} onClose={() => { setShowWithdrawModal(false); setWithdrawWalletNetwork(""); setWithdrawError(null); }} title="Withdraw from Wallet">
           <div className="space-y-3">
             <p className="text-xs text-text-secondary">
               Send USDT from your Crossmint wallet to the platform hot treasury.
@@ -292,13 +284,13 @@ export default function AgentDashboard() {
             <div>
               <label className="text-xs text-text-secondary mb-1 block">Wallet</label>
               <select
-                value={withdrawWalletType}
-                onChange={(e) => setWithdrawWalletType(e.target.value)}
+                value={withdrawWalletNetwork}
+                onChange={(e) => setWithdrawWalletNetwork(e.target.value)}
                 className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
               >
                 {(agentDetail?.wallets || []).map((w) => (
-                  <option key={w.walletType} value={w.walletType}>
-                    {w.walletType} ({w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network}) — {w.balance} USDT
+                  <option key={w.network} value={w.network}>
+                    {w.network} — {w.balance} USDT
                   </option>
                 ))}
               </select>
@@ -315,7 +307,7 @@ export default function AgentDashboard() {
                   className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary placeholder-text-subtle focus:outline-none focus:border-primary pr-16"
                 />
                 {(() => {
-                  const bal = agentDetail?.wallets?.find(w => w.walletType === withdrawWalletType)?.balance;
+                  const bal = agentDetail?.wallets?.find(w => w.network === withdrawWalletNetwork)?.balance;
                   return bal ? (
                     <button
                       onClick={() => setWithdrawAmount(String(bal))}
@@ -345,10 +337,10 @@ export default function AgentDashboard() {
                 setWithdrawing(true);
                 setWithdrawError(null);
                 try {
-                  await AgentApi.walletWithdraw(profile.id, amt, withdrawWalletType);
+                  await AgentApi.walletWithdraw(profile.id, amt);
                   setShowWithdrawModal(false);
                   setWithdrawAmount("");
-                  setWithdrawWalletType("MAIN");
+                  setWithdrawWalletNetwork("");
                   loadDashboard();
                 } catch (err: any) {
                   setWithdrawError(err?.response?.data?.error || err?.message || "Withdrawal failed");
@@ -364,7 +356,7 @@ export default function AgentDashboard() {
         </Modal>
 
         {/* Swap Modal */}
-        <Modal open={showSwapModal} onClose={() => { setShowSwapModal(false); setSwapDirection("TO_LEDGER"); setSwapWalletType("MAIN"); setSwapError(null); setSwapSuccess(false); }} title="Swap Funds">
+        <Modal open={showSwapModal} onClose={() => { setShowSwapModal(false); setSwapDirection("TO_LEDGER"); setSwapWalletNetwork(""); setSwapError(null); setSwapSuccess(false); }} title="Swap Funds">
           <div className="space-y-3">
             <p className="text-xs text-text-secondary">
               {swapDirection === "TO_LEDGER"
@@ -378,13 +370,13 @@ export default function AgentDashboard() {
                 {swapDirection === "TO_LEDGER" ? "Source Wallet" : "Destination Wallet"}
               </label>
               <select
-                value={swapWalletType}
-                onChange={(e) => setSwapWalletType(e.target.value)}
+                value={swapWalletNetwork}
+                onChange={(e) => setSwapWalletNetwork(e.target.value)}
                 className="w-full bg-card-alt border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary"
               >
                 {(agentDetail?.wallets || []).map((w) => (
-                  <option key={w.walletType} value={w.walletType}>
-                    {w.walletType} ({w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network}) — {w.balance} USDT
+                  <option key={w.network} value={w.network}>
+                    {w.network} — {w.balance} USDT
                   </option>
                 ))}
               </select>
@@ -394,10 +386,10 @@ export default function AgentDashboard() {
             {swapDirection === "TO_LEDGER" && (
               <div className="bg-card-alt rounded-lg p-3 text-center">
                 <p className="text-xs text-text-secondary">
-                  {swapWalletType} Balance
+                  {swapWalletNetwork} Balance
                 </p>
                 <p className="text-lg font-bold text-text-primary">
-                  {agentDetail?.wallets?.find(w => w.walletType === swapWalletType)?.balance ?? 0} USDT
+                  {agentDetail?.wallets?.find(w => w.network === swapWalletNetwork)?.balance ?? 0} USDT
                 </p>
               </div>
             )}
@@ -433,7 +425,7 @@ export default function AgentDashboard() {
                 <button
                   onClick={() => {
                     const sourceBal = swapDirection === "TO_LEDGER"
-                      ? (agentDetail?.wallets?.find(w => w.walletType === swapWalletType)?.balance) || 0
+                      ? (agentDetail?.wallets?.find(w => w.network === swapWalletNetwork)?.balance) || 0
                       : agentDetail?.ledgerBalance || 0;
                     setSwapAmount(String(sourceBal));
                   }}
@@ -466,13 +458,13 @@ export default function AgentDashboard() {
                 setSwapError(null);
                 setSwapSuccess(false);
                 try {
-                  await AgentApi.swapFunds(profile.id, amt, swapDirection, swapWalletType);
+                  await AgentApi.swapFunds(profile.id, amt, swapDirection);
                   setSwapSuccess(true);
                   setTimeout(() => {
                     setShowSwapModal(false);
                     setSwapAmount("");
                     setSwapDirection("TO_LEDGER");
-                    setSwapWalletType("MAIN");
+                    setSwapWalletNetwork("");
                     setSwapSuccess(false);
                     loadDashboard();
                   }, 1500);
@@ -487,7 +479,7 @@ export default function AgentDashboard() {
                 ? "Swapping..."
                 : swapDirection === "TO_LEDGER"
                   ? `Swap${swapAmount ? ` ${swapAmount}` : ""} to Ledger`
-                  : `Swap${swapAmount ? ` ${swapAmount}` : ""} to ${swapWalletType}`}
+                  : `Swap${swapAmount ? ` ${swapAmount}` : ""} to ${swapWalletNetwork}`}
             </Button>
           </div>
         </Modal>

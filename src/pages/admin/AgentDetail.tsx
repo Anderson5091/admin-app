@@ -147,7 +147,6 @@ export default function AgentDetail() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-text-subtle uppercase border-b border-border">
-                  <th className="text-left py-2 pr-4">Type</th>
                   <th className="text-left py-2 pr-4">Network</th>
                   <th className="text-left py-2 pr-4">Address</th>
                   <th className="text-right py-2">Balance</th>
@@ -157,9 +156,8 @@ export default function AgentDetail() {
                 {a.wallets.map((w) => (
                   <tr key={w.id} className="border-b border-border last:border-0">
                     <td className="py-2 pr-4">
-                      <Badge variant="purple">{w.walletType}</Badge>
+                      <Badge variant="purple">{w.network}</Badge>
                     </td>
-                    <td className="py-2 pr-4 text-text-subtle">{w.walletType === "MAIN" ? "BASE  ·  ETHEREUM  ·  POLYGON" : w.network}</td>
                     <td className="py-2 pr-4">
                       {w.address ? (
                         <button
