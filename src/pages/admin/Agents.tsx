@@ -20,16 +20,27 @@ export default function Agents() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [createError, setCreateError] = useState("");
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchAgents();
   }, [fetchAgents]);
 
   const handleCreate = async () => {
-    if (!formData.email || !formData.password) return;
-    await createAgent(formData);
-    setShowForm(false);
-    setFormData({ email: "", password: "", fullName: "", phone: "", type: "PARTNER" });
+    setCreateError("");
+    if (!formData.email) { setCreateError("Email is required"); return; }
+    if (!formData.password) { setCreateError("Password is required"); return; }
+    if (formData.password.length < 8) { setCreateError("Password must be at least 8 characters"); return; }
+    setCreating(true);
+    try {
+      await createAgent(formData);
+      setShowForm(false);
+      setFormData({ email: "", password: "", fullName: "", phone: "", type: "PARTNER" });
+    } catch (err: any) {
+      setCreateError(err?.response?.data?.error || err?.message || "Failed to create agent");
+    }
+    setCreating(false);
   };
 
   return (
@@ -100,6 +111,7 @@ export default function Agents() {
               <option value="INTERNAL">Internal Agent</option>
             </select>
           </div>
+          {createError && <p className="text-sm text-danger">{createError}</p>}
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setShowForm(false)}
@@ -109,9 +121,10 @@ export default function Agents() {
             </button>
             <button
               onClick={handleCreate}
-              className="text-xs font-semibold text-white bg-gradient-to-r from-[#00D6A3] to-[#0084FF] hover:opacity-90 px-3 py-1.5 rounded-lg transition-all"
+              disabled={creating}
+              className="text-xs font-semibold text-white bg-gradient-to-r from-[#00D6A3] to-[#0084FF] hover:opacity-90 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
             >
-              Create Agent
+              {creating ? "Creating..." : "Create Agent"}
             </button>
           </div>
         </Card>
