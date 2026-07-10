@@ -347,6 +347,7 @@ export const useAdminStore = create<AdminState>((set) => ({
       set((state) => ({
         partners: state.partners.filter((p) => p.id !== partnerId),
       }));
+      useAdminStore.getState().fetchPartners();
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || "Failed to delete partner";
       throw new Error(message);
@@ -605,6 +606,7 @@ export const useAdminStore = create<AdminState>((set) => ({
         agents: state.agents.filter((a) => a.id !== agentId),
         agentDetail: state.agentDetail?.id === agentId ? null : state.agentDetail,
       }));
+      useAdminStore.getState().fetchDashboard();
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || "Failed to delete agent";
       throw new Error(message);
