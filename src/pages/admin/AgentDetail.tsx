@@ -4,6 +4,7 @@ import { useAdminStore } from "../../features/admin/admin.store";
 import { useAuthStore } from "../../features/admin/auth.store";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
+import ConfirmModal from "../../components/ui/ConfirmModal";
 import {
   ArrowLeft, DollarSign, Activity,
   Wallet, Clock, BarChart3, HandCoins, RefreshCw, Copy, Check, Trash2,
@@ -17,6 +18,7 @@ export default function AgentDetail() {
   const [kpiPeriod, setKpiPeriod] = useState("DAILY");
   const [copiedWalletId, setCopiedWalletId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -73,21 +75,11 @@ export default function AgentDetail() {
           </button>
           {canDelete && (
             <button
-              onClick={async () => {
-                if (!confirm(`Permanently delete ${isPartner ? "partner" : "agent"} "${a.fullName || a.email}"? This cannot be undone.`)) return;
-                setDeleting(true);
-                try {
-                  await deleteAgent(id!);
-                  navigate("/agents");
-                } catch {
-                  setDeleting(false);
-                }
-              }}
-              disabled={deleting}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-danger-dim text-danger hover:bg-danger/20 disabled:opacity-50 flex items-center gap-1"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-danger-dim text-danger hover:bg-danger/20 flex items-center gap-1"
             >
               <Trash2 size={14} />
-              {deleting ? "Deleting..." : `Delete ${isPartner ? "Partner" : "Agent"}`}
+              Delete {isPartner ? "Partner" : "Agent"}
             </button>
           )}
         </div>
@@ -293,6 +285,26 @@ export default function AgentDetail() {
           )}
         </Card>
       </div>
+
+      <ConfirmModal
+        open={showDeleteConfirm}
+        title={`Delete ${isPartner ? "Partner" : "Agent"}`}
+        message={`Permanently delete ${isPartner ? "partner" : "agent"} "${a?.fullName || a?.email}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        variant="danger"
+        loading={deleting}
+        onConfirm={async () => {
+          setDeleting(true);
+          try {
+            await deleteAgent(id!);
+            navigate("/agents");
+          } catch {
+            setDeleting(false);
+            setShowDeleteConfirm(false);
+          }
+        }}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 }
