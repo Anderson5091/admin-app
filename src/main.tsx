@@ -3,6 +3,9 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { setupInterceptors } from "./api/interceptors";
+
+setupInterceptors();
 
 const queryClient = new QueryClient();
 

@@ -16,10 +16,6 @@ function processQueue(error: any, token: string | null = null) {
   failedQueue = [];
 }
 
-function isAuthMeEndpoint(url: string): boolean {
-  return url.includes("/auth/me");
-}
-
 export function resetInterceptorState() {
   isRefreshing = false;
   failedQueue = [];
@@ -57,7 +53,7 @@ export const setupInterceptors = () => {
       }
 
       const url: string = originalRequest.url || "";
-      if (url.includes("/auth/refresh") || isAuthMeEndpoint(url)) {
+      if (url.includes("/auth/refresh")) {
         return Promise.reject(error);
       }
 
