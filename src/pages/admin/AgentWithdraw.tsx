@@ -9,6 +9,7 @@ import {
   Loader2, CheckCircle, AlertCircle, Search, User, Mail, Phone,
   Clock, ArrowRight,
 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 type Step = "search" | "user" | "form";
 
@@ -331,7 +332,7 @@ export default function AgentWithdraw() {
               <div>
                 <label className="block text-sm text-text-secondary mb-1.5">
                   <DollarSign size={14} className="inline mr-1" />
-                  USDT Amount *
+                  {`${CURRENCY_TOKEN} Amount *`}
                 </label>
                 <input
                   type="number"

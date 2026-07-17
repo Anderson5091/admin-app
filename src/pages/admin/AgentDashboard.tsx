@@ -8,6 +8,7 @@ import { Wallet, TrendingUp, RefreshCw, Clock, HandCoins, Loader2, Send, XCircle
 import Modal from "../../components/ui/Modal";
 import Button from "../../components/ui/Button";
 import type { AgentDetail } from "../../features/admin/admin.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 export default function AgentDashboard() {
   const profile = useAuthStore((s) => s.profile);
@@ -123,10 +124,10 @@ export default function AgentDashboard() {
   const agentName = agentDetail?.fullName || profile?.email || "Agent";
 
   const kpiCards = [
-    { label: "Balance", value: agentDetail?.ledgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: "USDT" },
-    { label: "Wallet Balance (Total)", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: agentDetail?.walletBalances?.map(w => `${w.network}: ${w.balance} USDT`).join(" | ") || "USDT", isSub: true },
+    { label: "Balance", value: agentDetail?.ledgerBalance ?? "—", icon: Wallet, color: "text-warning bg-warning-dim", suffix: CURRENCY_TOKEN },
+    { label: "Wallet Balance (Total)", value: agentDetail?.walletBalance ?? "—", icon: Wallet, color: "text-primary bg-primary-dim", suffix: agentDetail?.walletBalances?.map(w => `${w.network}: ${w.balance} ${CURRENCY_TOKEN}`).join(" | ") || CURRENCY_TOKEN, isSub: true },
     { label: "Today Volume", value: agentDetail?.todayVolume ? `$${agentDetail.todayVolume.toLocaleString()}` : "$0", icon: TrendingUp, color: "text-secondary bg-secondary-dim", suffix: agentDetail?.todayTxCount ? `${agentDetail.todayTxCount} txs` : "" },
-    { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: "USDT" },
+    { label: "Today Commission", value: agentDetail?.todayCommission ? `$${agentDetail.todayCommission.toLocaleString()}` : "$0", icon: HandCoins, color: "text-violet-400 bg-violet-900/30", suffix: CURRENCY_TOKEN },
   ];
 
   const isPartner = profile?.role === "AGENT_PARTNER";
@@ -186,7 +187,7 @@ export default function AgentDashboard() {
                     <div className="flex items-center gap-2 mb-2">
                       <Badge variant="purple">{w.network}</Badge>
                     </div>
-                    <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} USDT</p>
+                    <p className="text-lg font-bold text-text-primary">{w.balance.toLocaleString()} {CURRENCY_TOKEN}</p>
                   </div>
                 );
               })}
@@ -215,7 +216,7 @@ export default function AgentDashboard() {
         <Modal open={showDepositModal} onClose={() => setShowDepositModal(false)} title="Deposit into Wallet">
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-text-secondary mb-1 block">Amount (USDT)</label>
+              <label className="text-xs text-text-secondary mb-1 block">{`Amount (${CURRENCY_TOKEN})`}</label>
               <input
                 type="number"
                 placeholder="0.00"
@@ -235,10 +236,10 @@ export default function AgentDashboard() {
                   <option value="bank">Bank Account</option>
                 </optgroup>
                 <optgroup label="External Address">
-                  <option value="BASE">BASE (USDT)</option>
-                  <option value="ETHEREUM">Ethereum (USDT)</option>
-                  <option value="POLYGON">Polygon (USDT)</option>
-                  <option value="SOLANA">Solana (USDT)</option>
+                  <option value="BASE">{`BASE (${CURRENCY_TOKEN})`}</option>
+                  <option value="ETHEREUM">{`Ethereum (${CURRENCY_TOKEN})`}</option>
+                  <option value="POLYGON">{`Polygon (${CURRENCY_TOKEN})`}</option>
+                  <option value="SOLANA">{`Solana (${CURRENCY_TOKEN})`}</option>
                 </optgroup>
               </select>
             </div>
@@ -257,7 +258,7 @@ export default function AgentDashboard() {
                         >
                           <Copy size={12} /> Copy Address
                         </button>
-                        <p className="text-[10px] text-text-subtle mt-1">Only send {depositFrom === "SOLANA" ? "USDT (SOL)" : "USDT"} to this address</p>
+                        <p className="text-[10px] text-text-subtle mt-1">Only send {depositFrom === "SOLANA" ? `${CURRENCY_TOKEN} (SOL)` : CURRENCY_TOKEN} to this address</p>
                       </>
                     ) : (
                       <p className="text-sm text-text-subtle">No address available</p>
@@ -276,7 +277,7 @@ export default function AgentDashboard() {
         <Modal open={showWithdrawModal} onClose={() => { setShowWithdrawModal(false); setWithdrawWalletNetwork(""); setWithdrawError(null); }} title="Withdraw from Wallet">
           <div className="space-y-3">
             <p className="text-xs text-text-secondary">
-              Send USDT from your Crossmint wallet to the platform hot treasury.
+              Send {CURRENCY_TOKEN} from your Crossmint wallet to the platform hot treasury.
             </p>
 
             {/* Wallet selector */}
@@ -289,14 +290,14 @@ export default function AgentDashboard() {
               >
                 {(agentDetail?.wallets || []).map((w) => (
                   <option key={w.network} value={w.network}>
-                    {w.network} — {w.balance} USDT
+                    {w.network} — {w.balance} {CURRENCY_TOKEN}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="text-xs text-text-secondary mb-1 block">Amount (USDT)</label>
+              <label className="text-xs text-text-secondary mb-1 block">{`Amount (${CURRENCY_TOKEN})`}</label>
               <div className="relative">
                 <input
                   type="number"
@@ -349,7 +350,7 @@ export default function AgentDashboard() {
               }}
             >
               {withdrawing ? <Loader2 size={14} className="animate-spin mr-1" /> : <ArrowUpFromLine size={14} className="mr-1" />}
-              {withdrawing ? "Processing..." : `Withdraw${withdrawAmount ? ` ${withdrawAmount}` : ""} USDT to Treasury`}
+              {withdrawing ? "Processing..." : `Withdraw${withdrawAmount ? ` ${withdrawAmount}` : ""} ${CURRENCY_TOKEN} to Treasury`}
             </Button>
           </div>
         </Modal>
@@ -375,7 +376,7 @@ export default function AgentDashboard() {
               >
                 {(agentDetail?.wallets || []).map((w) => (
                   <option key={w.network} value={w.network}>
-                    {w.network} — {w.balance} USDT
+                    {w.network} — {w.balance} {CURRENCY_TOKEN}
                   </option>
                 ))}
               </select>
@@ -388,7 +389,7 @@ export default function AgentDashboard() {
                   {swapWalletNetwork} Balance
                 </p>
                 <p className="text-lg font-bold text-text-primary">
-                  {agentDetail?.wallets?.find(w => w.network === swapWalletNetwork)?.balance ?? 0} USDT
+                  {agentDetail?.wallets?.find(w => w.network === swapWalletNetwork)?.balance ?? 0} {CURRENCY_TOKEN}
                 </p>
               </div>
             )}
@@ -396,7 +397,7 @@ export default function AgentDashboard() {
             <div className="flex items-center justify-between bg-card-alt rounded-lg p-3">
               <div className="text-left">
                 <p className="text-xs text-text-secondary">Ledger Balance</p>
-                <p className="text-lg font-bold text-text-primary">{agentDetail?.ledgerBalance || 0} USDT</p>
+                <p className="text-lg font-bold text-text-primary">{agentDetail?.ledgerBalance || 0} {CURRENCY_TOKEN}</p>
               </div>
               <button
                 onClick={() => setSwapDirection((d) => d === "TO_LEDGER" ? "TO_WALLET" : "TO_LEDGER")}
@@ -407,12 +408,12 @@ export default function AgentDashboard() {
               </button>
               <div className="text-right">
                 <p className="text-xs text-text-secondary">Total Wallet</p>
-                <p className="text-lg font-bold text-text-primary">{agentDetail?.walletBalance || 0} USDT</p>
+                <p className="text-lg font-bold text-text-primary">{agentDetail?.walletBalance || 0} {CURRENCY_TOKEN}</p>
               </div>
             </div>
 
             <div>
-              <label className="text-xs text-text-secondary mb-1 block">Amount (USDT)</label>
+              <label className="text-xs text-text-secondary mb-1 block">{`Amount (${CURRENCY_TOKEN})`}</label>
               <div className="relative">
                 <input
                   type="number"

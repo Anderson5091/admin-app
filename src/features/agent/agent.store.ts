@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { AgentApi } from "./agent.api";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 interface AgentActionState {
   loading: boolean;
@@ -42,7 +43,7 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       const res = await AgentApi.addBalance(agentId, payload);
       set({
         loading: false,
-        result: { success: true, message: `Deposit completed — ${res.netAmount} USDT credited to user`, reference: res.reference },
+        result: { success: true, message: `Deposit completed — ${res.netAmount} ${CURRENCY_TOKEN} credited to user`, reference: res.reference },
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Deposit failed";
@@ -56,7 +57,7 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       const res = await AgentApi.withdraw(agentId, payload);
       set({
         loading: false,
-        result: { success: true, message: `Withdrawal completed — ${res.netAmount} USDT debited from user`, reference: res.reference },
+        result: { success: true, message: `Withdrawal completed — ${res.netAmount} ${CURRENCY_TOKEN} debited from user`, reference: res.reference },
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Withdrawal failed";
@@ -70,7 +71,7 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       const res = await AgentApi.topupPartner(payload);
       set({
         loading: false,
-        result: { success: true, message: `Top-up completed — ${payload.usdtAmount} USDT sent to partner`, reference: res.id },
+        result: { success: true, message: `Top-up completed — ${payload.usdtAmount} ${CURRENCY_TOKEN} sent to partner`, reference: res.id },
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Top-up failed";
@@ -84,7 +85,7 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       const res = await AgentApi.processPayout(agentId, payload);
       set({
         loading: false,
-        result: { success: true, message: `Payout processed — ${res.netAmount} USDT via ${payload.payoutMethod}`, reference: res.reference },
+        result: { success: true, message: `Payout processed — ${res.netAmount} ${CURRENCY_TOKEN} via ${payload.payoutMethod}`, reference: res.reference },
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Payout failed";
@@ -98,7 +99,7 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       const res = await AgentApi.processTransfer(agentId, payload);
       set({
         loading: false,
-        result: { success: true, message: `Transfer processed — ${res.netAmount} USDT via ${payload.payoutMethod}`, reference: res.reference },
+        result: { success: true, message: `Transfer processed — ${res.netAmount} ${CURRENCY_TOKEN} via ${payload.payoutMethod}`, reference: res.reference },
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Transfer failed";
@@ -113,7 +114,7 @@ export const useAgentStore = create<AgentActionState>((set) => ({
       const label = direction === "TO_LEDGER" ? "wallet to ledger" : "ledger to wallet";
       set({
         loading: false,
-        result: { success: true, message: `Swapped ${res.swappedAmount} USDT from ${label}` },
+        result: { success: true, message: `Swapped ${res.swappedAmount} ${CURRENCY_TOKEN} from ${label}` },
       });
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.message || "Swap failed";

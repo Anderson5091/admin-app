@@ -9,6 +9,7 @@ import {
   Users, ArrowUpDown, Shield, AlertTriangle, Scale, Ban, AlertCircle, Clock, Radio, UserCog, Handshake,
   TrendingUp, BarChart3, Search, X, Banknote, Landmark
 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const statusColors: Record<string, string> = {
   PENDING_PAYOUT: "text-warning",
@@ -187,7 +188,7 @@ export default function Dashboard() {
           { label: "Total Users", value: (d.totalUsers ?? 0).toLocaleString(), icon: Users, color: "text-secondary bg-secondary-dim" },
           { label: "Active Users", value: (d.activeUsers ?? 0).toLocaleString(), icon: Users, color: "text-primary bg-primary-dim" },
           { label: "Total Transfers", value: (d.totalTransfers ?? 0).toLocaleString(), icon: ArrowUpDown, color: "text-violet-400 bg-violet-900/30" },
-          { label: "Volume (USDT)", value: "$" + ((d.totalVolume ?? 0) / 1_000).toFixed(1) + "K", icon: ArrowUpDown, color: "text-primary bg-primary-dim" },
+          { label: `Volume (${CURRENCY_TOKEN})`, value: "$" + ((d.totalVolume ?? 0) / 1_000).toFixed(1) + "K", icon: ArrowUpDown, color: "text-primary bg-primary-dim" },
           { label: "Pending KYC", value: d.pendingKyc ?? 0, icon: Shield, color: "text-warning bg-warning-dim" },
           { label: "Failed Payouts", value: d.failedPayouts ?? 0, icon: AlertTriangle, color: "text-danger bg-danger-dim" },
           { label: "Open Cases", value: d.openCases ?? 0, icon: Scale, color: "text-warning bg-warning-dim" },

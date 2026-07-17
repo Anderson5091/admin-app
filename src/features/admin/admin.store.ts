@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
 import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer } from "./admin.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 interface AdminState {
   dashboard: AdminDashboardData | null;
@@ -639,7 +640,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ agentActionLoading: true, agentActionResult: null });
     try {
       await AdminApi.addBalance(payload);
-      set({ agentActionLoading: false, agentActionResult: `Top-up completed — ${payload.usdtAmount} USDT sent to partner` });
+      set({ agentActionLoading: false, agentActionResult: `Top-up completed — ${payload.usdtAmount} ${CURRENCY_TOKEN} sent to partner` });
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || "Top up failed";
       set({ agentActionLoading: false, agentActionResult: message });

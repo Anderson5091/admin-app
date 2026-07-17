@@ -7,6 +7,7 @@ import {
   ArrowLeft, ArrowUpFromLine, DollarSign,
   Loader2, CheckCircle, AlertCircle, Users,
 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 export default function AgentTopUpAgent() {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ export default function AgentTopUpAgent() {
         </button>
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-text-primary">Top Up Partner</h1>
-          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Transfer USDT from system treasury to a partner's wallet</p>
+          <p className="text-text-secondary text-xs sm:text-sm mt-0.5">Transfer {CURRENCY_TOKEN} from system treasury to a partner's wallet</p>
         </div>
       </div>
 
@@ -92,7 +93,7 @@ export default function AgentTopUpAgent() {
         <div>
           <label className="block text-sm text-text-secondary mb-1.5">
             <DollarSign size={14} className="inline mr-1" />
-            USDT Amount *
+            {`${CURRENCY_TOKEN} Amount *`}
           </label>
           <input
             type="number"

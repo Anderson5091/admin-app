@@ -5,6 +5,7 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import { Search, Filter, RefreshCw, AlertTriangle, CheckCircle, X, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import type { PayoutDetailItem } from "../../features/admin/admin.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const statusOptions = ["All Statuses", "FAILED", "COMPLETED", "PENDING", "PROCESSING", "QUEUED"];
 
@@ -370,7 +371,7 @@ export default function PayoutMonitor() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-text-primary font-semibold text-sm sm:text-base">${(payout.amount || 0).toLocaleString()}</p>
-                        <Badge variant="info">{payout.currency || "USDT"}</Badge>
+                        <Badge variant="info">{payout.currency || CURRENCY_TOKEN}</Badge>
                         <Badge variant="danger">Failed</Badge>
                       </div>
                       {payout.referenceId && <p className="text-xs text-text-subtle mt-0.5">Ref: {payout.referenceId}</p>}
@@ -413,7 +414,7 @@ export default function PayoutMonitor() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-text-primary font-semibold text-sm sm:text-base">${(payout.amount || 0).toLocaleString()}</p>
-                        <Badge variant="info">{payout.currency || "USDT"}</Badge>
+                        <Badge variant="info">{payout.currency || CURRENCY_TOKEN}</Badge>
                         <Badge variant="success">Completed</Badge>
                       </div>
                       {payout.referenceId && <p className="text-xs text-text-subtle mt-0.5">Ref: {payout.referenceId}</p>}

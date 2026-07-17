@@ -8,6 +8,7 @@ import {
   ArrowLeft, Send, DollarSign, Percent, CreditCard, User,
   Loader2, CheckCircle, AlertCircle, Hash, Globe, Building2, Smartphone, MapPin, Search
 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const PAYOUT_METHODS = [
   { value: "BANK_TRANSFER", label: "Bank Transfer" },
@@ -205,7 +206,7 @@ export default function AgentTransfer() {
         <div>
           <label className="block text-sm text-text-secondary mb-1.5">
             <DollarSign size={14} className="inline mr-1" />
-            USDT Amount *
+            {`${CURRENCY_TOKEN} Amount *`}
           </label>
           <input
             type="number"

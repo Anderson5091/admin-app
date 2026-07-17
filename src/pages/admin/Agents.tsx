@@ -6,6 +6,7 @@ import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 import { Plus, UserCog, DollarSign, BarChart3, X, ExternalLink, HandCoins, Trash2 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const typeColors: Record<string, string> = {
   PARTNER: "text-purple-400 bg-purple-900/30 border-purple-700/30",
@@ -148,11 +149,11 @@ export default function Agents() {
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-text-secondary">
                     <span className="flex items-center gap-1">
                       <DollarSign size={12} className="text-primary" />
-                      Wallet: {(agent.walletBalance ?? 0).toLocaleString()} USDT
+                      Wallet: {(agent.walletBalance ?? 0).toLocaleString()} {CURRENCY_TOKEN}
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 size={12} className="text-secondary" />
-                      Ledger: {agent.ledgerBalance.toLocaleString()} USDT
+                      Ledger: {agent.ledgerBalance.toLocaleString()} {CURRENCY_TOKEN}
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 size={12} className="text-secondary" />

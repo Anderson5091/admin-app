@@ -9,6 +9,7 @@ import {
   ArrowLeft, DollarSign, Activity,
   Wallet, Clock, BarChart3, HandCoins, RefreshCw, Copy, Check, Trash2,
 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 export default function AgentDetail() {
   const { id } = useParams();
@@ -95,7 +96,7 @@ export default function AgentDetail() {
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">{a.walletBalance?.toLocaleString() ?? "N/A"}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Wallet Balance</p>
-              <p className="text-[9px] text-text-subtle">USDT</p>
+              <p className="text-[9px] text-text-subtle">{CURRENCY_TOKEN}</p>
             </div>
           </div>
         </Card>
@@ -107,7 +108,7 @@ export default function AgentDetail() {
             <div className="min-w-0">
               <p className="text-base sm:text-lg font-bold text-text-primary truncate">{a.ledgerBalance.toLocaleString()}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary">Ledger Balance</p>
-              <p className="text-[9px] text-text-subtle">USDT</p>
+              <p className="text-[9px] text-text-subtle">{CURRENCY_TOKEN}</p>
             </div>
           </div>
         </Card>
@@ -175,7 +176,7 @@ export default function AgentDetail() {
                         <span className="text-text-subtle">—</span>
                       )}
                     </td>
-                    <td className="py-2 text-right text-text-primary font-bold">{w.balance.toLocaleString()} USDT</td>
+                    <td className="py-2 text-right text-text-primary font-bold">{w.balance.toLocaleString()} {CURRENCY_TOKEN}</td>
                   </tr>
                 ))}
               </tbody>
