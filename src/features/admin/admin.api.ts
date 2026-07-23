@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemRevenueData, AgentRevenueData, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer, TreasuryOfframpResult } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemRevenueData, AgentRevenueData, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, SolvencyReport, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer, TreasuryOfframpResult } from "./admin.types";
 
 export const AdminApi = {
   async getDashboard(): Promise<AdminDashboardData> {
@@ -144,6 +144,11 @@ export const AdminApi = {
 
   async getTreasuryOverview(): Promise<TreasuryOverview> {
     const { data } = await api.get("/treasury/overview");
+    return data;
+  },
+
+  async getSolvency(): Promise<SolvencyReport> {
+    const { data } = await api.get("/treasury/solvency");
     return data;
   },
 

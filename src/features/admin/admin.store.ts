@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AdminApi } from "./admin.api";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, SolvencyReport, Agent, AgentDetail, AgentKpiItem, AdminUserItem, AddBalancePayload, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer } from "./admin.types";
 import { CURRENCY_TOKEN } from "../../config/constants";
 
 interface AdminState {
@@ -21,6 +21,8 @@ interface AdminState {
   systemMetrics: SystemMetrics | null;
   systemStatus: SystemStatus | null;
   treasuryOverview: TreasuryOverview | null;
+  solvency: SolvencyReport | null;
+  solvencyLoading: boolean;
   treasuryLoading: boolean;
   treasuryError: string;
   rebalanceMessage: string;
@@ -134,6 +136,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   systemMetrics: null,
   systemStatus: null,
   treasuryOverview: null,
+  solvency: null,
+  solvencyLoading: false,
   treasuryLoading: false,
   treasuryError: "",
   rebalanceMessage: "",
@@ -419,6 +423,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       const message = err?.response?.data?.error || err?.message || "Failed to load treasury data";
       console.error("Failed to fetch treasury overview:", err);
       set({ treasuryLoading: false, treasuryError: message });
+    }
+  },
+
+  fetchSolvency: async () => {
+    set({ solvencyLoading: true });
+    try {
+      const solvency = await AdminApi.getSolvency();
+      set({ solvency, solvencyLoading: false });
+    } catch (err) {
+      console.error("Failed to fetch solvency:", err);
+      set({ solvencyLoading: false });
     }
   },
 

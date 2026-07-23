@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "../../features/admin/admin.store";
-import type { TreasuryOverview } from "../../features/admin/admin.types";
+import type { TreasuryOverview, SolvencyReport } from "../../features/admin/admin.types";
 import Card from "../../components/ui/Card";
-import { Wallet, ArrowUpDown, AlertTriangle, RefreshCw, Thermometer, Database, Shield, Copy, Landmark, ArrowRightFromLine, ArrowLeftToLine, Plus, Trash2, XCircle, ExternalLink } from "lucide-react";
+import { Wallet, ArrowUpDown, AlertTriangle, RefreshCw, Thermometer, Database, Shield, Copy, Landmark, ArrowRightFromLine, ArrowLeftToLine, Plus, Trash2, XCircle, ExternalLink, BarChart3 } from "lucide-react";
 
 const walletTypeColors: Record<string, string> = {
   HOT: "text-danger bg-danger-dim border-danger/30",
@@ -33,6 +33,7 @@ const statusBadge: Record<string, string> = {
 export default function Treasury() {
   const {
     treasuryOverview, treasuryLoading, treasuryError, rebalanceMessage,
+    solvency, solvencyLoading, fetchSolvency,
     fetchTreasuryOverview, triggerRebalance,
     treasuryOnrampInfo, treasuryBankAccounts,
     treasuryOfframpOrders, treasuryOnrampTransfers,
@@ -66,6 +67,7 @@ export default function Treasury() {
 
   useEffect(() => {
     fetchTreasuryOverview();
+    fetchSolvency();
     fetchTreasuryOnrampInfo();
     fetchTreasuryBankAccounts();
     fetchTreasuryOfframpOrders();
@@ -155,6 +157,7 @@ export default function Treasury() {
         <button
           onClick={() => {
             fetchTreasuryOverview();
+            fetchSolvency();
             fetchTreasuryOnrampInfo();
             fetchTreasuryBankAccounts();
             fetchTreasuryOfframpOrders();
@@ -213,7 +216,53 @@ export default function Treasury() {
             </div>
           </div>
         </Card>
+        {/* Obligation */}
+        <Card className="p-3 sm:p-4 border-l-4 border-l-violet-500">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-violet-900/20 text-violet-400">
+              <BarChart3 size={16} className="sm:w-[18px] sm:h-[18px]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">
+                {solvency ? fmt(solvency.totalObligation) : "—"}
+              </p>
+              <p className="text-[10px] sm:text-xs text-violet-400 font-medium truncate">Total Obligation</p>
+            </div>
+          </div>
+        </Card>
       </div>
+
+      {/* Solvency Alert & Gauge */}
+      {solvency && (
+        <div className="space-y-3">
+          {!solvency.healthy && (
+            <div className="flex items-center gap-2 bg-danger-dim border border-danger/30 text-danger text-sm rounded-lg px-4 py-2.5">
+              <AlertTriangle size={16} />
+              <span>Insufficient platform liquidity. Contact treasury.</span>
+            </div>
+          )}
+          <div className="bg-card-alt border border-border rounded-lg p-3 text-xs">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-text-secondary font-medium">Obligation vs HOT+WARM</span>
+              <span className={`font-mono font-semibold ${!solvency.healthy ? "text-danger" : solvency.availableLiquidity < solvency.hotWarmTotal * 0.1 ? "text-warning" : "text-success"}`}>
+                {fmt(solvency.totalObligation)} / {fmt(solvency.hotWarmTotal)}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-border rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${!solvency.healthy ? "bg-danger" : "bg-primary"}`}
+                style={{ width: `${Math.min((solvency.hotWarmTotal > 0 ? (solvency.totalObligation / solvency.hotWarmTotal) * 100 : 0), 100)}%` }}
+              />
+            </div>
+            <div className="flex justify-between mt-1 text-[10px] text-text-subtle">
+              <span>Available: {fmt(solvency.availableLiquidity)}</span>
+              <span>User: {fmt(solvency.userObligation)}</span>
+              <span>Agent: {fmt(solvency.agentObligation)}</span>
+              <span>Pending: {fmt(solvency.pendingObligation)}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Network Allocation */}
       <Card>

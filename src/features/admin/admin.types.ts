@@ -491,6 +491,20 @@ export interface TreasuryOfframpResult {
   amount: number;
 }
 
+export interface SolvencyReport {
+  healthy: boolean;
+  availableLiquidity: number;
+  userObligation: number;
+  agentObligation: number;
+  pendingObligation: number;
+  totalObligation: number;
+  hotBalance: number;
+  warmBalance: number;
+  coldBalance: number;
+  hotWarmTotal: number;
+  deficit: number | null;
+}
+
 export interface FeeConfig {
   id: string;
   transactionType: string;
