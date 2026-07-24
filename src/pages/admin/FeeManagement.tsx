@@ -45,7 +45,7 @@ export default function FeeManagement() {
   const [ruleForm, setRuleForm] = useState<Partial<FeeRule> & { isNew?: boolean }>({});
   const [ruleSaving, setRuleSaving] = useState(false);
 
-  const PAYOUT_METHOD_OPTIONS = ["BANK", "MOBILE_MONEY", "CASH_PICKUP"];
+  const PAYOUT_METHOD_OPTIONS = ["ALL", "BANK", "MOBILE_MONEY", "CASH_PICKUP"];
 
   const fetchRules = async () => {
     setRulesLoading(true);
