@@ -170,7 +170,7 @@ export default function Treasury() {
         </button>
       </div>
 
-      {/* Liquidity Summary */}
+      {/* Total Liquidity + Wallet KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <Card className="p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -180,28 +180,6 @@ export default function Treasury() {
             <div className="min-w-0">
               <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tLiquidity)}</p>
               <p className="text-[10px] sm:text-xs text-text-secondary truncate">Total Liquidity</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-3 sm:p-4 border-l-4 border-l-danger">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-danger-dim text-danger">
-              <Thermometer size={16} className="sm:w-[18px] sm:h-[18px]" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tHot)}</p>
-              <p className="text-[10px] sm:text-xs text-danger font-medium truncate">Hot Wallet</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-3 sm:p-4 border-l-4 border-l-warning">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-warning-dim text-warning">
-              <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tWarm)}</p>
-              <p className="text-[10px] sm:text-xs text-warning font-medium truncate">Warm Wallet</p>
             </div>
           </div>
         </Card>
@@ -216,33 +194,50 @@ export default function Treasury() {
             </div>
           </div>
         </Card>
-        {/* Obligation */}
-        <Card className="p-3 sm:p-4 border-l-4 border-l-violet-500">
+        <Card className="p-3 sm:p-4 border-l-4 border-l-warning">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-violet-900/20 text-violet-400">
-              <BarChart3 size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <div className="p-1.5 sm:p-2 rounded-lg bg-warning-dim text-warning">
+              <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" />
             </div>
             <div className="min-w-0">
-              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">
-                {solvency ? fmt(solvency.totalObligation) : "—"}
-              </p>
-              <p className="text-[10px] sm:text-xs text-violet-400 font-medium truncate">Total Obligation</p>
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tWarm)}</p>
+              <p className="text-[10px] sm:text-xs text-warning font-medium truncate">Warm Wallet</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-3 sm:p-4 border-l-4 border-l-danger">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-danger-dim text-danger">
+              <Thermometer size={16} className="sm:w-[18px] sm:h-[18px]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(tHot)}</p>
+              <p className="text-[10px] sm:text-xs text-danger font-medium truncate">Hot Wallet</p>
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Solvency Alert & Gauge */}
+      {/* Obligation + Gauge */}
       {solvency && (
-        <div className="space-y-3">
-          {!solvency.healthy && (
-            <div className="flex items-center gap-2 bg-danger-dim border border-danger/30 text-danger text-sm rounded-lg px-4 py-2.5">
-              <AlertTriangle size={16} />
-              <span>Insufficient platform liquidity. Contact treasury.</span>
+        <Card className="p-3 sm:p-4 border-l-4 border-l-violet-500">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-violet-900/20 text-violet-400">
+              <BarChart3 size={16} className="sm:w-[18px] sm:h-[18px]" />
             </div>
-          )}
-          <div className="bg-card-alt border border-border rounded-lg p-3 text-xs">
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">{fmt(solvency.totalObligation)}</p>
+              <p className="text-[10px] sm:text-xs text-violet-400 font-medium truncate">Total Obligation</p>
+            </div>
+          </div>
+          <div className="space-y-1">
+            {!solvency.healthy && (
+              <div className="flex items-center gap-1.5 bg-danger-dim border border-danger/30 text-danger text-[10px] rounded px-2 py-1 mb-1">
+                <AlertTriangle size={10} />
+                <span>Insufficient platform liquidity. Contact treasury.</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-xs">
               <span className="text-text-secondary font-medium">Obligation vs HOT+WARM</span>
               <span className={`font-mono font-semibold ${!solvency.healthy ? "text-danger" : solvency.availableLiquidity < solvency.hotWarmTotal * 0.1 ? "text-warning" : "text-success"}`}>
                 {fmt(solvency.totalObligation)} / {fmt(solvency.hotWarmTotal)}
@@ -254,14 +249,27 @@ export default function Treasury() {
                 style={{ width: `${Math.min((solvency.hotWarmTotal > 0 ? (solvency.totalObligation / solvency.hotWarmTotal) * 100 : 0), 100)}%` }}
               />
             </div>
-            <div className="flex justify-between mt-1 text-[10px] text-text-subtle">
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-text-subtle">
               <span>Available: {fmt(solvency.availableLiquidity)}</span>
               <span>User: {fmt(solvency.userObligation)}</span>
               <span>Agent: {fmt(solvency.agentObligation)}</span>
               <span>Pending: {fmt(solvency.pendingObligation)}</span>
             </div>
           </div>
-        </div>
+        </Card>
+      )}
+      {!solvency && (
+        <Card className="p-3 sm:p-4 border-l-4 border-l-violet-500">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-violet-900/20 text-violet-400">
+              <BarChart3 size={16} className="sm:w-[18px] sm:h-[18px]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-text-primary truncate">—</p>
+              <p className="text-[10px] sm:text-xs text-violet-400 font-medium truncate">Total Obligation</p>
+            </div>
+          </div>
+        </Card>
       )}
 
       {/* Network Allocation */}
