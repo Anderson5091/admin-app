@@ -9,7 +9,7 @@ export const AgentApi = {
 
   async addBalance(
     agentId: string,
-    payload: { userId: string; fiatAmount: string; usdtAmount: number; commissionPercent?: number }
+    payload: { userId: string; fiatAmount: string; usdtAmount: number }
   ): Promise<{ id: string; status: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
     const { data } = await api.post(`/agent/${agentId}/add-balance`, payload);
     return data;
@@ -17,7 +17,7 @@ export const AgentApi = {
 
   async withdraw(
     agentId: string,
-    payload: { userId: string; amount: number; commissionPercent?: number; destinationType?: "OFFCHAIN" | "MAIN" }
+    payload: { userId: string; amount: number; destinationType?: "OFFCHAIN" | "MAIN" }
   ): Promise<{ id: string; status: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
     const { data } = await api.post(`/agent/${agentId}/withdraw`, payload);
     return data;
@@ -30,7 +30,7 @@ export const AgentApi = {
 
   async processPayout(
     agentId: string,
-    payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string; commissionPercent?: number }
+    payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string }
   ): Promise<{ id: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {
     const { data } = await api.post(`/agent/${agentId}/process-payout`, payload);
     return data;
@@ -52,7 +52,6 @@ export const AgentApi = {
         mobileProvider?: string;
         cashPickupLocation?: string;
       };
-      commissionPercent?: number;
       debitUserWallet?: boolean;
     }
   ): Promise<{ id: string; type: string; amount: number; commission: number; netAmount: number; reference: string }> {

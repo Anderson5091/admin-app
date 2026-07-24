@@ -5,7 +5,7 @@ import { useAgentStore } from "../../features/agent/agent.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import {
-  ArrowLeft, Wallet, DollarSign, Percent,
+  ArrowLeft, Wallet, DollarSign,
   Loader2, CheckCircle, AlertCircle, Search, User, Mail, Phone,
   Clock, ArrowRight,
 } from "lucide-react";
@@ -38,7 +38,6 @@ export default function AgentDeposit() {
 
   const [fiatAmount, setFiatAmount] = useState("");
   const [usdtAmount, setUsdtAmount] = useState("");
-  const [commissionPercent, setCommissionPercent] = useState("0");
 
   const [recentDeposits, setRecentDeposits] = useState<RecentDeposit[]>([]);
   const [depositsLoading, setDepositsLoading] = useState(true);
@@ -89,7 +88,6 @@ export default function AgentDeposit() {
       userId: foundUser.id,
       fiatAmount,
       usdtAmount: Number(usdtAmount),
-      commissionPercent: Number(commissionPercent) || 0,
     });
   };
 
@@ -100,7 +98,6 @@ export default function AgentDeposit() {
     setFoundUser(null);
     setFiatAmount("");
     setUsdtAmount("");
-    setCommissionPercent("0");
     useAgentStore.getState().clearResult();
     loadRecentDeposits();
   };
@@ -362,23 +359,6 @@ export default function AgentDeposit() {
                   />
                   <p className="text-[10px] text-text-subtle mt-1">{`${CURRENCY_TOKEN} to credit to user's wallet`}</p>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm text-text-secondary mb-1.5">
-                  <Percent size={14} className="inline mr-1" />
-                  Commission %
-                </label>
-                <input
-                  type="number"
-                  value={commissionPercent}
-                  onChange={(e) => setCommissionPercent(e.target.value)}
-                  placeholder="0"
-                  className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-full sm:max-w-[200px]"
-                  disabled={loading}
-                  min="0"
-                  max="100"
-                />
               </div>
 
               {result && !result.success && (

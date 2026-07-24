@@ -5,7 +5,7 @@ import { useAgentStore } from "../../features/agent/agent.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import {
-  ArrowLeft, Send, DollarSign, Percent,
+  ArrowLeft, Send, DollarSign,
   Loader2, CheckCircle, AlertCircle, Search, User, Mail, Phone,
   Clock, ArrowRight,
 } from "lucide-react";
@@ -38,7 +38,6 @@ export default function AgentWithdraw() {
   const [foundUser, setFoundUser] = useState<{ id: string; email: string; fullName: string | null; phone: string | null } | null>(null);
 
   const [amount, setAmount] = useState("");
-  const [commissionPercent, setCommissionPercent] = useState("0");
   const [destinationType, setDestinationType] = useState<"OFFCHAIN" | "MAIN">("OFFCHAIN");
 
   const isPartner = profile?.role === "AGENT_PARTNER";
@@ -91,7 +90,6 @@ export default function AgentWithdraw() {
     await withdraw(agentId, {
       userId: foundUser.id,
       amount: Number(amount),
-      commissionPercent: Number(commissionPercent) || 0,
       destinationType,
     });
   };
@@ -102,7 +100,6 @@ export default function AgentWithdraw() {
     setStep("search");
     setFoundUser(null);
     setAmount("");
-    setCommissionPercent("0");
     useAgentStore.getState().clearResult();
     loadRecentWithdrawals();
   };
@@ -365,23 +362,6 @@ export default function AgentWithdraw() {
                   </label>
                 </div>
               )}
-
-              <div>
-                <label className="block text-sm text-text-secondary mb-1.5">
-                  <Percent size={14} className="inline mr-1" />
-                  Commission %
-                </label>
-                <input
-                  type="number"
-                  value={commissionPercent}
-                  onChange={(e) => setCommissionPercent(e.target.value)}
-                  placeholder="0"
-                  className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-full sm:max-w-[200px]"
-                  disabled={loading}
-                  min="0"
-                  max="100"
-                />
-              </div>
 
               {result && !result.success && (
                 <div className="flex items-start gap-3 px-4 py-3 rounded-lg text-sm bg-danger/10 text-danger">

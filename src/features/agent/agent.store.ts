@@ -7,10 +7,10 @@ interface AgentActionState {
   result: { success: boolean; message: string; reference?: string } | null;
 
   swapFunds: (agentId: string, amount: number, direction: "TO_LEDGER" | "TO_WALLET") => Promise<void>;
-  deposit: (agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number; commissionPercent?: number }) => Promise<void>;
-  withdraw: (agentId: string, payload: { userId: string; amount: number; commissionPercent?: number; destinationType?: "OFFCHAIN" | "MAIN" }) => Promise<void>;
+  deposit: (agentId: string, payload: { userId: string; fiatAmount: string; usdtAmount: number }) => Promise<void>;
+  withdraw: (agentId: string, payload: { userId: string; amount: number; destinationType?: "OFFCHAIN" | "MAIN" }) => Promise<void>;
   topupPartner: (payload: { partnerAgentId: string; usdtAmount: number }) => Promise<void>;
-  payout: (agentId: string, payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string; commissionPercent?: number }) => Promise<void>;
+  payout: (agentId: string, payload: { userId: string; amount: number; payoutMethod: string; beneficiaryId?: string }) => Promise<void>;
   transfer: (agentId: string, payload: {
     userId?: string;
     amount: number;
@@ -25,7 +25,6 @@ interface AgentActionState {
       mobileProvider?: string;
       cashPickupLocation?: string;
     };
-    commissionPercent?: number;
     debitUserWallet?: boolean;
   }) => Promise<void>;
   requestCash: (agentId: string, payload: { amount: number; notes?: string }) => Promise<void>;

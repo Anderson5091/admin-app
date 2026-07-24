@@ -5,7 +5,7 @@ import { useAgentStore } from "../../features/agent/agent.store";
 import { AgentApi } from "../../features/agent/agent.api";
 import Card from "../../components/ui/Card";
 import {
-  ArrowLeft, Send, DollarSign, Percent, CreditCard, User,
+  ArrowLeft, Send, DollarSign, CreditCard, User,
   Loader2, CheckCircle, AlertCircle, Hash, Globe, Building2, Smartphone, MapPin, Search
 } from "lucide-react";
 import { CURRENCY_TOKEN } from "../../config/constants";
@@ -32,7 +32,6 @@ export default function AgentTransfer() {
   const [payoutMethod, setPayoutMethod] = useState("BANK_TRANSFER");
   const [beneficiaryId, setBeneficiaryId] = useState("");
   const [useExistingBeneficiary, setUseExistingBeneficiary] = useState(false);
-  const [commissionPercent, setCommissionPercent] = useState("0");
 
   const [fullName, setFullName] = useState("");
   const [country, setCountry] = useState("");
@@ -82,7 +81,6 @@ export default function AgentTransfer() {
       payoutMethod,
       beneficiaryId: useExistingBeneficiary ? beneficiaryId || undefined : undefined,
       beneficiary,
-      commissionPercent: Number(commissionPercent) || 0,
       debitUserWallet: foundUser ? debitUserWallet : false,
     });
   };
@@ -95,7 +93,7 @@ export default function AgentTransfer() {
     if (result?.success) {
       const t = setTimeout(() => {
         clearResult();
-        setAmount(""); setBeneficiaryId(""); setCommissionPercent("0");
+        setAmount(""); setBeneficiaryId("");
         setFullName(""); setCountry(""); setBankName(""); setAccountNumber("");
         setMobileWalletNumber(""); setMobileProvider(""); setCashPickupLocation("");
         setCustomerIdentifier(""); setFoundUser(null); setDebitUserWallet(false);
@@ -372,23 +370,6 @@ export default function AgentTransfer() {
             )}
           </div>
         )}
-
-        <div>
-          <label className="block text-sm text-text-secondary mb-1.5">
-            <Percent size={14} className="inline mr-1" />
-            Commission %
-          </label>
-          <input
-            type="number"
-            value={commissionPercent}
-            onChange={(e) => setCommissionPercent(e.target.value)}
-            placeholder="0"
-            className="w-full bg-card-alt border border-border rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder:text-text-subtle focus:outline-none focus:border-primary max-w-full sm:max-w-[200px]"
-            disabled={loading}
-            min="0"
-            max="100"
-          />
-        </div>
 
         {result && (
           <div className={`flex items-start gap-3 px-4 py-3 rounded-lg text-sm ${
