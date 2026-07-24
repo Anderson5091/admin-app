@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../../features/admin/auth.store";
 import { AdminApi } from "../../features/admin/admin.api";
-import type { FeeConfig } from "../../features/admin/admin.types";
+import type { FeeConfig, FeeRule } from "../../features/admin/admin.types";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
-import { Save, X, AlertTriangle, CheckCircle } from "lucide-react";
+import { Save, X, AlertTriangle, CheckCircle, Plus, Trash2, Edit3 } from "lucide-react";
 
 type FeeMode = "FIXED" | "PERCENTAGE" | "BOTH";
 
@@ -38,6 +38,83 @@ export default function FeeManagement() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [rules, setRules] = useState<FeeRule[]>([]);
+  const [rulesLoading, setRulesLoading] = useState(true);
+  const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
+  const [ruleForm, setRuleForm] = useState<Partial<FeeRule> & { isNew?: boolean }>({});
+  const [ruleSaving, setRuleSaving] = useState(false);
+
+  const PAYOUT_METHOD_OPTIONS = ["BANK", "MOBILE_MONEY", "CASH_PICKUP"];
+
+  const fetchRules = async () => {
+    setRulesLoading(true);
+    try {
+      const data = await AdminApi.getFeeRules();
+      setRules(data);
+    } catch {
+    } finally {
+      setRulesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRules();
+  }, []);
+
+  const startAddRule = () => {
+    setEditingRuleId("__new__");
+    setRuleForm({ country: "", payoutMethod: "BANK", fixedFee: 0, percentFee: 0, isNew: true });
+  };
+
+  const startEditRule = (rule: FeeRule) => {
+    setEditingRuleId(rule.id);
+    setRuleForm({ ...rule });
+  };
+
+  const cancelRuleEdit = () => {
+    setEditingRuleId(null);
+    setRuleForm({});
+  };
+
+  const handleSaveRule = async () => {
+    if (!ruleForm.country || !ruleForm.payoutMethod) return;
+    setRuleSaving(true);
+    try {
+      if (editingRuleId === "__new__") {
+        const created = await AdminApi.createFeeRule({
+          country: ruleForm.country,
+          payoutMethod: ruleForm.payoutMethod,
+          fixedFee: ruleForm.fixedFee ?? 0,
+          percentFee: ruleForm.percentFee ?? 0,
+        });
+        setRules((prev) => [...prev, created]);
+      } else if (editingRuleId) {
+        const updated = await AdminApi.updateFeeRule(editingRuleId, {
+          country: ruleForm.country,
+          payoutMethod: ruleForm.payoutMethod,
+          fixedFee: ruleForm.fixedFee,
+          percentFee: ruleForm.percentFee,
+        });
+        setRules((prev) => prev.map((r) => (r.id === editingRuleId ? updated : r)));
+      }
+      cancelRuleEdit();
+    } catch {
+      setError("Failed to save fee rule");
+    } finally {
+      setRuleSaving(false);
+    }
+  };
+
+  const handleDeleteRule = async (id: string) => {
+    if (!confirm("Delete this fee rule?")) return;
+    try {
+      await AdminApi.deleteFeeRule(id);
+      setRules((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      setError("Failed to delete fee rule");
+    }
+  };
 
   const fetchConfigs = async () => {
     setLoading(true);
@@ -334,6 +411,217 @@ export default function FeeManagement() {
             </Card>
           );
         })}
+      </div>
+
+      <hr className="border-border my-8" />
+
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-text-primary">Cross-Border Fee Rules</h2>
+            <p className="text-text-secondary text-sm mt-0.5">Country + payout method fees deducted from recipient at payout</p>
+          </div>
+          <button
+            onClick={startAddRule}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:opacity-90 transition-opacity"
+          >
+            <Plus size={14} />
+            Add Rule
+          </button>
+        </div>
+
+        <Card className="overflow-hidden">
+          {rulesLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+            </div>
+          ) : rules.length === 0 && editingRuleId !== "__new__" ? (
+            <p className="text-text-subtle text-sm py-8 text-center">No fee rules configured. Add one to apply cross-border fees.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-text-subtle text-[10px] uppercase tracking-wider">
+                    <th className="text-left py-3 px-4">Country</th>
+                    <th className="text-left py-3 px-4">Payout Method</th>
+                    <th className="text-right py-3 px-4">Fixed Fee ($)</th>
+                    <th className="text-right py-3 px-4">Percent (%)</th>
+                    <th className="text-right py-3 px-4 w-24">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {editingRuleId === "__new__" && (
+                    <tr className="bg-primary-dim/30 border-b border-border">
+                      <td className="py-2 px-4">
+                        <input
+                          value={ruleForm.country || ""}
+                          onChange={(e) => setRuleForm({ ...ruleForm, country: e.target.value })}
+                          placeholder="e.g. Haiti"
+                          className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary focus:outline-none focus:border-primary"
+                        />
+                      </td>
+                      <td className="py-2 px-4">
+                        <select
+                          value={ruleForm.payoutMethod || "BANK"}
+                          onChange={(e) => setRuleForm({ ...ruleForm, payoutMethod: e.target.value })}
+                          className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary focus:outline-none focus:border-primary"
+                        >
+                          {PAYOUT_METHOD_OPTIONS.map((pm) => (
+                            <option key={pm} value={pm}>{pm}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="py-2 px-4">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={ruleForm.fixedFee ?? 0}
+                          onChange={(e) => setRuleForm({ ...ruleForm, fixedFee: parseFloat(e.target.value) || 0 })}
+                          className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary text-right focus:outline-none focus:border-primary"
+                        />
+                      </td>
+                      <td className="py-2 px-4">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="100"
+                          value={ruleForm.percentFee ?? 0}
+                          onChange={(e) => setRuleForm({ ...ruleForm, percentFee: parseFloat(e.target.value) || 0 })}
+                          className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary text-right focus:outline-none focus:border-primary"
+                        />
+                      </td>
+                      <td className="py-2 px-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={handleSaveRule}
+                            disabled={ruleSaving || !ruleForm.country}
+                            className="p-1.5 text-primary hover:bg-primary-dim rounded transition-colors disabled:opacity-40"
+                            title="Save"
+                          >
+                            {ruleSaving ? (
+                              <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
+                            ) : (
+                              <Save size={14} />
+                            )}
+                          </button>
+                          <button
+                            onClick={cancelRuleEdit}
+                            className="p-1.5 text-text-subtle hover:text-text-primary rounded transition-colors"
+                            title="Cancel"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  {rules.map((rule) => {
+                    const isEditing = editingRuleId === rule.id;
+                    return (
+                      <tr key={rule.id} className="border-b border-border last:border-0 hover:bg-card-alt/50 transition-colors">
+                        {isEditing ? (
+                          <>
+                            <td className="py-2 px-4">
+                              <input
+                                value={ruleForm.country || ""}
+                                onChange={(e) => setRuleForm({ ...ruleForm, country: e.target.value })}
+                                className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary focus:outline-none focus:border-primary"
+                              />
+                            </td>
+                            <td className="py-2 px-4">
+                              <select
+                                value={ruleForm.payoutMethod || "BANK"}
+                                onChange={(e) => setRuleForm({ ...ruleForm, payoutMethod: e.target.value })}
+                                className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary focus:outline-none focus:border-primary"
+                              >
+                                {PAYOUT_METHOD_OPTIONS.map((pm) => (
+                                  <option key={pm} value={pm}>{pm}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="py-2 px-4">
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={ruleForm.fixedFee ?? 0}
+                                onChange={(e) => setRuleForm({ ...ruleForm, fixedFee: parseFloat(e.target.value) || 0 })}
+                                className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary text-right focus:outline-none focus:border-primary"
+                              />
+                            </td>
+                            <td className="py-2 px-4">
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                max="100"
+                                value={ruleForm.percentFee ?? 0}
+                                onChange={(e) => setRuleForm({ ...ruleForm, percentFee: parseFloat(e.target.value) || 0 })}
+                                className="w-full bg-card-alt border border-border rounded px-2 py-1.5 text-sm text-text-primary text-right focus:outline-none focus:border-primary"
+                              />
+                            </td>
+                            <td className="py-2 px-4">
+                              <div className="flex items-center justify-end gap-1">
+                                <button
+                                  onClick={handleSaveRule}
+                                  disabled={ruleSaving || !ruleForm.country}
+                                  className="p-1.5 text-primary hover:bg-primary-dim rounded transition-colors disabled:opacity-40"
+                                  title="Save"
+                                >
+                                  {ruleSaving ? (
+                                    <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
+                                  ) : (
+                                    <Save size={14} />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={cancelRuleEdit}
+                                  className="p-1.5 text-text-subtle hover:text-text-primary rounded transition-colors"
+                                  title="Cancel"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="py-3 px-4 text-text-primary font-medium">{rule.country}</td>
+                            <td className="py-3 px-4">
+                              <Badge variant="info">{rule.payoutMethod}</Badge>
+                            </td>
+                            <td className="py-3 px-4 text-right text-text-primary">{rule.fixedFee.toFixed(2)}</td>
+                            <td className="py-3 px-4 text-right text-text-primary">{rule.percentFee}%</td>
+                            <td className="py-3 px-4">
+                              <div className="flex items-center justify-end gap-1">
+                                <button
+                                  onClick={() => startEditRule(rule)}
+                                  className="p-1.5 text-text-subtle hover:text-primary rounded transition-colors"
+                                  title="Edit"
+                                >
+                                  <Edit3 size={14} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteRule(rule.id)}
+                                  className="p-1.5 text-text-subtle hover:text-danger rounded transition-colors"
+                                  title="Delete"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
       </div>
     </div>
   );

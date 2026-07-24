@@ -524,3 +524,11 @@ export interface FeeConfig {
   updatedAt: string;
   createdAt: string;
 }
+
+export interface FeeRule {
+  id: string;
+  country: string;
+  payoutMethod: string;
+  fixedFee: number;
+  percentFee: number;
+}

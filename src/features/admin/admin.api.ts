@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, SystemRevenueData, AgentRevenueData, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, SolvencyReport, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer, TreasuryOfframpResult } from "./admin.types";
+import type { AdminDashboardData, AdminUser, PendingKycItem, ComplianceCaseItem, FailedPayoutItem, ExecutedPayoutItem, PayoutDetailItem, FraudAnalysis, AdminNotification, AdminPartner, PartnerSlaMetric, FeeConfig, FeeRule, SystemRevenueData, AgentRevenueData, SystemHealth, SystemMetrics, SystemStatus, TreasuryOverview, SolvencyReport, Agent, AgentDetail, AgentKpiItem, AdminUserItem, TransferItem, AuditLogItem, TreasuryOnrampInfo, TreasuryBankAccount, TreasuryOfframpOrder, TreasuryOnrampTransfer, TreasuryOfframpResult } from "./admin.types";
 
 export const AdminApi = {
   async getDashboard(): Promise<AdminDashboardData> {
@@ -312,6 +312,25 @@ export const AdminApi = {
   async updateFeeConfig(id: string, payload: Partial<FeeConfig>): Promise<FeeConfig> {
     const { data } = await api.put(`/admin/fees/${id}`, payload);
     return data;
+  },
+
+  async getFeeRules(): Promise<FeeRule[]> {
+    const { data } = await api.get("/admin/fees/rules");
+    return data;
+  },
+
+  async createFeeRule(payload: Omit<FeeRule, "id">): Promise<FeeRule> {
+    const { data } = await api.post("/admin/fees/rules", payload);
+    return data;
+  },
+
+  async updateFeeRule(id: string, payload: Partial<FeeRule>): Promise<FeeRule> {
+    const { data } = await api.put(`/admin/fees/rules/${id}`, payload);
+    return data;
+  },
+
+  async deleteFeeRule(id: string): Promise<void> {
+    await api.delete(`/admin/fees/rules/${id}`);
   },
 
   async getSystemRevenue(period: string = "day"): Promise<SystemRevenueData> {
